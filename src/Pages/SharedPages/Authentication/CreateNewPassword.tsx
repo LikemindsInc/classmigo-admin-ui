@@ -1,9 +1,8 @@
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { ButtonElement, InputElement } from "../../../Ui_elements";
+import { devices } from "../../../utils/mediaQueryBreakPoints";
 
 const CreateNewPassword = () => {
-  const navigate = useNavigate()
   return (
     <LoginBox>
       <h3>Create New Password</h3>
@@ -31,7 +30,7 @@ const LoginBox = styled.div`
     margin-bottom: 0.5rem;
   }
   p {
-    font-size: 1rem;
+    font-size: clamp(0.8rem, 5vw, 1rem);
   }
   > div {
     display: flex;
@@ -39,15 +38,7 @@ const LoginBox = styled.div`
     gap: 1rem;
     margin: 3rem 0;
   }
-`;
-
-const ResetPassword = styled.p`
-  color: var(--primary-color);
-  text-decoration: underline;
-  font-weight: 600;
-  margin-top: 0.5rem;
-  margin-bottom: 4rem;
-  :hover{
-    cursor: pointer;
+  @media ${devices.tablet}{
+    width: 100%;
   }
 `;

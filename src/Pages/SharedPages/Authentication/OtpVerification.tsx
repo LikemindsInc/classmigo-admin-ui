@@ -3,6 +3,7 @@ import OTPInput from "react-otp-input";
 import styled from "styled-components";
 import { ButtonElement, InputElement } from "../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
+import { devices } from "../../../utils/mediaQueryBreakPoints";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
@@ -58,6 +59,9 @@ const Container = styled.div`
     flex-direction: column;
     gap: 1rem;
     margin: 3rem 0;
+  }
+  @media ${devices.tablet} {
+    width: 100%;
   }
 `;
 
