@@ -13,17 +13,13 @@ export const AuthenticationLayout = ({ children }: LayoutProp) => {
   return (
     <Container>
       <CarouselContainer>
-        <CarouselBox autoplay dots={false} effect="fade">
+        <CarouselBox autoplay dots={false} effect="fade" autoplaySpeed={5000}>
           <CarouselElement color="var(--primary-color)">
             <div>
               <h6>
-                Classroom engagement through cognitive and critical thinking
+                Learn with video libraries covering the Nigeria academic
+                syllabus
               </h6>
-              <DotsContainer>
-                <div />
-                <div />
-                <div />
-              </DotsContainer>
             </div>
 
             <img src={OnBoard1} alt={"OnBoard1"} />
@@ -34,11 +30,6 @@ export const AuthenticationLayout = ({ children }: LayoutProp) => {
               <h6>
                 Classroom engagement through cognitive and critical thinking
               </h6>
-              <DotsContainer>
-                <div />
-                <div />
-                <div />
-              </DotsContainer>
             </div>
             <img src={OnBoard2} alt={"OnBoard2"} />
           </CarouselElement>
@@ -48,11 +39,6 @@ export const AuthenticationLayout = ({ children }: LayoutProp) => {
               <h6>
                 Improved learning with age and class-specific practice questions
               </h6>
-              <DotsContainer>
-                <div />
-                <div />
-                <div />
-              </DotsContainer>
             </div>
             <img src={OnBoard3} alt={"OnBoard3"} />
           </CarouselElement>
@@ -78,7 +64,7 @@ const Container = styled.main`
 const CarouselContainer = styled.aside`
   max-height: 100vh;
   width: 30%;
-  transition: all ease .3s;
+  transition: all ease 0.3s;
   @media ${devices.tabletL} {
     display: none !important;
   }
@@ -110,18 +96,7 @@ const CarouselElement = styled.div`
   h6 {
     width: 15rem;
     font-size: clamp(1rem, 1.3rem, 1.3rem);
-  }
-`;
-
-const DotsContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 2rem;
-  div {
-    width: 10px;
-    height: 10px;
-    background-color: black;
-    border-radius: 50%;
+    color: white;
   }
 `;
 

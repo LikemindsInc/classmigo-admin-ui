@@ -1,7 +1,7 @@
 import { useState } from "react";
 import OTPInput from "react-otp-input";
 import styled from "styled-components";
-import { ButtonElement, InputElement } from "../../../Ui_elements";
+import { ButtonElement} from "../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
 
