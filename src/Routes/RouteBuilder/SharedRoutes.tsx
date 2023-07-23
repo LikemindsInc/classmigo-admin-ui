@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthenticationLayout } from "../../Layouts/AuthenticationLayout";
+import { Loader } from "../../Ui_elements";
 
 const LazyLogin = lazy(
   () => import("../../Pages/SharedPages/Authentication/Login")
@@ -27,7 +28,7 @@ export const SharedRoutes = () => {
   const sharedRoutes: RouteConfig[] = [
     {
       path: "/",
-      element: <LazyLogin />,
+      element: <LazyLogin/>,
     },
     {
       path: "/signup",
@@ -55,7 +56,11 @@ export const SharedRoutes = () => {
           key={index}
           path={route.path}
           element={
-            <Suspense>
+            <Suspense
+              fallback={
+                <Loader/>
+              }
+            >
               <AuthenticationLayout>{route.element}</AuthenticationLayout>
             </Suspense>
           }
