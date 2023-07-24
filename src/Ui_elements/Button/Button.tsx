@@ -13,7 +13,7 @@ export const ButtonElement = ({ label, width, ...otherProps }: ButtonProp) => {
         style={{
             background: "var(--primary-color)",
             color: "white",
-            width: width || "fill",
+            width: width || "100%",
             height: "3rem",
             fontWeight:700
         }}

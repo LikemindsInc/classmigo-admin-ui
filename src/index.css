@@ -69,10 +69,10 @@ h6{
 }
 
 .input{
-  	border: 1px solid var(--primary-color);
+  border: 1px solid var(--primary-color);
 	border-radius: 10px;
-	height: 4.5rem;
-	width: 4.5rem !important;
+	height: clamp(2rem, 10vw, 4.5rem);
+	width: clamp(2rem, 10vw, 4.5rem) !important;
   font-size: 2rem;
 }
 .input:focus{
