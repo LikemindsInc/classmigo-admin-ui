@@ -49,7 +49,7 @@ export const AuthenticationLayout = ({ children }: LayoutProp) => {
           <Logo />
         </div>
 
-        {children}
+        <div>{children}</div>
       </LoginContainer>
     </Container>
   );
@@ -57,7 +57,7 @@ export const AuthenticationLayout = ({ children }: LayoutProp) => {
 
 const Container = styled.main`
   width: 100%;
-  max-height: 100vh !important;
+  height: 100vh !important;
   display: flex;
 `;
 
@@ -104,20 +104,18 @@ const LoginContainer = styled.section`
   padding: 6.25rem 0 0 6.25rem;
   width: 100% !important;
   height: 100vh !important;
-  /* background-color: red; */
 
   @media ${devices.tabletL} {
-    padding: 10% 5%;
+    padding: 0 !important;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
-    > div:first-child {
-      /* position: absolute;
-      top: 15%;
-      left: 50%;
-      transform: translateX(-50%); */
-    }
+  }
+  @media ${devices.nesthub}{
+    padding: 2rem 0 0 2rem;
+  }
+  @media ${devices.nesthubMax}{
+    padding: 3rem 0 0 3rem;
   }
 `;

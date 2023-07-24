@@ -10,7 +10,11 @@ const CreateNewPassword = () => {
 
       <div>
         <InputElement placeholder="Password" label="New Password" />
-        <InputElement placeholder="Password" label="Confirm New Password" type="password" />
+        <InputElement
+          placeholder="Password"
+          label="Confirm New Password"
+          type="password"
+        />
       </div>
       <ButtonElement type="primary" size="small" label="CONTINUE" />
     </LoginBox>
@@ -24,13 +28,13 @@ export default CreateNewPassword;
 const LoginBox = styled.div`
   margin-top: 14rem;
   width: 500px;
-  height: 500px;
+  height: fit-content;
   h3 {
-    font-size: clamp(1rem, 2rem, 2rem);
+    font-size: clamp(1.1rem, 5vw, 2rem);
     margin-bottom: 0.5rem;
   }
   p {
-    font-size: clamp(0.8rem, 5vw, 1rem);
+    font-size: clamp(0.8rem, 3vw, 1rem);
   }
   > div {
     display: flex;
@@ -38,7 +42,18 @@ const LoginBox = styled.div`
     gap: 1rem;
     margin: 3rem 0;
   }
-  @media ${devices.tablet}{
-    width: 100%;
+  @media ${devices.tablet} {
+    width: 25rem;
+    margin-top: 3rem;
+  }
+  @media ${devices.mobileXS} {
+    width: 10rem;
+    margin-top: 3rem;
+  }
+  @media ${devices.nesthub} {
+    margin-top: 2% !important;
+  }
+  @media ${devices.nesthubMax} {
+    margin-top: 15% !important;
   }
 `;

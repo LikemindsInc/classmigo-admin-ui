@@ -1,7 +1,7 @@
 import { useState } from "react";
 import OTPInput from "react-otp-input";
 import styled from "styled-components";
-import { ButtonElement} from "../../../Ui_elements";
+import { ButtonElement } from "../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
 
@@ -45,14 +45,14 @@ export default OtpVerification;
 
 const Container = styled.div`
   margin-top: 14rem;
-  width: 500px;
-  height: 500px;
+  width: fit-content !important;
+  height: fit-content !important;
   h3 {
-    font-size: clamp(1rem, 2rem, 2rem);
+    font-size: clamp(1.1rem, 5vw, 2rem);
     margin-bottom: 0.5rem;
   }
   p {
-    font-size: 1rem;
+    font-size: clamp(0.8rem, 3vw, 1rem);
   }
   > div {
     display: flex;
@@ -61,7 +61,19 @@ const Container = styled.div`
     margin: 3rem 0;
   }
   @media ${devices.tablet} {
-    width: 100%;
+    width: 18rem;
+    margin-top: 3rem;
+    padding: 0 10%;
+  }
+  @media ${devices.mobileXS} {
+    width: 10rem;
+    margin-top: 3rem;
+  }
+  @media ${devices.nesthub} {
+    margin-top: 2% !important;
+  }
+  @media ${devices.nesthubMax} {
+    margin-top: 15% !important;
   }
 `;
 
