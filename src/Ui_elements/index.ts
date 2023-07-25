@@ -1,3 +1,5 @@
 export * from "./Input/Input"
 export * from "./Button/Button"
 export * from "./Loader/Loader"
+export * from "./SidebarMenuItem/SideBarMenuItem"
+export * from "./Select/Select"

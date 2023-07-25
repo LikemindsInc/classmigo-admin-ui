@@ -1,7 +1,9 @@
 import React from 'react'
 
-export const Parents = () => {
+const Parents = () => {
   return (
     <div>Parents</div>
   )
 }
+
+export default Parents
