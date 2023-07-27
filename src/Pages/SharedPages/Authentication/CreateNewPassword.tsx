@@ -16,7 +16,7 @@ const CreateNewPassword = () => {
           type="password"
         />
       </div>
-      <ButtonElement type="primary" size="small" label="CONTINUE" />
+      <ButtonElement label="CONTINUE" />
     </LoginBox>
   );
 };

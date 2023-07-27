@@ -12,11 +12,12 @@ export const SelectInput = ({
   options,
   onChange,
   defaultValue,
+  width
 }: SelectProps) => {
   return (
     <SelectElement
       defaultValue={defaultValue}
-      style={{ width: 120 }}
+      style={{ width: width || 120 }}
       onChange={onChange}
       options={options}
     />
@@ -24,7 +25,6 @@ export const SelectInput = ({
 };
 
 const SelectElement = styled(Select)`
-  width: 100%;
   .ant-select-selector{
     border-color: var(--primary-color) !important;
     background-color: transparent !important;

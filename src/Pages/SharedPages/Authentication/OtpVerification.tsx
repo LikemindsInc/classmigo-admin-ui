@@ -29,7 +29,6 @@ const OtpVerification = () => {
       </div>
       <div>
         <ButtonElement
-          type="primary"
           label="CONTINUE"
           onClick={() => navigate("/create_new_password")}
         />
