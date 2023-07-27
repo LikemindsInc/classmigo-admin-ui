@@ -1,20 +1,15 @@
+import { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
-import {
-  ButtonElement,
-  InputElement,
-  SearchInput,
-  SelectInput,
-} from "../../../../../Ui_elements";
-import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
 import { Drawer, Switch } from "antd";
-import { columns, data } from "../../../../../utils/dummyDataStudents";
-import { useContext, useEffect } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
+import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
+import { ButtonElement, InputElement, SearchInput } from "../../../../../Ui_elements";
+import { columns, data } from "../../../../../utils/dummyDataParents";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
-const Students = () => {
-  const handleSearchFilter = (value: string) => {};
-  //drawer handler
+
+const Parents = () => {
+
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
 
   useEffect(() => {
@@ -24,6 +19,7 @@ const Students = () => {
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
   };
+
 
   const headerStyle = {
     color: "gray",
@@ -38,20 +34,15 @@ const Students = () => {
         updatedColumn.width = 400;
         break;
       case "phoneNumber":
-        updatedColumn.width = 200;
-        break;
-      case "subscription":
-        updatedColumn.width = 150;
+        updatedColumn.width = 300;
         break;
       case "status":
         updatedColumn.width = 150;
         break;
-      case "username":
-        updatedColumn.width = 150;
+      case "email":
+        updatedColumn.width = 300;
         break;
-      case "class":
-        updatedColumn.width = 100;
-        break;
+
       default:
         break;
     }
@@ -60,103 +51,11 @@ const Students = () => {
     return updatedColumn;
   });
 
-  const classOptions = [
-    {
-      value: 0,
-      label: "Primary 1",
-    },
-    {
-      value: 1,
-      label: "Primary 2",
-    },
-    {
-      value: 2,
-      label: "Primary 3",
-    },
-    {
-      value: 3,
-      label: "Primary 4",
-    },
-    {
-      value: 4,
-      label: "Primary 5",
-    },
-    {
-      value: 5,
-      label: "Primary 6",
-    },
-    {
-      value: 6,
-      label: "Primary 2",
-    },
-    {
-      value: 7,
-      label: "JSS1",
-    },
-    {
-      value: 8,
-      label: "JSS2",
-    },
-    {
-      value: 9,
-      label: "JSS3",
-    },
-    {
-      value: 10,
-      label: "SS1",
-    },
-    {
-      value: 11,
-      label: "SS2",
-    },
-    {
-      value: 12,
-      label: "SS3",
-    },
-  ];
-
-  const statusOptions = [
-    {
-      value: 0,
-      label: "Verified",
-    },
-    {
-      value: 1,
-      label: "Unverified",
-    },
-  ];
-
-  const subscribeOptions = [
-    {
-      value: 0,
-      label: "Subscribed",
-    },
-    {
-      value: 1,
-      label: "Unsubscribed",
-    },
-  ];
   return (
     <Container>
       <UtilsHolder>
         <div>
           <SearchInput />
-          <SelectInput
-            options={classOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Class"
-          />
-          <SelectInput
-            options={statusOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Status"
-          />
-          <SelectInput
-            options={subscribeOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Subscription"
-            width={150}
-          />
           <h6>2,500 Results</h6>
         </div>
         <button>
@@ -165,6 +64,8 @@ const Students = () => {
         </button>
       </UtilsHolder>
       <TableElement columns={updatedColumns} data={data} />
+     
+      
       <Drawer
         placement="right"
         onClose={() => setOpenDrawer(false)}
@@ -193,6 +94,10 @@ const Students = () => {
             </div>
             <div>
               <InputElement placeholder="08000000000" label="Phone number" />
+              <ButtonElement label={"Update"} outline width={84} />
+            </div>
+            <div>
+              <InputElement placeholder="johnchuka87@gmail.com" label="Email" />
               <ButtonElement label={"Update"} outline width={84} />
             </div>
           </UpdateDetails>
@@ -224,18 +129,26 @@ const Students = () => {
             </div>
             <div>
               <h4>Verification</h4>
-              <SwitchContainer>
-                <p>Unverified</p>
-                <Switch defaultChecked onChange={onChange} />
-              </SwitchContainer>
+              <Switch
+                defaultChecked
+                onChange={onChange}
+              />
             </div>
 
-            <ParentContainer>
-              <h4>Parent</h4>
+            <StudentContainer>
+              <h4>Student</h4>
               <h5>John Chukwuemeka</h5>
               <p>0808994637</p>
               <ButtonElement outline width={84} label={"Unlink"} />
-            </ParentContainer>
+            </StudentContainer>
+
+            <StudentContainer>
+              <h4>Student</h4>
+              <h5>John Chukwuemeka</h5>
+              <p>0808994637</p>
+              <ButtonElement outline width={84} label={"Unlink"} />
+            </StudentContainer>
+
           </Details>
         </DrawerContentContainer>
       </Drawer>
@@ -243,7 +156,8 @@ const Students = () => {
   );
 };
 
-export default Students;
+export default Parents;
+
 
 const Container = styled.section`
   width: 100%;
@@ -332,7 +246,7 @@ const UpdateDetails = styled.div`
 
 const Details = styled.div`
   > div {
-    margin-top: 2rem;
+        margin-top: 2rem;
     h6 {
       font-weight: 600;
       font-size: 0.9rem;
@@ -342,33 +256,26 @@ const Details = styled.div`
     }
   }
 
-  h4 {
+  h4{
     margin-bottom: 0.6rem;
   }
 
-  > div:first-child {
-    div {
+  >div:first-child{
+    div{
       margin-top: 1rem;
     }
   }
 `;
 
-const ParentContainer = styled.div`
+
+const StudentContainer = styled.div`
   margin-top: 2rem;
 
-  h5 {
+  h5{
     margin-bottom: 0.6rem;
   }
 
-  p {
+  p{
     margin-bottom: 1rem;
   }
-`;
-
-const SwitchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap:10px;
-
-  
 `
