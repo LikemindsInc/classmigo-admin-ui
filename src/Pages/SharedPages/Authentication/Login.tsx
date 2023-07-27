@@ -16,7 +16,7 @@ const Login = () => {
       </div>
 
       <ResetPassword onClick={()=>navigate("/forgot_password")}>Forgot Password?</ResetPassword>
-      <ButtonElement type="primary" size="large" label="LOGIN" />
+      <ButtonElement label="LOGIN" />
     </LoginBox>
   );
 };

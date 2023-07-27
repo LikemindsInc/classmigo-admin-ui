@@ -13,7 +13,6 @@ const ForgotPassword = () => {
         <InputElement placeholder="email@classmigo.com" label="Email" />
       </div>
       <ButtonElement
-        type="primary"
         label="CONTINUE"
         onClick={() => navigate("/otp_verification")}
       />

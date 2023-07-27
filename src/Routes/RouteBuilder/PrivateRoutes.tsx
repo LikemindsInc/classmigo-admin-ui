@@ -11,7 +11,7 @@ const LazyHome = lazy(
 
 //user menu routes
 const LazyStudents = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Users/Students")
+  () => import("../../Pages/PrivatePages/Dashboard/Users/Students/Students")
 );
 const LazyParents = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Users/Parents")

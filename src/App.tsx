@@ -1,7 +1,8 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { SharedRoutes, PrivateRoutes } from "./Routes";
+import {PrivateRoutes } from "./Routes";
 import { ThemeProvider, createTheme } from "@mui/material";
+import { DrawerContextProvider } from "./Contexts/Providers/DrawerContextProvider";
 
 function App() {
   const customTheme = createTheme({
@@ -23,7 +24,9 @@ function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <ThemeProvider theme={customTheme}>
-        <PrivateRoutes />
+        <DrawerContextProvider>
+          <PrivateRoutes />
+        </DrawerContextProvider>
       </ThemeProvider>
     </LocalizationProvider>
   );

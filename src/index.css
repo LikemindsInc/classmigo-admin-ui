@@ -26,9 +26,9 @@ code {
   --primary-color: #7B31B2;
   --yellow:#FFC000;
   --green:#00AC3E;
-  --hover-color: background: #F5E9FF;;
+  --hover-color: background: #F5E9FF;
   --dashboardBackground:#F5F5F5;
-
+  --text-color:#343434;
 }
 
 
@@ -54,6 +54,7 @@ select
 {
   font-family: 'Inter', sans-serif;
   font-size: clamp(0.8rem, 1rem, 1rem);
+  color: var(--text-color);
 }
 
 h1{

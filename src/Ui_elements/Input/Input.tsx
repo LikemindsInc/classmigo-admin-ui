@@ -1,4 +1,3 @@
-import React from "react";
 import { styled } from "styled-components";
 import { Input } from "antd";
 
@@ -32,7 +31,7 @@ const TextInput = styled(Input)`
   width: fill;
   border-color: var(--primary-color);
   border-width: 1px;
-  padding: clamp(0.8rem, 1rem, 1rem);
+  padding: clamp(0.5rem, 30vw, 1rem);
   :hover {
     border-width: 2px;
     border-color: var(--primary-color);
