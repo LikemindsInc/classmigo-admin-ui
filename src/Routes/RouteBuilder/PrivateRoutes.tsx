@@ -14,7 +14,7 @@ const LazyStudents = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Users/Students/Students")
 );
 const LazyParents = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Users/Parents")
+  () => import("../../Pages/PrivatePages/Dashboard/Users/Parents/Parents")
 );
 const LazyPayments = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Users/Payments")
