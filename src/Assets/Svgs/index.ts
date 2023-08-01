@@ -15,7 +15,15 @@ import { ReactComponent as GreenIcon } from '../Svgs/DashboardIcons/green-arrow.
 import { ReactComponent as RedIcon } from '../Svgs/DashboardIcons/red-arrow.svg';
 import { ReactComponent as ExportIcon } from '../Svgs/DashboardIcons/export.svg';
 import { ReactComponent as MoreIcon} from '../Svgs/DashboardIcons/more.svg';
-import { ReactComponent as CancelIcon} from '../Svgs/DashboardIcons/cancel.svg';
+import { ReactComponent as CancelIcon } from '../Svgs/DashboardIcons/cancel.svg';
+import { ReactComponent as PlayIcon } from '../Svgs/DashboardIcons/play.svg';
+import { ReactComponent as PauseIcon } from '../Svgs/DashboardIcons/pause.svg';
+import { ReactComponent as SendIcon } from '../Svgs/DashboardIcons/send.svg';
+import { ReactComponent as SendFileIcon} from '../Svgs/DashboardIcons/fileSend.svg';
+
+
+
+
 
 
 export {
@@ -34,5 +42,9 @@ export {
     RedIcon,
     ExportIcon,
     MoreIcon,
-    CancelIcon
+    CancelIcon,
+    PlayIcon,
+    PauseIcon,
+    SendIcon,
+    SendFileIcon
 }

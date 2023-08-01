@@ -1,13 +1,11 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import { AuthenticationLayout } from "../../Layouts/AuthenticationLayout";
 import { Loader } from "../../Ui_elements";
 import { DashboardLayout } from "../../Layouts/DashboardLayout/DashboardLayout";
 
 const LazyHome = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Home/Home")
 );
-
 
 //user menu routes
 const LazyStudents = lazy(
@@ -17,9 +15,8 @@ const LazyParents = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Users/Parents/Parents")
 );
 const LazyPayments = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Users/Payments")
+  () => import("../../Pages/PrivatePages/Dashboard/Users/Payments/Payments")
 );
-
 
 //Lessons Menu routes
 const LazyLessonCriteria = lazy(
@@ -41,16 +38,17 @@ const LazyScheduleLiveLessons = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Lessons/ScheduleLessons")
 );
 
-
 //Extras Menu Routes
 const LazyAssignmentHelp = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Extras/AssignmentHelp")
+  () => import("../../Pages/PrivatePages/Dashboard/Extras/AssignmentHelp/AssignmentHelp")
 );
 const LazyGeneralKnowledge = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge")
 );
 
-
+const LazyChat = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Chat/Chat")
+);
 
 export const PrivateRoutes = () => {
   interface RouteConfig {
@@ -61,11 +59,11 @@ export const PrivateRoutes = () => {
   const privateRoutes: RouteConfig[] = [
     {
       path: "/",
-      element: <LazyHome/>,
+      element: <LazyHome />,
     },
     {
       path: "/students",
-      element: <LazyStudents/>,
+      element: <LazyStudents />,
     },
     {
       path: "/parents",
@@ -73,17 +71,17 @@ export const PrivateRoutes = () => {
     },
     {
       path: "/payments",
-      element: <LazyPayments/>,
+      element: <LazyPayments />,
     },
 
     //lesson routes
     {
       path: "/lessons_criteria",
-      element: <LazyLessonCriteria/>,
+      element: <LazyLessonCriteria />,
     },
     {
       path: "/video_library",
-      element: <LazyVideoLibrary/>,
+      element: <LazyVideoLibrary />,
     },
     {
       path: "/quiz_library",
@@ -91,12 +89,12 @@ export const PrivateRoutes = () => {
     },
     {
       path: "/schedule_lessons",
-      element: <LazyScheduleLessons/>,
+      element: <LazyScheduleLessons />,
     },
 
     {
       path: "/ask_the_teacher",
-      element: <LazyAskTheTeacher/>,
+      element: <LazyAskTheTeacher />,
     },
     {
       path: "/live_lessons",
@@ -104,13 +102,18 @@ export const PrivateRoutes = () => {
     },
     {
       path: "/assignment_help",
-      element: <LazyAssignmentHelp/>,
+      element: <LazyAssignmentHelp />,
     },
     {
       path: "/general_knowledge",
-      element: <LazyGeneralKnowledge/>,
+      element: <LazyGeneralKnowledge />,
+    },
+    {
+      path: "/assignment_help/:topic/discussion",
+      element: <LazyChat />,
     },
   ];
+
 
   return (
     <Routes>
@@ -119,13 +122,9 @@ export const PrivateRoutes = () => {
           key={index}
           path={route.path}
           element={
-            <Suspense
-              fallback={
-                <Loader/>
-              }
-            >
-              <DashboardLayout>{route.element}</DashboardLayout>
-            </Suspense>
+            <DashboardLayout>
+              <Suspense fallback={<Loader />}>{route.element}</Suspense>
+            </DashboardLayout>
           }
         />
       ))}
