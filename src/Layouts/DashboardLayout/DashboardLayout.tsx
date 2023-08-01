@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { styled } from 'styled-components'
 import { DashboardSidebar } from './components/DashboardSidebar'
 import { DashboardNavbar } from './components/DashboardNavbar'

@@ -5,7 +5,7 @@ import { devices } from "../../../../utils/mediaQueryBreakPoints";
 const Home = () => {
   return (
     <Container>
-      <ScrollCap><p>Top</p></ScrollCap>
+      <ScrollCap><p>{" "}</p></ScrollCap>
       <CardContainer>
         <Card value={"250,000"} description="Students Registered" />
         <Card value={"100,000"} description="Parents Registered" />

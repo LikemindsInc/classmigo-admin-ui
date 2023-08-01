@@ -1,10 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 interface ButtonProp {
-  label: React.ReactNode; // Use React.ReactNode for better type safety
+  label: React.ReactNode;
   width?: number;
   outline?: boolean;
+  icon?: any;
   onClick?: () => void;
 }
 
@@ -13,16 +14,27 @@ interface StyledButtonProps {
   outline?: boolean;
 }
 
-export const ButtonElement: React.FC<ButtonProp> = ({ label, width, outline, ...otherProps }) => {
+export const ButtonElement: React.FC<ButtonProp> = ({
+  label,
+  width,
+  outline,
+  icon,
+  ...otherProps
+}) => {
   return (
     <Button width={width} outline={outline} {...otherProps}>
       {label}
+      {icon && <div>{icon}</div>}
     </Button>
   );
 };
 
 const Button = styled.button<StyledButtonProps>`
-  background-color: ${({ outline }) => (outline ? "transparent" : "var(--primary-color)")};
+  display: flex;
+  align-items: center !important;
+  gap: 1rem;
+  background-color: ${({ outline }) =>
+    outline ? "transparent" : "var(--primary-color)"};
   color: ${({ outline }) => (outline ? "var(--primary-color)" : "white")};
   font-weight: 700;
   padding: ${({ outline }) => (outline ? "0.6rem 0.8rem" : "0.8rem")};
@@ -32,6 +44,7 @@ const Button = styled.button<StyledButtonProps>`
   width: ${({ width }) => (width ? width + "px" : "100%")};
   border-radius: 6px;
   outline: none;
-  border: ${({ outline }) => (outline ? "1px solid var(--primary-color)" : "none")};
+  border: ${({ outline }) =>
+    outline ? "1px solid var(--primary-color)" : "none"};
   cursor: pointer;
 `;

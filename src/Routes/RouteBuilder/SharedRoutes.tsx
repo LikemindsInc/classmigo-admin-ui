@@ -46,7 +46,6 @@ export const SharedRoutes = () => {
       path: "/create_new_password",
       element: <LazyCreateNewPassword />,
     },
-    // Add more routes as needed
   ];
 
   return (
