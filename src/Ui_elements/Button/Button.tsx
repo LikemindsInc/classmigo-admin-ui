@@ -1,11 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-
+import { Spinner } from "../Spinner/Spinner";
 interface ButtonProp {
   label: React.ReactNode;
   width?: number;
   outline?: boolean;
   icon?: any;
+  type?: "submit" | "button" | "reset";
+  isLoading?: boolean;
   onClick?: () => void;
 }
 
@@ -19,12 +21,20 @@ export const ButtonElement: React.FC<ButtonProp> = ({
   width,
   outline,
   icon,
+  type,
+  isLoading,
   ...otherProps
 }) => {
   return (
-    <Button width={width} outline={outline} {...otherProps}>
-      {label}
-      {icon && <div>{icon}</div>}
+    <Button width={width} outline={outline} {...otherProps} type={type}>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          {label}
+          {icon && <div>{icon}</div>}
+        </>
+      )}
     </Button>
   );
 };

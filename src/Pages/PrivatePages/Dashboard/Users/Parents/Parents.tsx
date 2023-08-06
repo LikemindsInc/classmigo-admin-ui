@@ -4,12 +4,15 @@ import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Drawer, Switch } from "antd";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
-import { ButtonElement, InputElement, SearchInput } from "../../../../../Ui_elements";
+import {
+  ButtonElement,
+  InputElement,
+  SearchInput,
+} from "../../../../../Ui_elements";
 import { columns, data } from "../../../../../utils/dummyDataParents";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
 
 const Parents = () => {
-
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
 
   useEffect(() => {
@@ -19,7 +22,6 @@ const Parents = () => {
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
   };
-
 
   const headerStyle = {
     color: "gray",
@@ -31,16 +33,16 @@ const Parents = () => {
 
     switch (column.dataIndex) {
       case "name":
-        updatedColumn.width = 400;
+        updatedColumn.width = "25%";
         break;
       case "phoneNumber":
-        updatedColumn.width = 300;
+        updatedColumn.width = "25%";
         break;
       case "status":
-        updatedColumn.width = 150;
+        updatedColumn.width = "25%";
         break;
       case "email":
-        updatedColumn.width = 300;
+        updatedColumn.width = "25%";
         break;
 
       default:
@@ -64,8 +66,7 @@ const Parents = () => {
         </button>
       </UtilsHolder>
       <TableElement columns={updatedColumns} data={data} />
-     
-      
+
       <Drawer
         placement="right"
         onClose={() => setOpenDrawer(false)}
@@ -129,10 +130,7 @@ const Parents = () => {
             </div>
             <div>
               <h4>Verification</h4>
-              <Switch
-                defaultChecked
-                onChange={onChange}
-              />
+              <Switch defaultChecked onChange={onChange} />
             </div>
 
             <StudentContainer>
@@ -148,7 +146,6 @@ const Parents = () => {
               <p>0808994637</p>
               <ButtonElement outline width={84} label={"Unlink"} />
             </StudentContainer>
-
           </Details>
         </DrawerContentContainer>
       </Drawer>
@@ -157,7 +154,6 @@ const Parents = () => {
 };
 
 export default Parents;
-
 
 const Container = styled.section`
   width: 100%;
@@ -179,17 +175,34 @@ const Container = styled.section`
 const UtilsHolder = styled.div`
   display: flex;
   margin-top: 3rem;
-  width: 100%;
+  width: auto;
   align-items: center;
   justify-content: space-between;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
+    width: 50%;
+
+    @media ${devices.tabletL} {
+      flex-direction: column;
+      align-self: center;
+      width: 100%;
+    }
 
     h6 {
-      font-size: 1rem;
+      font-size: clamp(1rem, 1vw, 1rem);
       font-weight: 700;
+      width: 100%;
+
+      @media ${devices.tabletL} {
+        text-align: center;
+      }
     }
   }
   button {
@@ -205,6 +218,9 @@ const UtilsHolder = styled.div`
     gap: 0.5rem;
     font-weight: 700;
     cursor: pointer;
+    @media ${devices.tabletL} {
+      margin-top: 5%;
+    }
   }
 `;
 
@@ -246,7 +262,7 @@ const UpdateDetails = styled.div`
 
 const Details = styled.div`
   > div {
-        margin-top: 2rem;
+    margin-top: 2rem;
     h6 {
       font-weight: 600;
       font-size: 0.9rem;
@@ -256,26 +272,25 @@ const Details = styled.div`
     }
   }
 
-  h4{
+  h4 {
     margin-bottom: 0.6rem;
   }
 
-  >div:first-child{
-    div{
+  > div:first-child {
+    div {
       margin-top: 1rem;
     }
   }
 `;
 
-
 const StudentContainer = styled.div`
   margin-top: 2rem;
 
-  h5{
+  h5 {
     margin-bottom: 0.6rem;
   }
 
-  p{
+  p {
     margin-bottom: 1rem;
   }
-`
+`;

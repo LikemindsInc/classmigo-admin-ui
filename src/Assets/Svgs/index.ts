@@ -19,9 +19,15 @@ import { ReactComponent as CancelIcon } from '../Svgs/DashboardIcons/cancel.svg'
 import { ReactComponent as PlayIcon } from '../Svgs/DashboardIcons/play.svg';
 import { ReactComponent as PauseIcon } from '../Svgs/DashboardIcons/pause.svg';
 import { ReactComponent as SendIcon } from '../Svgs/DashboardIcons/send.svg';
-import { ReactComponent as SendFileIcon} from '../Svgs/DashboardIcons/fileSend.svg';
-
-
+import { ReactComponent as SendFileIcon } from '../Svgs/DashboardIcons/fileSend.svg';
+import { ReactComponent as CsvIcon } from '../Svgs/DashboardIcons/csvIcon.svg';
+import { ReactComponent as AddIcon } from '../Svgs/DashboardIcons/addIcon.svg';
+import { ReactComponent as UploadTick } from '../Svgs/DashboardIcons/uploadTick.svg';
+import { ReactComponent as Placeholder } from '../Svgs/DashboardIcons/placeholder.svg';
+import { ReactComponent as EditIcon } from '../Svgs/DashboardIcons/edit.svg';
+import { ReactComponent as DeleteIcon } from '../Svgs/DashboardIcons/delete.svg';
+import { ReactComponent as UploadIcon } from '../Svgs/DashboardIcons/upload.svg';
+import { ReactComponent as ErrorIcon} from '../Svgs/DashboardIcons/error.svg';
 
 
 
@@ -46,5 +52,13 @@ export {
     PlayIcon,
     PauseIcon,
     SendIcon,
-    SendFileIcon
+    SendFileIcon,
+    CsvIcon,
+    AddIcon,
+    UploadTick,
+    Placeholder,
+    EditIcon,
+    DeleteIcon,
+    UploadIcon,
+    ErrorIcon
 }

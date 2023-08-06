@@ -10,9 +10,10 @@ export const TableElement = ({ columns, data }: TableProps) => {
     <Table
       sortDirections={["ascend"]}
       size="large"
-      sticky={true}
+      // sticky={true}
       columns={columns}
       dataSource={data}
+      scroll={{x:"max-content"}}
     />
   );
 };

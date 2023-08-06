@@ -43,11 +43,15 @@ const LazyAssignmentHelp = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Extras/AssignmentHelp/AssignmentHelp")
 );
 const LazyGeneralKnowledge = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge")
+  () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/GeneralKnowledge")
 );
 
 const LazyChat = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Chat/Chat")
+);
+
+const LazyAddQuestion = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion/AddQuestion")
 );
 
 export const PrivateRoutes = () => {
@@ -107,6 +111,10 @@ export const PrivateRoutes = () => {
     {
       path: "/general_knowledge",
       element: <LazyGeneralKnowledge />,
+    },
+    {
+      path: "/general_knowledge/add_question",
+      element: <LazyAddQuestion />,
     },
     {
       path: "/assignment_help/:topic/discussion",

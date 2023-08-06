@@ -2,22 +2,30 @@ import React from "react";
 import { Modal } from "antd";
 import { useContext } from "react";
 import { ModalContext } from "../../Contexts/Contexts";
+import styled from "styled-components";
 
 interface ModalProps {
   children: any;
+  width?: string | number
   cancel:()=>void
 }
 
-export const CenteredDialog = ({ children, cancel }: ModalProps) => {
+export const CenteredDialog = ({ children,width, cancel }: ModalProps) => {
   const { openModal } = useContext(ModalContext);
   return (
-    <Modal
+    <StyledModal
       centered
       open={openModal}
-      width={"80%"}
+      width={width}
       onCancel={cancel}
     >
       {children}
-    </Modal>
+    </StyledModal>
   );
 };
+
+const StyledModal = styled(Modal)`
+  .ant-modal-footer{
+    display: none !important;
+  }
+`

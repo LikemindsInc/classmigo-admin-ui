@@ -2,7 +2,11 @@ import { Divider, Timeline } from "antd";
 import React, { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { ExportIcon } from "../../../../../Assets/Svgs";
-import { SearchInput } from "../../../../../Ui_elements";
+import {
+  DatePickerInput,
+  SearchInput,
+  SelectInput,
+} from "../../../../../Ui_elements";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { columns, data } from "../../../../../utils/dummyDataPayments";
@@ -10,7 +14,7 @@ import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 
 const Payments = () => {
-  const {setOpenModal} = useContext(ModalContext)
+  const { setOpenModal } = useContext(ModalContext);
   const headerStyle = {
     color: "gray",
     fontSize: "12px",
@@ -21,15 +25,23 @@ const Payments = () => {
 
     switch (column.dataIndex) {
       case "name":
-        updatedColumn.width = 300;
+        updatedColumn.width = "30%";
         break;
       case "username":
-        updatedColumn.width = 200;
+        updatedColumn.width = "15%";
         break;
       case "datePurchased":
-        updatedColumn.width = 200;
+        updatedColumn.width = "15%";
         break;
-
+      case "class":
+        updatedColumn.width = "10%";
+        break;
+      case "plan":
+        updatedColumn.width = "10%";
+        break;
+      case "amount":
+        updatedColumn.width = "15%";
+        break;
       default:
         break;
     }
@@ -38,29 +50,112 @@ const Payments = () => {
     return updatedColumn;
   });
 
+  const classOptions = [
+    {
+      value: 0,
+      label: "Primary 1",
+    },
+    {
+      value: 1,
+      label: "Primary 2",
+    },
+    {
+      value: 2,
+      label: "Primary 3",
+    },
+    {
+      value: 3,
+      label: "Primary 4",
+    },
+    {
+      value: 4,
+      label: "Primary 5",
+    },
+    {
+      value: 5,
+      label: "Primary 6",
+    },
+    {
+      value: 6,
+      label: "Primary 2",
+    },
+    {
+      value: 7,
+      label: "JSS1",
+    },
+    {
+      value: 8,
+      label: "JSS2",
+    },
+    {
+      value: 9,
+      label: "JSS3",
+    },
+    {
+      value: 10,
+      label: "SS1",
+    },
+    {
+      value: 11,
+      label: "SS2",
+    },
+    {
+      value: 12,
+      label: "SS3",
+    },
+  ];
+
+  const planOptions = [
+    {
+      value: 0,
+      label: "1 Month",
+    },
+    {
+      value: 1,
+      label: "2 Months",
+    },
+    {
+      value: 2,
+      label: "3 Months",
+    },
+  ];
+
+  const handleSearchFilter = (value: string) => {};
+
   const handleOk = () => {
-    setOpenModal(false)
-  }
+    setOpenModal(false);
+  };
   const handleCancel = () => {
-    setOpenModal(false)
-  }
+    setOpenModal(false);
+  };
 
   return (
     <Container>
       <UtilsHolder>
         <div>
           <SearchInput />
+          <SelectInput
+            options={classOptions}
+            onChange={handleSearchFilter}
+            defaultValue="Class"
+            width={200}
+          />
+          <SelectInput
+            options={planOptions}
+            onChange={handleSearchFilter}
+            defaultValue="Status"
+            width={200}
+          />
+          <DatePickerInput width={400} label={"Sort By Date"} />
           <h6>2,500 Results</h6>
         </div>
-        <button>
+        <Button>
           Export
           <ExportIcon />
-        </button>
+        </Button>
       </UtilsHolder>
       <TableElement columns={updatedColumns} data={data} />
-      <Modal
-        cancel={handleCancel}
-      >
+      <Modal cancel={handleCancel} width={"80%"}>
         <TransactionHeader>
           <p>
             Transaction <span>&gt;</span> 841951890
@@ -163,32 +258,34 @@ const Container = styled.section`
 const UtilsHolder = styled.div`
   display: flex;
   margin-top: 3rem;
-  width: 100%;
+  width: auto;
   align-items: center;
   justify-content: space-between;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
+    width:80%;
+
+    @media ${devices.tabletL} {
+      flex-direction: column;
+      align-self: center;
+      width: 100%;
+    }
 
     h6 {
-      font-size: 1rem;
+      font-size: clamp(1rem, 1vw, 1rem);
       font-weight: 700;
+      width: 100%;
+      @media ${devices.tabletL} {
+        text-align: center;
+      }
     }
-  }
-  button {
-    background-color: var(--primary-color);
-    padding: 0.6rem;
-    color: white;
-    display: flex;
-    font-size: 0.8rem;
-    outline: none;
-    border: none;
-    border-radius: 12px;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    cursor: pointer;
   }
 `;
 
@@ -239,8 +336,26 @@ const ReceiptElements = styled.div`
 `;
 
 const ReceiptTimeline = styled.div`
-  flex:0.4;
+  flex: 0.4;
   display: flex;
   flex-direction: column;
   align-items: center;
-`
+`;
+
+const Button = styled.button`
+  background-color: var(--primary-color);
+  padding: 0.6rem;
+  color: white;
+  display: flex;
+  font-size: 0.8rem;
+  outline: none;
+  border: none;
+  border-radius: 12px;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  @media ${devices.tabletL} {
+    margin-top: 5%;
+  }
+`;
