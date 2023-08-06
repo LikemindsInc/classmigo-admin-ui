@@ -15,7 +15,7 @@ export const Card = ({ value, description }: CardProps) => {
 };
 
 const Container = styled.div`
-  width: clamp(10rem, 50vw, 23rem);
+  width: auto;
   height: clamp(5rem, 50vh, 10rem);
   background: var(--dashboardBackground);
   padding-left: 2rem;
@@ -25,22 +25,24 @@ const Container = styled.div`
   justify-content: flex-end;
   border-radius: 12px;
   transition: all ease 0.3s;
-  @media ${devices.tablet} {
+  @media ${devices.tabletL} {
     width: 100%;
+    padding: 0.4rem;
   }
   &:hover {
     p,
     h3 {
       color: white;
+      transition: all ease 0.3s;
     }
     background: var(--primary-color);
   }
 
   h3 {
-    font-size: clamp(1.2rem, 30vw, 3rem);
+    font-size: clamp(2rem, 3vw, 3rem);
     font-weight: 700;
   }
   p {
-    font-size: clamp(0.8rem, 30vw, 0.9rem);
+    font-size: clamp(0.8rem, 1vw, 0.9rem);
   }
 `;

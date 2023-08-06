@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 import { styled } from 'styled-components'
 import { DashboardSidebar } from './components/DashboardSidebar'
 import { DashboardNavbar } from './components/DashboardNavbar'
+import { devices } from '../../utils/mediaQueryBreakPoints'
 
 interface DashboardProp{
     children: ReactNode
@@ -28,6 +29,7 @@ const Container = styled.div`
   width: 100%;
   min-height: 100vh !important;
   height: auto;
+
   background-color: var(--dashboardBackground);
 `
 const Main = styled.main`
@@ -38,5 +40,9 @@ const Main = styled.main`
   padding-left: 4rem;
   padding-right: 2rem;
   padding-bottom: 1.5rem;
+
+  @media ${devices.tabletL}{
+    padding: 1rem;
+  }
 
 `

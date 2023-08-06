@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { AudioPlayer } from "../../../../../../Ui_elements";
 import { Divider } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { boolean } from "yup";
 
 interface AssignmentProps {
   image?: string;
@@ -30,22 +32,33 @@ export const AssignmentCard = ({
     questionImage: questionImage,
     topic: topic,
   };
+
+  const [expand, setExpand] = useState(false);
+
+  const handleDropDown = () => {
+    setExpand(!expand);
+  };
+
   return (
-    <Container
-      onClick={() => navigate(`${topic}/discussion`, { state: { ...state } })}
-    >
+    <Container>
       <Header>
         <h5>{topic}</h5>
-
         {read ? null : <Unread />}
       </Header>
-      <Content>
+      <Message
+        onClick={() => navigate(`${topic}/discussion`, { state: { ...state } })}
+      >
         <p>{message}</p>
+      </Message>
+      <Content
+        expand={expand}
+        onClick={() => navigate(`${topic}/discussion`, { state: { ...state } })}
+      >
         {audioUrl && <AudioPlayer audioUrl={audioUrl} />}
         {questionImage && <img src={questionImage} alt="question" />}
       </Content>
       <Divider />
-      <Footer>
+      <Footer expand={expand}>
         <User>
           <h5>Posted by</h5>
           <img
@@ -54,6 +67,7 @@ export const AssignmentCard = ({
           />
           <h5>{author}</h5>
         </User>
+        <button onClick={handleDropDown}>⤵</button>
       </Footer>
     </Container>
   );
@@ -106,16 +120,46 @@ const User = styled.div`
     object-fit: cover;
   }
 `;
-const Content = styled.div`
+const Content = styled.div<{ expand: boolean }>`
+  display: ${({ expand }) => (expand ? "block" : "none")};
+  height: ${({ expand }) => (expand ? "100%" : "0%")};
+
   img {
     width: 30rem;
     height: 30rem;
     object-fit: contain;
     margin-top: 5%;
   }
+`;
+
+const Footer = styled.div<{ expand: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  p {
+    font-weight: 800 !important;
+    font-size: 1rem;
+  }
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    transform: ${({ expand }) =>
+      expand ? "rotate(180deg) scaleX(-1)" : "none"};
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+`;
+
+const Message = styled.div`
   p {
     font-size: 0.8rem;
   }
 `;
-
-const Footer = styled.div``;

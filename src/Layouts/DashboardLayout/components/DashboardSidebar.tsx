@@ -1,8 +1,8 @@
+// import { MenuUnfoldOutlined } from "@ant-design/icons";
 import React from "react";
 import styled from "styled-components";
 import {
   AdminIcon,
-  AskIcon,
   HomeIcon,
   LessonIcon,
   Logo,
@@ -16,7 +16,6 @@ import { SideBarMenuItem } from "../../../Ui_elements";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
 
 export const DashboardSidebar = () => {
-
   const userMenus = [
     {
       path: "/students",
@@ -61,11 +60,11 @@ export const DashboardSidebar = () => {
       title: "Ask The Teacher",
       icon: <VideoIcon />,
     },
-    {
-      path: "/quiz_library",
-      title: "Quiz Library",
-      icon: <AskIcon />,
-    },
+    // {
+    //   path: "/quiz_library",
+    //   title: "Quiz Library",
+    //   icon: <AskIcon />,
+    // },
     {
       path: "/schedule_lessons",
       title: "Schedule Live Lessons",
@@ -86,61 +85,64 @@ export const DashboardSidebar = () => {
     },
   ];
   return (
-    <Container>
-      <div>
-        <SideLogo />
-        <section>
-          <SideBarMenuItem icon={<HomeIcon />} path="/" title="Home" />
-        </section>
-        <section>
-          <h6>USERS</h6>
-          {userMenus.map((item, index) => {
-            return (
-              <SideBarMenuItem
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-              />
-            );
-          })}
-        </section>
-        <section>
-          <h6>LESSONS</h6>
-          {lessonMenus.map((item, index) => {
-            return (
-              <SideBarMenuItem
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-              />
-            );
-          })}
-        </section>
-        <section>
-          <h6>EXTRAS</h6>
-          {extrasMenus.map((item, index) => {
-            return (
-              <SideBarMenuItem
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-              />
-            );
-          })}
-        </section>
-      </div>
+    <>
+      {/* <Menu /> */}
+      <Container>
+        <div>
+          <SideLogo />
+          <section>
+            <SideBarMenuItem icon={<HomeIcon />} path="/" title="Home" />
+          </section>
+          <section>
+            <h6>USERS</h6>
+            {userMenus.map((item, index) => {
+              return (
+                <SideBarMenuItem
+                  key={index}
+                  icon={item.icon}
+                  title={item.title}
+                  path={item.path}
+                />
+              );
+            })}
+          </section>
+          <section>
+            <h6>LESSONS</h6>
+            {lessonMenus.map((item, index) => {
+              return (
+                <SideBarMenuItem
+                  key={index}
+                  icon={item.icon}
+                  title={item.title}
+                  path={item.path}
+                />
+              );
+            })}
+          </section>
+          <section>
+            <h6>EXTRAS</h6>
+            {extrasMenus.map((item, index) => {
+              return (
+                <SideBarMenuItem
+                  key={index}
+                  icon={item.icon}
+                  title={item.title}
+                  path={item.path}
+                />
+              );
+            })}
+          </section>
+        </div>
 
-      <div>
-        <SideBarMenuItem
-          icon={<AdminIcon />}
-          title="Admin Access"
-          path={"/admin"}
-        />
-      </div>
-    </Container>
+        <div>
+          <SideBarMenuItem
+            icon={<AdminIcon />}
+            title="Admin Access"
+            path={"/admin"}
+          />
+        </div>
+      </Container>
+    </>
   );
 };
 
@@ -159,10 +161,9 @@ const Container = styled.aside`
     display: none;
   }
 
-  @media ${devices.tablet}{
+  @media ${devices.tablet} {
     display: none;
   }
-
 
   h6 {
     font-size: 1rem;
@@ -183,3 +184,10 @@ const SideLogo = styled(Logo)`
   margin-bottom: 2.8rem;
   margin-left: 3.4rem;
 `;
+
+
+// const Menu = styled(MenuUnfoldOutlined)`
+//   font-size: 2rem;
+//   color: var(--primary-color);
+//   margin-top: 2rem;
+// `

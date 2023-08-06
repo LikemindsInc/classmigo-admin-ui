@@ -28,7 +28,7 @@ export const SharedRoutes = () => {
   const sharedRoutes: RouteConfig[] = [
     {
       path: "/",
-      element: <LazyLogin/>,
+      element: <LazyLogin />,
     },
     {
       path: "/signup",
@@ -55,13 +55,9 @@ export const SharedRoutes = () => {
           key={index}
           path={route.path}
           element={
-            <Suspense
-              fallback={
-                <Loader/>
-              }
-            >
-              <AuthenticationLayout>{route.element}</AuthenticationLayout>
-            </Suspense>
+            <AuthenticationLayout>
+              <Suspense fallback={<Loader />}>{route.element}</Suspense>
+            </AuthenticationLayout>
           }
         />
       ))}

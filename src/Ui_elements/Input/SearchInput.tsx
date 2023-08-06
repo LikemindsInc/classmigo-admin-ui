@@ -1,13 +1,14 @@
-import { SearchOutlined } from "@ant-design/icons";
 import styled from "styled-components";
+import { SearchOutlined } from "@ant-design/icons";
 
 interface SearchProps {
   onSearch?: () => void;
+  width?: string;
 }
 
-export const SearchInput = ({ onSearch }: SearchProps) => {
+export const SearchInput = ({ onSearch, width }: SearchProps) => {
   return (
-    <SearchContainer>
+    <SearchContainer width={width}>
       <input placeholder="search" />
       <div>
         <SearchIcon />
@@ -16,11 +17,11 @@ export const SearchInput = ({ onSearch }: SearchProps) => {
   );
 };
 
-const SearchContainer = styled.div`
-  width: 200px;
+const SearchContainer = styled.div<{ width?: string }>`
+  width: ${({ width }) => (width ? width : "100%")};
   display: flex;
   background-color: var(--dashboardBackground);
-  border-radius: 12px;
+  border-radius: 10px;
   justify-content: space-between;
 
   input {
@@ -36,17 +37,18 @@ const SearchContainer = styled.div`
     }
   }
 
-  >div{
+  > div {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 3rem;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
-    transition: all ease .3s;
-    &:hover{
-        background-color: #F5E9FF;
-        cursor: pointer;    
+    transition: all ease 0.3s;
+
+    &:hover {
+      background-color: #f5e9ff;
+      cursor: pointer;
     }
   }
 `;

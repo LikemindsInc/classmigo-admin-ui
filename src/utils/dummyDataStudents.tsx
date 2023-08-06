@@ -18,6 +18,7 @@ export const columns: ColumnsType<DataType> = [
     title: "NAME",
     dataIndex: "name",
     key: "name",
+    ellipsis: true,
     render: (name: string, record: DataType) => (
       <UserDetails image={record.image} name={name} />
     ),
@@ -26,31 +27,37 @@ export const columns: ColumnsType<DataType> = [
     title: "USERNAME",
     dataIndex: "username",
     key: "username",
+    ellipsis: true,
   },
   {
     title: "CLASS",
     dataIndex: "class",
     key: "class",
+    ellipsis: true,
   },
   {
     title: "PHONE NUMBER",
     dataIndex: "phoneNumber",
     key: "phoneNumber",
+    ellipsis: true,
   },
   {
     title: "STATUS",
     dataIndex: "status",
     key: "status",
+    ellipsis: true,
   },
   {
     title: "SUBSCRIPTION",
     dataIndex: "subscription",
     key: "subscription",
+    ellipsis: true,
   },
   {
     title: "",
     dataIndex: "options",
     key: "options",
+    ellipsis: true,
     render: () => (
       <Options/>
     ),

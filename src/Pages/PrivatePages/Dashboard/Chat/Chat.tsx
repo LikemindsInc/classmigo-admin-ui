@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../utils/mediaQueryBreakPoints";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   AudioPlayer,
   ButtonElement,
@@ -12,6 +12,7 @@ import { MessageSection } from "./Components/MessageSection";
 
 const Chat = () => {
   const { state } = useLocation();
+  const navigate = useNavigate()
   const { author, message, audioUrl, questionImage, topic } = state;
   const [respond, setRespond] = useState(false);
   const [messages, setMessages] = useState([
@@ -41,8 +42,13 @@ const Chat = () => {
     ]);
   };
 
+  const handleGoBack = () => {
+    navigate(-1)
+  }
+
   return (
     <Container>
+      <Arrow onClick={handleGoBack}>˿</Arrow>
       <MessagesContainer>
         <InitialQuestion>
           <Header>
@@ -151,3 +157,12 @@ const Header = styled.div`
         color: var(--primary-color);
     }
 `;
+
+const Arrow = styled.p`
+  font-size: 3rem;
+  font-weight: 700;
+  cursor: pointer;
+  &:hover{
+    color: var(--primary-color);
+  }
+`

@@ -42,13 +42,14 @@ const Container = styled.div`
   padding: 2rem;
   transition: all ease 0.3s;
   background-color: white;
-  transition: all ease .3s;
-  &:hover{
-        p,h3{
-            color: white;
-        }
-        background: var(--primary-color);
+  transition: all ease 0.3s;
+  &:hover {
+    p,
+    h3 {
+      color: white;
     }
+    background: var(--primary-color);
+  }
 `;
 
 const IconHolder = styled.div`
@@ -62,16 +63,15 @@ const IconHolder = styled.div`
 
 const DetailHolder = styled.div`
   h3 {
-    font-size: clamp(1.2rem, 30vw, 3rem);
+    font-size: clamp(1.2rem, 2.5vw, 3rem);
     font-weight: 700;
   }
   p {
-    font-size: clamp(0.8rem, 30vw, 0.9rem);
+    font-size: clamp(0.8rem, 0.5vw, 0.9rem);
   }
 `;
 
 const StatHolder = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    ;
-`
+  display: flex;
+  justify-content: flex-end;
+`;

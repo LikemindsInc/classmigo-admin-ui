@@ -6,55 +6,29 @@ import { useState } from "react";
 
 interface InputProps {
   placeholder?: string;
-  wordCount?: number;
   label?: string;
-  messages: any[];
-  onSend: (e: any) => void;
+  handleChange: (e: any) => void;
+  value: string | number;
 }
 
 const { TextArea } = Input;
 
-export const TextAreaElement = ({
+export const TextAreaInput = ({
   placeholder,
-  wordCount,
   label,
-  messages,
-  onSend,
+  value,
+  handleChange,
 }: InputProps) => {
-  const [message, setMessage] = useState("");
-
-  const handleMessage = (e: any) => {
-    setMessage(e.target.value);
-  };
-
-  const handleSubmit = () => {
-    if (message.trim() !== "") {
-      onSend(message);
-      setMessage("");
-    }
-  };
-
   return (
     <>
       <InputHolder>
         <label>{label}</label>
         <TextInput
-          showCount
           placeholder={placeholder}
-          maxLength={wordCount}
           allowClear
-          onChange={handleMessage}
-          value={message}
+          onChange={handleChange}
+          value={value}
         />
-        <SendContainer>
-          <SendIconStyled />
-          <ButtonElement
-            onClick={handleSubmit}
-            label="Send"
-            icon={<SendIcon />}
-            width={100}
-          />
-        </SendContainer>
       </InputHolder>
     </>
   );
@@ -92,22 +66,4 @@ const InputHolder = styled.div`
     font-size: 0.8rem;
     color: var(--primary-color);
   }
-`;
-
-const SendContainer = styled.div`
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  button {
-    font-size: 0.8rem;
-    padding: 0.5rem 1rem;
-  }
-`;
-
-const SendIconStyled = styled(SendFileIcon)`
-  cursor: pointer;
 `;

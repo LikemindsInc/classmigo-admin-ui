@@ -112,10 +112,10 @@ const LoginContainer = styled.section`
     align-items: center;
     justify-content: center;
   }
-  @media ${devices.nesthub}{
+  @media ${devices.nesthub} {
     padding: 2rem 0 0 2rem;
   }
-  @media ${devices.nesthubMax}{
+  @media ${devices.nesthubMax} {
     padding: 3rem 0 0 3rem;
   }
 `;

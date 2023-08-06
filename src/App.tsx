@@ -1,11 +1,21 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { PrivateRoutes } from "./Routes";
+import { PrivateRoutes, SharedRoutes } from "./Routes";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { DrawerContextProvider } from "./Contexts/Providers";
+import {
+  DrawerContextProvider,
+  NavbarContextProvider,
+} from "./Contexts/Providers";
 import { ModalContextProvider } from "./Contexts/Providers/ModalContextProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "react-toastify/dist/ReactToastify.css";
+import { useContext } from "react";
+import { UserContext } from "./Contexts/Contexts";
 
 function App() {
+  const { user } = useContext(UserContext);
+  const queryClient = new QueryClient();
+
   const customTheme = createTheme({
     typography: {
       fontFamily: "Arial, sans-serif",
@@ -22,16 +32,21 @@ function App() {
     },
   });
 
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <ThemeProvider theme={customTheme}>
-        <DrawerContextProvider>
-          <ModalContextProvider>
-            <PrivateRoutes />
-          </ModalContextProvider>
-        </DrawerContextProvider>
-      </ThemeProvider>
-    </LocalizationProvider>
+    <QueryClientProvider client={queryClient}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ThemeProvider theme={customTheme}>
+          <NavbarContextProvider>
+            <DrawerContextProvider>
+              <ModalContextProvider>
+                {user ? <PrivateRoutes /> : <SharedRoutes />}
+              </ModalContextProvider>
+            </DrawerContextProvider>
+          </NavbarContextProvider>
+        </ThemeProvider>
+      </LocalizationProvider>
+    </QueryClientProvider>
   );
 }
 

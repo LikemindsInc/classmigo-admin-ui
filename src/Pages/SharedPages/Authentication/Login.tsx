@@ -2,21 +2,82 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { ButtonElement, InputElement } from "../../../Ui_elements";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { loginSchema } from "./authenticationSchema";
+import { useApiPost } from "../../../custom-hooks";
+import { loginUrl } from "../../../Urls/Authentication";
+import { ToastContainer, toast } from "react-toastify";
+import { useContext, useEffect } from "react";
+import { UserContext } from "../../../Contexts/Contexts";
+import { UserAddOutlined } from "@ant-design/icons";
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext) ?? {};
+  type Inputs = {
+    email: string;
+    password: any;
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>({
+    resolver: yupResolver(loginSchema),
+  });
+
+  const handleSuccess = ({data}: any) => {
+    setUser(data);
+    navigate("/");
+  }
+  const handleError = (error: any) => {
+    console.log(error)
+  }
+  const {
+    mutate: login,
+    isLoading: isLogin,
+  } = useApiPost(
+    loginUrl,
+    handleSuccess,
+    handleError
+  );
+
+  // loginError && console.log(loginError)
+
+  const onSubmit: SubmitHandler<Inputs | any> = (data: any) => {
+    login(data);
+  };
+
   return (
     <LoginBox>
       <h3>Login</h3>
       <p>Teacher/Administrator Login</p>
 
-      <div>
-        <InputElement placeholder="email@classmigo.com" label="Email" />
-        <InputElement placeholder="Password" label="Password" type="password" />
-      </div>
-
-      <ResetPassword onClick={()=>navigate("/forgot_password")}>Forgot Password?</ResetPassword>
-      <ButtonElement label="LOGIN" />
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <InputElement
+          placeholder="email@classmigo.com"
+          label="Email"
+          id="email"
+          register={register}
+          error={errors}
+        />
+        <InputElement
+          placeholder="Password"
+          label="Password"
+          type="password"
+          id="password"
+          register={register}
+          error={errors}
+        />
+        <ResetPassword onClick={() => navigate("/forgot_password")}>
+          Forgot Password?
+        </ResetPassword>
+        <ButtonElement type="submit" label="LOGIN" isLoading={isLogin} />
+      </Form>
+      {/* {loginError ? <Error>{loginError}</Error> : null} */}
+      <ToastContainer />
     </LoginBox>
   );
 };
@@ -26,7 +87,7 @@ export default Login;
 //styles
 
 const LoginBox = styled.div`
-  margin-top: 14rem;
+  margin-top: 9rem;
   width: 32rem;
   height: fit-content;
   h3 {
@@ -42,18 +103,18 @@ const LoginBox = styled.div`
     gap: 1rem;
     margin-top: 3rem;
   }
-  @media ${devices.tablet}{
+  @media ${devices.tablet} {
     width: 18rem;
     margin-top: 3rem;
   }
-  @media ${devices.mobileXS}{
+  @media ${devices.mobileXS} {
     width: 10rem;
     margin-top: 3rem;
   }
-  @media ${devices.nesthub}{
+  @media ${devices.nesthub} {
     margin-top: 2% !important;
   }
-  @media ${devices.nesthubMax}{
+  @media ${devices.nesthubMax} {
     margin-top: 15% !important;
   }
 `;
@@ -63,8 +124,20 @@ const ResetPassword = styled.p`
   text-decoration: underline;
   font-weight: 600;
   margin-top: 0.5rem;
-  margin-bottom: 4rem;
-  :hover{
+  margin-bottom: 2rem;
+  :hover {
     cursor: pointer;
   }
+`;
+
+const Form = styled.form`
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Error = styled.p`
+  color: red;
+  font-size: 0.8rem;
 `;

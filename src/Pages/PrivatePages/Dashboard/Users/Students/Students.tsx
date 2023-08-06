@@ -12,6 +12,8 @@ import { columns, data } from "../../../../../utils/dummyDataStudents";
 import { useContext, useEffect } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
+import { getStudentDataUrl } from "../../../../../Urls/Students";
+import { useApiGet } from "../../../../../custom-hooks";
 const Students = () => {
   const handleSearchFilter = (value: string) => {};
   //drawer handler
@@ -20,6 +22,15 @@ const Students = () => {
   useEffect(() => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
+
+  const { data: studentData, isLoading: isLoadingStudentData } = useApiGet(
+    ["Student data"],
+    ()=>getStudentDataUrl(),
+    {
+      refetchOnWindowFocus: true,
+      enabled: true,
+    }
+  );
 
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
@@ -35,22 +46,22 @@ const Students = () => {
 
     switch (column.dataIndex) {
       case "name":
-        updatedColumn.width = 400;
+        updatedColumn.width = "25%";
         break;
       case "phoneNumber":
-        updatedColumn.width = 200;
+        updatedColumn.width = "15%";
         break;
       case "subscription":
-        updatedColumn.width = 150;
+        updatedColumn.width = "15%";
         break;
       case "status":
-        updatedColumn.width = 150;
+        updatedColumn.width = "10%";
         break;
       case "username":
-        updatedColumn.width = 150;
+        updatedColumn.width = "15";
         break;
       case "class":
-        updatedColumn.width = 100;
+        updatedColumn.width = "10";
         break;
       default:
         break;
@@ -145,11 +156,13 @@ const Students = () => {
             options={classOptions}
             onChange={handleSearchFilter}
             defaultValue="Class"
+            width={200}
           />
           <SelectInput
             options={statusOptions}
             onChange={handleSearchFilter}
             defaultValue="Status"
+            width={200}
           />
           <SelectInput
             options={subscribeOptions}
@@ -265,17 +278,30 @@ const Container = styled.section`
 const UtilsHolder = styled.div`
   display: flex;
   margin-top: 3rem;
-  width: 100%;
+  width: auto;
   align-items: center;
   justify-content: space-between;
+
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
+    width: 65%;
+
+    @media ${devices.tabletL} {
+      flex-direction: column;
+      width: 100%;
+    }
 
     h6 {
-      font-size: 1rem;
+      font-size: clamp(1rem, 1vw, 1rem);
       font-weight: 700;
+      width: fit-content;
     }
   }
   button {
@@ -291,6 +317,10 @@ const UtilsHolder = styled.div`
     gap: 0.5rem;
     font-weight: 700;
     cursor: pointer;
+
+    @media ${devices.tabletL} {
+      margin-top: 5%;
+    }
   }
 `;
 
@@ -368,7 +398,5 @@ const ParentContainer = styled.div`
 const SwitchContainer = styled.div`
   display: flex;
   align-items: center;
-  gap:10px;
-
-  
-`
+  gap: 10px;
+`;
