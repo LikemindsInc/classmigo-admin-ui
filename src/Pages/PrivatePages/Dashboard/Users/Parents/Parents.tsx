@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Drawer, Switch } from "antd";
@@ -9,11 +9,15 @@ import {
   InputElement,
   SearchInput,
 } from "../../../../../Ui_elements";
-import { columns, data } from "../../../../../utils/dummyDataParents";
+import { columns} from "../../../../../utils/dummyDataParents";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
+import { useApiGet } from "../../../../../custom-hooks";
+import { getParentDataUrl } from "../../../../../Urls";
 
 const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
+  const [parent, setParent] = useState<any>([]);
+
 
   useEffect(() => {
     setOpenDrawer(false);
@@ -22,6 +26,28 @@ const Parents = () => {
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
   };
+
+  const {
+    data: parentData,
+    isLoading: isLoadingParentData,
+    refetch: fetchParent,
+  } = useApiGet(["Parent data"], () => getParentDataUrl(), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
+
+  useEffect(() => {
+    if (parentData) {
+      const newData = parentData?.data?.content.map((item: any) => ({
+        key: item._id,
+        name: item.fullName,
+        email: item.email,
+        phoneNumber: item.phoneNumber,
+        status: item.role,
+      }));
+      setParent(newData);
+    }
+  }, [parentData]);
 
   const headerStyle = {
     color: "gray",
@@ -48,7 +74,6 @@ const Parents = () => {
       default:
         break;
     }
-
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
@@ -65,7 +90,15 @@ const Parents = () => {
           <ExportIcon />
         </button>
       </UtilsHolder>
-      <TableElement columns={updatedColumns} data={data} />
+      <TableElement
+        columns={updatedColumns}
+        data={parent || null}
+        loading={isLoadingParentData}
+        pagination
+        paginationData={parentData?.data?.pagination}
+        fetchFunction={getParentDataUrl}
+        fetchAction={fetchParent}
+      />
 
       <Drawer
         placement="right"
@@ -166,6 +199,7 @@ const Container = styled.section`
   gap: 10%;
   overflow-y: scroll;
   position: relative !important;
+import { data } from '../../../../../utils/dummyDataStudents';
 
   @media ${devices.tablet} {
     padding: 0 1rem 1rem 1rem;

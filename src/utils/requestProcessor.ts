@@ -2,17 +2,19 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { BASE_URL } from "./constants";
 import Cookies from "js-cookie";
 
-
 var accessToken: any = Cookies.get("user");
-const token = JSON.parse(accessToken);
-
+let token: any = "";
+if (accessToken) {
+  token = JSON.parse(accessToken);
+}
 
 const client = axios.create({
   baseURL: BASE_URL,
 });
 
 export const request = async (options: any) => {
-  client.defaults.headers.common.Authorization = `Bearer ${token?.token}`;
+  token !== "" &&
+    (client.defaults.headers.common.Authorization = `Bearer ${token?.token}`);
 
   const onSuccess = (response: AxiosResponse) => {
     return response?.data;

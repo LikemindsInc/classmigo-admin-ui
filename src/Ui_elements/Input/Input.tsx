@@ -1,5 +1,4 @@
 import { styled } from "styled-components";
-import { Input } from "antd";
 import { ErrorIcon } from "../../Assets/Svgs";
 
 interface InputProps {

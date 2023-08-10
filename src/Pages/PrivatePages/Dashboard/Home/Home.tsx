@@ -2,23 +2,48 @@ import styled from "styled-components";
 import { Card } from "./Components/Card";
 import { PaymentData } from "./Components/PaymentData";
 import { devices } from "../../../../utils/mediaQueryBreakPoints";
+import { useApiGet } from "../../../../custom-hooks";
+import { getDashboardAnalytics } from "../../../../Urls/Home";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@mui/material";
 const Home = () => {
+  const [analyticsData, setAnalyticsData] = useState<any>("");
+  const { data: analytics } = useApiGet(
+    ["Analytics"],
+    () => getDashboardAnalytics(),
+    {
+      refetchOnWindowFocus: true,
+      enabled: true,
+    }
+  );
+  useEffect(() => {
+    analytics && setAnalyticsData(analytics?.data);
+  }, [analytics, setAnalyticsData]);
+
   return (
     <Container>
       <ScrollCap>
         <p> </p>
       </ScrollCap>
-      <CardGrid>
-        <Card value={"250,000"} description="Students Registered" />
-        <Card value={"100,000"} description="Parents Registered" />
-        <Card value={"12"} description="Classes Covered" />
-        <Card value={"2,000"} description="Videos Uploaded" />
-        <Card value={"5000"} description="Quiz Questions Uploaded" />
-        <Card value={"1,000"} description="Live Lessons Taken" />
-      </CardGrid>
+      {analyticsData ? (
+        <CardGrid>
+          {Object.keys(analyticsData).map((title, index) => (
+            <Card key={index} value={analyticsData[title]} description={title} />
+          ))}
+        </CardGrid>
+      ) : (
+        <CardGrid>
+            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+        </CardGrid>
+      )}
 
       <Details>
-        <PaymentData />
+        <PaymentData/>
       </Details>
     </Container>
   );
@@ -69,9 +94,10 @@ const ScrollCap = styled.div`
   @media ${devices.tablet} {
     height: 0.8rem;
     margin-bottom: 0 !important;
-  }
+  }import { Skeleton } from 'antd';
+
 `;
 
 const Details = styled.div`
   width: auto;
-`
+`;

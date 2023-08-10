@@ -3,34 +3,62 @@ import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import {
   ButtonElement,
   InputElement,
+  Options,
   SearchInput,
   SelectInput,
 } from "../../../../../Ui_elements";
 import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
 import { Drawer, Switch } from "antd";
-import { columns, data } from "../../../../../utils/dummyDataStudents";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
 import { getStudentDataUrl } from "../../../../../Urls/Students";
 import { useApiGet } from "../../../../../custom-hooks";
+import { UserDetails } from "./Components/UserDetails";
+import { ColumnsType } from "antd/es/table";
 const Students = () => {
   const handleSearchFilter = (value: string) => {};
   //drawer handler
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
+  const [student, setStudent] = useState<any>([]);
 
   useEffect(() => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
 
-  const { data: studentData, isLoading: isLoadingStudentData } = useApiGet(
+
+  const {
+    data: studentData,
+    isLoading: isLoadingStudentData,
+    refetch:fetchStudent
+  } = useApiGet(
     ["Student data"],
-    ()=>getStudentDataUrl(),
+    () => getStudentDataUrl(),
     {
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       enabled: true,
     }
   );
+
+  useEffect(() => {
+    if (studentData) {
+      const newData = studentData?.data?.content.map((item: any) => ({
+        key: item._id,
+        name: `${item.firstName} ${item.lastName}`,
+        username: item.userName,
+        phoneNumber:item.phoneNumber,
+        class: (item.class &&item.class.length > 0
+          ? item.class.map((classItem: any) => classItem.name)
+          : "" || null) || "",
+        status: item.role,
+        subscription: item.subcription,
+        image:
+          item.image ||
+          "https://img.freepik.com/free-photo/portrait-handsome-man-with-dark-hairstyle-bristle-toothy-smile-dressed-white-sweatshirt-feels-very-glad-poses-indoor-pleased-european-guy-being-good-mood-smiles-positively-emotions-concept_273609-61405.jpg?w=2000",
+      }));
+      setStudent(newData);
+    }
+  }, [studentData]);
 
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
@@ -41,9 +69,66 @@ const Students = () => {
     fontSize: "12px",
     fontWeight: 700,
   };
+  interface DataType {
+    key: string;
+    name: string;
+    username: string;
+    class: string;
+    phoneNumber: number;
+    status: string;
+    subscription: string;
+    image: string;
+  }
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "NAME",
+      dataIndex: "name",
+      key: "name",
+      ellipsis: true,
+      render: (name: string, record: DataType) => (
+        <UserDetails image={record.image} name={name} />
+      ),
+    },
+    {
+      title: "USERNAME",
+      dataIndex: "username",
+      key: "username",
+      ellipsis: true,
+    },
+    {
+      title: "CLASS",
+      dataIndex: "class",
+      key: "class",
+      ellipsis: true,
+    },
+    {
+      title: "PHONE NUMBER",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      ellipsis: true,
+    },
+    {
+      title: "STATUS",
+      dataIndex: "status",
+      key: "status",
+      ellipsis: true,
+    },
+    {
+      title: "SUBSCRIPTION",
+      dataIndex: "subscription",
+      key: "subscription",
+      ellipsis: true,
+    },
+    {
+      title: "",
+      dataIndex: "options",
+      key: "options",
+      ellipsis: true,
+      render: () => <Options />,
+    },
+  ];
   const updatedColumns = columns.map((column: any) => {
     let updatedColumn = { ...column };
-
     switch (column.dataIndex) {
       case "name":
         updatedColumn.width = "25%";
@@ -66,7 +151,6 @@ const Students = () => {
       default:
         break;
     }
-
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
@@ -177,7 +261,17 @@ const Students = () => {
           <ExportIcon />
         </button>
       </UtilsHolder>
-      <TableElement columns={updatedColumns} data={data} />
+
+      <TableElement
+        loading={isLoadingStudentData}
+        columns={updatedColumns}
+        data={student || null}
+        pagination
+        paginationData={studentData?.data?.pagination}
+        fetchFunction={getStudentDataUrl}
+        fetchAction={fetchStudent}
+      />
+
       <Drawer
         placement="right"
         onClose={() => setOpenDrawer(false)}
@@ -205,7 +299,7 @@ const Students = () => {
               <ButtonElement width={84} outline label={"Update"} />
             </div>
             <div>
-              <InputElement placeholder="08000000000" label="Phone number" />
+              <InputElement placeholder="08000000000" label="Phone number"/>
               <ButtonElement label={"Update"} outline width={84} />
             </div>
           </UpdateDetails>
@@ -257,6 +351,15 @@ const Students = () => {
 };
 
 export default Students;
+
+
+
+
+
+
+
+
+
 
 const Container = styled.section`
   width: 100%;

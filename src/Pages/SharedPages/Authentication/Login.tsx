@@ -7,14 +7,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "./authenticationSchema";
 import { useApiPost } from "../../../custom-hooks";
 import { loginUrl } from "../../../Urls/Authentication";
-import { ToastContainer, toast } from "react-toastify";
-import { useContext, useEffect } from "react";
+import { ToastContainer } from "react-toastify";
+import { useContext } from "react";
 import { UserContext } from "../../../Contexts/Contexts";
-import { UserAddOutlined } from "@ant-design/icons";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext) ?? {};
+  const { setUser } = useContext(UserContext) ?? {};
   type Inputs = {
     email: string;
     password: any;
