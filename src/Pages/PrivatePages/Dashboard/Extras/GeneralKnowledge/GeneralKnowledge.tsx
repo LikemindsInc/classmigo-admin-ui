@@ -10,11 +10,11 @@ import { AddIcon, CsvIcon, UploadTick } from "../../../../../Assets/Svgs";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 import { QuestionCard } from "./Components/QuestionCard";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 const GeneralKnowledge = () => {
   const { setOpenModal } = useContext(ModalContext);
-  const [questions, setQuestions] = useState([
+  const [questions, setQuestions] = useState <any>([
     {
       question:
         "Two immiscible liquids with different boiling points can be separated by",
@@ -118,9 +118,13 @@ const GeneralKnowledge = () => {
   const handleSearchFilter = (value: string) => {};
 
   const navigate = useNavigate()
-  const handleOk = () => {
-    setOpenModal(false);
-  };
+  // const handleOk = () => {
+  //   setOpenModal(false);
+  // };
+
+  const handleSetQuestions = () => {
+    setQuestions(null)
+  }
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -157,7 +161,7 @@ const GeneralKnowledge = () => {
           <p>250 Results</p>
         </SearchContainer>
         <Questions>
-          {questions.map((item, index) => (
+          {questions.map((item:any, index:number) => (
             <QuestionCard
               id={index+1}
               imageUrl={item?.imageUrl}
@@ -174,7 +178,7 @@ const GeneralKnowledge = () => {
         <ModalContent>
           <UploadTick />
           <p>Question Uploaded Successfully</p>
-          <ButtonElement label="Done" width={100} />
+          <ButtonElement label="Done" width={100} onClick={handleSetQuestions} />
         </ModalContent>
       </Modal>
     </Container>

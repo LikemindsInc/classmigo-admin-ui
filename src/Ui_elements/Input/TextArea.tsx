@@ -1,8 +1,6 @@
 import { styled } from "styled-components";
 import { Input } from "antd";
-import { SendFileIcon, SendIcon } from "../../Assets/Svgs";
-import { ButtonElement } from "../Button/Button";
-import { useState } from "react";
+
 
 interface InputProps {
   placeholder?: string;

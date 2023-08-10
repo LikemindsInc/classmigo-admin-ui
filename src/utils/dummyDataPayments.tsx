@@ -1,8 +1,7 @@
-import { Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { ToolTipElement } from "../Pages/PrivatePages/Dashboard/Users/Payments/Components/ToolTip";
 import { UserDetails } from "../Pages/PrivatePages/Dashboard/Users/Payments/Components/UserDetails";
-import { ModalOptions, Options } from "../Ui_elements";
+import { ModalOptions} from "../Ui_elements";
 
 interface DataType {
   key: string;

@@ -59,9 +59,9 @@ const HiddenInput = styled.input`
   display: none;
 `;
 
-const ImagePreview = styled.img`
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: 8px;
-  margin-top: 10px;
-`;
+// const ImagePreview = styled.img`
+//   max-width: 100%;
+//   max-height: 200px;
+//   border-radius: 8px;
+//   margin-top: 10px;
+// `;

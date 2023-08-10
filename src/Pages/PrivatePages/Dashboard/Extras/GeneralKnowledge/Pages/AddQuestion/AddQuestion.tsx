@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { ImageInput, TextAreaInput } from "../../../../../../../Ui_elements";
+import { TextAreaInput } from "../../../../../../../Ui_elements";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 
 const AddQuestion = () => {
   const [question, setQuestion] = useState("");
-  const [image, setImageUrl] = useState(null);
+  // const [image, setImageUrl] = useState(null);
 
   return (
     <Container>
@@ -15,7 +15,8 @@ const AddQuestion = () => {
         handleChange={(e: any) => setQuestion(e.target.value)}
         value={question}
       />
-      <ImageInput onChange={(e: any) => setImageUrl(e.target.files[0])} />
+    
+      {/* <ImageInput onChange={(e: any) => setImageUrl(e.target.files[0])} /> */}
     </Container>
   );
 };

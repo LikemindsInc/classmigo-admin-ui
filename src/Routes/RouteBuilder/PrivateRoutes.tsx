@@ -20,7 +20,7 @@ const LazyPayments = lazy(
 
 //Lessons Menu routes
 const LazyLessonCriteria = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LessonCriteria")
+  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/LessonCriteria")
 );
 const LazyVideoLibrary = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Lessons/VideoLibrary")

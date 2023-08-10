@@ -27,7 +27,11 @@ import { ReactComponent as Placeholder } from '../Svgs/DashboardIcons/placeholde
 import { ReactComponent as EditIcon } from '../Svgs/DashboardIcons/edit.svg';
 import { ReactComponent as DeleteIcon } from '../Svgs/DashboardIcons/delete.svg';
 import { ReactComponent as UploadIcon } from '../Svgs/DashboardIcons/upload.svg';
-import { ReactComponent as ErrorIcon} from '../Svgs/DashboardIcons/error.svg';
+import { ReactComponent as ErrorIcon } from '../Svgs/DashboardIcons/error.svg';
+import { ReactComponent as NoDataIcon } from '../Svgs/DashboardIcons/more.svg';
+import { ReactComponent as MoveIcon} from '../Svgs/DashboardIcons/move.svg';
+
+
 
 
 
@@ -60,5 +64,7 @@ export {
     EditIcon,
     DeleteIcon,
     UploadIcon,
-    ErrorIcon
+    ErrorIcon,
+    NoDataIcon,
+    MoveIcon
 }

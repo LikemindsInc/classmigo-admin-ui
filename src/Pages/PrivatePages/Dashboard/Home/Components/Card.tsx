@@ -1,15 +1,36 @@
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
+import { useEffect, useState } from "react";
 
 interface CardProps {
   value: string;
   description: string;
 }
 export const Card = ({ value, description }: CardProps) => {
+  const [newDescription, setNewDescription] = useState<any>("");
+
+  useEffect(() => {
+    if (description === "studentCount") {
+      setNewDescription("Students Registered");
+    }
+    if (description === "parentCount") {
+      setNewDescription("Parents Registered");
+    }
+    if (description === "classesCount") {
+      setNewDescription("Classes Covered");
+    }
+    if (description === "videoCount") {
+      setNewDescription("Videos Uploaded");
+    }
+    if (description === "quizCount") {
+      setNewDescription("Quiz Questions Uploaded");
+    }
+  }, [description]);
+
   return (
     <Container>
       <h3>{value}</h3>
-      <p>{description}</p>
+      <p>{newDescription}</p>
     </Container>
   );
 };

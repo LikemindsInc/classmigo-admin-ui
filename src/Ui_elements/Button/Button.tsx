@@ -47,7 +47,7 @@ const Button = styled.button<StyledButtonProps>`
     outline ? "transparent" : "var(--primary-color)"};
   color: ${({ outline }) => (outline ? "var(--primary-color)" : "white")};
   font-weight: 700;
-  padding: ${({ outline }) => (outline ? "0.6rem 0.8rem" : "0.8rem")};
+  padding: ${({ outline }) => (outline ? "0.6rem 0.8rem" : "1.1rem")};
   display: flex;
   align-items: center;
   justify-content: center;

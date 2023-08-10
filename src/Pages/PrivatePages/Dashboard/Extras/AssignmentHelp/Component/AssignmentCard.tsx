@@ -3,7 +3,6 @@ import { AudioPlayer } from "../../../../../../Ui_elements";
 import { Divider } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { boolean } from "yup";
 
 interface AssignmentProps {
   image?: string;

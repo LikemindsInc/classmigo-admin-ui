@@ -1,5 +1,5 @@
 import { Divider, Timeline } from "antd";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { ExportIcon } from "../../../../../Assets/Svgs";
 import {
@@ -122,9 +122,9 @@ const Payments = () => {
 
   const handleSearchFilter = (value: string) => {};
 
-  const handleOk = () => {
-    setOpenModal(false);
-  };
+  // const handleOk = () => {
+  //   setOpenModal(false);
+  // };
   const handleCancel = () => {
     setOpenModal(false);
   };
