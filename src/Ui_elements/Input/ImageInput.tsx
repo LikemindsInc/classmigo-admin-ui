@@ -3,15 +3,15 @@ import styled from "styled-components";
 import { UploadIcon } from "../../Assets/Svgs";
 
 interface ImageInputProps {
-  onChange: (file: File | null) => void;
+  onChange?: (file: File | null) => void;
 }
 
 export const ImageInput: React.FC<ImageInputProps> = ({ onChange }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    onChange(file);
+    // const file = event.target.files?.[0] || null;
+    // onChange(file);
   };
 
   const handleUploadButtonClick = () => {
@@ -29,21 +29,20 @@ export const ImageInput: React.FC<ImageInputProps> = ({ onChange }) => {
         onChange={handleInputChange}
       />
 
-      <UploadIcon onClick={handleUploadButtonClick} />
+      <Icon onClick={handleUploadButtonClick} />
       <p>Upload Image</p>
-      {/* You can add an image preview here if needed */}
-      {/* <ImagePreview src={previewImageURL} alt="Preview" /> */}
+      
     </Container>
   );
 };
 
 
 const Container = styled.div`
-  border: 1px solid var(--primary-color);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 10px;
-  width: 13rem;
-  height: 13rem;
+  width: 8rem;
+  height: 5rem;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -52,12 +51,18 @@ const Container = styled.div`
   cursor: pointer;
   p{
     color: gray;
+    font-size:0.8rem ;
   }
 `;
 
 const HiddenInput = styled.input`
   display: none;
 `;
+
+const Icon = styled(UploadIcon)`
+  width: 1rem;
+  height:1rem;
+`
 
 // const ImagePreview = styled.img`
 //   max-width: 100%;

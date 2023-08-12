@@ -29,7 +29,9 @@ import { ReactComponent as DeleteIcon } from '../Svgs/DashboardIcons/delete.svg'
 import { ReactComponent as UploadIcon } from '../Svgs/DashboardIcons/upload.svg';
 import { ReactComponent as ErrorIcon } from '../Svgs/DashboardIcons/error.svg';
 import { ReactComponent as NoDataIcon } from '../Svgs/DashboardIcons/more.svg';
-import { ReactComponent as MoveIcon} from '../Svgs/DashboardIcons/move.svg';
+import { ReactComponent as MoveIcon } from '../Svgs/DashboardIcons/move.svg';
+import { ReactComponent as ToggleIcon} from '../Svgs/DashboardIcons/toggle.svg';
+
 
 
 
@@ -66,5 +68,6 @@ export {
     UploadIcon,
     ErrorIcon,
     NoDataIcon,
-    MoveIcon
+    MoveIcon,
+    ToggleIcon
 }

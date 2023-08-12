@@ -2,19 +2,22 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { useContext } from "react";
 import { NavbarContext } from "../../Contexts/Contexts";
+import { devices } from "../../utils/mediaQueryBreakPoints";
 
 interface ButtonProps {
   icon: any;
   title: string;
   path: string;
+  setShowMenu?:()=>boolean
 }
 
-export const SideBarMenuItem = ({ icon, title, path }: ButtonProps) => {
+export const SideBarMenuItem = ({ icon, title, path, setShowMenu }: ButtonProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setTitle } = useContext(NavbarContext);
 
   const handleNavigate = (paths: string, title?: string) => {
+    // setShowMenu(false)
     setTitle(title);
     navigate(paths);
   };
@@ -51,4 +54,13 @@ const Container = styled.div<{ activeItem: boolean }>`
   p {
     font-size: 0.85rem;
   }
+
+  @media ${devices.tablet} {
+    p{
+      display: none;
+    }
+    width:fill !important;
+    padding: 11px 1rem;
+  }
+
 `;

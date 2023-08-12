@@ -51,6 +51,7 @@ const Button = styled.button<StyledButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size:1vw;
   width: ${({ width }) => (width ? width + "px" : "100%")};
   border-radius: 6px;
   outline: none;
