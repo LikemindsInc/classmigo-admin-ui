@@ -29,7 +29,6 @@ const Container = styled.div`
   width: 100%;
   min-height: 100vh !important;
   height: auto;
-
   background-color: var(--dashboardBackground);
 `
 const Main = styled.main`
@@ -43,6 +42,8 @@ const Main = styled.main`
 
   @media ${devices.tabletL}{
     padding: 1rem;
+    width: 85%;
+    margin-left:3rem;
   }
 
 `

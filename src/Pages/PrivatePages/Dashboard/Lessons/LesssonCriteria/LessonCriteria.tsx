@@ -1,43 +1,103 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { ButtonElement, InputElement } from "../../../../../Ui_elements";
 import noData from "../../../../../Assets/noData.png";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Card } from "./Components/Card";
-import { useForm } from "react-hook-form";
+import { useApiGet} from "../../../../../custom-hooks";
+import { Skeleton } from "@mui/material";
+import { getAllClassesUrl } from "../../../../../Urls";
+
 const LessonCriteria = () => {
   const [selectClass, setSelectClass] = useState<any>([]);
+  const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-  } = useForm({});
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["classes"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
-  const onSubmit = (data: any) => {
-    const { classname } = data;
-    setSelectClass((prevClasses: any) => [...prevClasses, classname]);
-    setValue("classname","")
+  useEffect(() => {
+    if (classes) {
+      setSelectClass(classes?.data);
+    }
+  }, [classes]);
+
+  const dragClass = useRef<any>(null);
+  const dragOverClass = useRef<any>(null);
+
+  const handleDragSort = () => {
+    let items = [...selectClass];
+    const draggedItem = items.splice(dragClass.current, 1)[0];
+    items.splice(dragOverClass.current, 0, draggedItem);
+    dragClass.current = null;
+    dragOverClass.current = null;
+    setSelectClass(items);
   };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form>
       <Container>
-        <Header>
-          <div>
-            <InputElement
-              label="Create a class"
-              placeholder="Enter a class name"
-              register={register}
-              id="classname"
-            />
-            <ButtonElement type="submit" label="Add Class +" width={200} />
-          </div>
-        </Header>
         <Body>
-          {selectClass ? (
-            selectClass.map((item: any, index: number) => {
-              return <Card classname={item} key={index} />;
-            })
+          {selectClass?.length > 0 ? (
+            selectClass.map((item: any, index: number) => (
+              <Card
+                item={item?.name}
+                classname={item?.value}
+                key={index}
+                index={index}
+                topicNumber={0}
+                subjectNumber={0}
+                onDragStart={() => (dragClass.current = index)}
+                onDragEnter={() => (dragOverClass.current = index)}
+                onDragEnd={handleDragSort}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDraggedOver(true);
+                }}
+                isDraggedOver={isDraggedOver}
+              />
+            ))
+          ) : isLoadingClasses ? (
+            <div>
+              <SkeletonContainer>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+              <SkeletonContainer>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+
+              <SkeletonContainer>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+
+              <SkeletonContainer>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+            </div>
           ) : (
             <NoData>
               <img src={noData} alt="No data" />
@@ -66,27 +126,16 @@ const Container = styled.section`
   position: relative !important;
 
   @media ${devices.tablet} {
-    padding: 0 1rem 1rem 1rem;
+    padding: 1rem;
   }
 `;
 
-const Header = styled.div`
-  width: 100%;
-  > div {
-    input {
-      width: 400px;
-    }
-    width: 100%;
-    display: flex;
-    gap: 2rem;
-    align-items: flex-end;
-  }
-`;
 
 const Body = styled.section`
   width: 100%;
   height: 100%;
 `;
+
 const NoData = styled.div`
   width: 100%;
   height: 60vh;
@@ -101,4 +150,8 @@ const NoData = styled.div`
     text-align: center;
     font-size: 0.8rem;
   }
+`;
+
+const SkeletonContainer = styled.div`
+  margin-bottom: 10px;
 `;

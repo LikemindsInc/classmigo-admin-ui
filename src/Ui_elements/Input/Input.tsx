@@ -28,26 +28,28 @@ export const InputElement = ({
             {...otherProps}
             type={type}
             placeholder={placeholder}
-            {...register(id)}
+            {...(register && { ...register(id) })}
           />
           {error && id ? (
-            <div>
+            <ErrorContainer>
               {error[id]?.message && <Error />}
               <p>{error[id]?.message}</p>
-            </div>
+            </ErrorContainer>
           ) : null}
         </InputHolder>
       )}
       {!type && (
         <InputHolder>
           <label>{label}</label>
-          <TextInput placeholder={placeholder} {...register(id)} />
+          <TextInput
+            placeholder={placeholder}
+            {...(register && { ...register(id) })}
+          />
           {error && id ? (
-            <div>
+            <ErrorContainer>
               {error[id]?.message && <Error />}
-
               <p>{error[id]?.message}</p>
-            </div>
+            </ErrorContainer>
           ) : null}
         </InputHolder>
       )}
@@ -75,6 +77,7 @@ const InputHolder = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  position: relative;
 
   label {
     font-weight: 600;
@@ -93,4 +96,10 @@ const InputHolder = styled.div`
 const Error = styled(ErrorIcon)`
   width: 0.8rem;
   height: 0.8rem;
+`;
+const ErrorContainer = styled.div`
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  z-index: 2;
 `;

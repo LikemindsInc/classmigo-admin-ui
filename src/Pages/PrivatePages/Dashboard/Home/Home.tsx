@@ -94,7 +94,7 @@ const ScrollCap = styled.div`
   @media ${devices.tablet} {
     height: 0.8rem;
     margin-bottom: 0 !important;
-  }import { Skeleton } from 'antd';
+  }
 
 `;
 

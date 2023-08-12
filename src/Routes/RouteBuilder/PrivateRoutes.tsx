@@ -54,6 +54,16 @@ const LazyAddQuestion = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion/AddQuestion")
 );
 
+const LazyLessonSubject = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Subject")
+);
+
+const LazyLessonTopic = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Topic")
+);
+
+
+
 export const PrivateRoutes = () => {
   interface RouteConfig {
     path: string;
@@ -120,6 +130,15 @@ export const PrivateRoutes = () => {
       path: "/assignment_help/:topic/discussion",
       element: <LazyChat />,
     },
+    {
+      path: "/lessons_criteria/:subject",
+      element: <LazyLessonSubject />,
+    },
+    {
+      path: "/lessons_criteria/:subject/:lesson",
+      element: <LazyLessonTopic />,
+    },
+    
   ];
 
 

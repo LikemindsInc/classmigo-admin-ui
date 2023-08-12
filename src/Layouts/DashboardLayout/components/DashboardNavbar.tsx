@@ -5,13 +5,15 @@ import { UserOutlined } from "@ant-design/icons";
 import { useContext } from "react";
 import { NavbarContext, UserContext } from "../../../Contexts/Contexts";
 import { Popover } from "antd";
+import { Breadcrumbs } from "../../../Ui_elements";
+import { devices } from "../../../utils/mediaQueryBreakPoints";
 
 export const DashboardNavbar = () => {
   const { title } = useContext(NavbarContext);
-  const {setUser} = useContext(UserContext)
+  const { setUser } = useContext(UserContext);
   const logout = () => {
-    setUser(null)
-  }
+    setUser(null);
+  };
 
   const content = (
     <Logout onClick={logout}>
@@ -21,7 +23,10 @@ export const DashboardNavbar = () => {
 
   return (
     <Container>
-      <h2>{title}</h2>
+      <div>
+        <h2>{title}</h2>
+        <Breadcrumbs/>
+      </div>
 
       <div>
         <NotificationIcon />
@@ -47,18 +52,26 @@ const Container = styled.nav`
 
   h2 {
     font-size: 1.7rem;
+    @media ${devices.tabletL} {
+      font-size:1.2rem;
+    }
   }
 
-  div {
+  >div {
     display: flex;
+    align-items:center;
     gap: 1rem;
   }
+
+  >div:first-child {
+    align-items:flex-end;
+  }
+
 `;
 
 const Logout = styled.div`
   width: 100%;
   text-align: center;
-  padding: 5px 10px;
   cursor: pointer;
   &:hover {
     background-color: #f5e9ff;

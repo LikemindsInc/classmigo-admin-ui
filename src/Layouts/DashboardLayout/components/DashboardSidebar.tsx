@@ -1,5 +1,6 @@
 // import { MenuUnfoldOutlined } from "@ant-design/icons";
-import React from "react";
+import { MenuOutlined } from "@ant-design/icons";
+import { useState } from "react";
 import styled from "styled-components";
 import {
   AdminIcon,
@@ -16,6 +17,8 @@ import { SideBarMenuItem } from "../../../Ui_elements";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
 
 export const DashboardSidebar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const userMenus = [
     {
       path: "/students",
@@ -84,10 +87,15 @@ export const DashboardSidebar = () => {
       icon: <UserIcon />,
     },
   ];
+
+  const showMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
   return (
-    <>
-      {/* <Menu /> */}
-      <Container>
+    <OuterContainer>
+      <Menu show={menuOpen} onClick={showMenu} />
+
+      <Container show={menuOpen}>
         <div>
           <SideLogo />
           <section>
@@ -98,6 +106,7 @@ export const DashboardSidebar = () => {
             {userMenus.map((item, index) => {
               return (
                 <SideBarMenuItem
+                  // setShowMenu={setMenuOpen}
                   key={index}
                   icon={item.icon}
                   title={item.title}
@@ -111,6 +120,7 @@ export const DashboardSidebar = () => {
             {lessonMenus.map((item, index) => {
               return (
                 <SideBarMenuItem
+                  // setShowMenu={setMenuOpen}
                   key={index}
                   icon={item.icon}
                   title={item.title}
@@ -124,6 +134,7 @@ export const DashboardSidebar = () => {
             {extrasMenus.map((item, index) => {
               return (
                 <SideBarMenuItem
+                  // setShowMenu={setMenuOpen}
                   key={index}
                   icon={item.icon}
                   title={item.title}
@@ -136,20 +147,26 @@ export const DashboardSidebar = () => {
 
         <div>
           <SideBarMenuItem
+            // setShowMenu={setMenuOpen}
             icon={<AdminIcon />}
             title="Admin Access"
             path={"/admin"}
           />
         </div>
       </Container>
-    </>
+
+      <Touchable
+        show={menuOpen}
+        onClick={() => setMenuOpen(!menuOpen)}
+      ></Touchable>
+    </OuterContainer>
   );
 };
 
-const Container = styled.aside`
+const Container = styled.aside<{ show: boolean }>`
   max-height: 100vh;
   padding: 1.5rem 0 3.4rem 0;
-  width: clamp(15rem, 100vw, 24.5rem) !important;
+  width: 19vw !important;
   background-color: white;
   transition: all 0.3s ease;
   display: flex;
@@ -162,13 +179,24 @@ const Container = styled.aside`
   }
 
   @media ${devices.tablet} {
-    display: none;
+    display: ${({ show }) => (show ? "block" : "none")};
+    width: 4rem !important;
+    padding: 0 !important;
+  }
+
+  > div {
+    float: left;
   }
 
   h6 {
     font-size: 1rem;
     font-weight: 700;
     padding-left: 3.4rem;
+    @media ${devices.tablet} {
+      font-size: 0.8rem;
+      color: gray;
+      display: none;
+    }
   }
   section {
     margin-bottom: 2.1rem;
@@ -178,16 +206,43 @@ const Container = styled.aside`
   }
 `;
 
+const OuterContainer = styled.div`
+  @media ${devices.tablet} {
+    display: flex;
+    width: 100vw !important ;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+`;
+
+const Touchable = styled.div<{ show: boolean }>`
+  width: 100%;
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.08);
+  display: ${({ show }) => (show ? "flex" : " none")};
+`;
+
 const SideLogo = styled(Logo)`
   width: clamp(6rem, 50vw, 11rem);
   height: clamp(1rem, 50vw, 1.5rem);
   margin-bottom: 2.8rem;
   margin-left: 3.4rem;
+  @media ${devices.tablet} {
+    display: none;
+  }
 `;
 
+const Menu = styled(MenuOutlined)<{ show: boolean }>`
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-top: 2.5rem;
+  margin-left: 1.2rem;
+  display: none;
 
-// const Menu = styled(MenuUnfoldOutlined)`
-//   font-size: 2rem;
-//   color: var(--primary-color);
-//   margin-top: 2rem;
-// `
+  @media ${devices.tablet} {
+    display: ${({ show }) => (show ? "none" : "block")};
+  }
+`;
