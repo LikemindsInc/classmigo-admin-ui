@@ -8,6 +8,8 @@ interface InputProps {
   error?: any;
   register?: any;
   id?: string;
+  disabled?: boolean;
+  value?: string | number;
 }
 
 export const InputElement = ({
@@ -17,6 +19,8 @@ export const InputElement = ({
   error,
   register,
   id,
+  disabled,
+  value,
   ...otherProps
 }: InputProps) => {
   return (
@@ -26,7 +30,9 @@ export const InputElement = ({
           <label>{label}</label>
           <TextInput
             {...otherProps}
+            value={value}
             type={type}
+            disabled={disabled}
             placeholder={placeholder}
             {...(register && { ...register(id) })}
           />
@@ -42,6 +48,9 @@ export const InputElement = ({
         <InputHolder>
           <label>{label}</label>
           <TextInput
+            value={value}
+            type={type}
+            disabled={disabled}
             placeholder={placeholder}
             {...(register && { ...register(id) })}
           />
@@ -62,14 +71,19 @@ const TextInput = styled.input`
   width: fill;
   border-color: var(--primary-color);
   border-width: 1px;
-  padding: clamp(0.5rem, 30vw, 1rem);
+  padding: 8px 20px;
   outline: none;
-  border: 1px solid #7b31b2;
+  font-size: 14px;
+  font-weight: 400;
+  border: ${({ disabled }) => (disabled ? "1px solid #EED7FF" : "1px solid #7b31b2")};
   border-radius: 5px;
+  color: ${({ disabled }) => (disabled ? "gray" : "black")};
+  background-color: ${({ disabled }) =>
+    disabled ? "var(--dashboardBackground)" : "transparent"};
   &:focus {
     border: 1px solid #7b31b2;
-    -webkit-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 0 0 2px rgba(123, 49, 178, 0.3);
+    box-shadow: 0 0 0 2px rgba(123, 49, 178, 0.3);
   }
 `;
 
@@ -81,6 +95,7 @@ const InputHolder = styled.div`
 
   label {
     font-weight: 600;
+    font-size: 0.8rem;
   }
   div {
     display: flex;
@@ -102,4 +117,7 @@ const ErrorContainer = styled.div`
   bottom: -20px;
   left: 0;
   z-index: 2;
+  p{
+    font-size:0.7rem !important;
+  }
 `;

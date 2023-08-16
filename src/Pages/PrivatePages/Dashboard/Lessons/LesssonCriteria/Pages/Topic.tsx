@@ -101,7 +101,7 @@ const SelectTopic = () => {
       <Header>
         <div>
           <div>
-            <label>Create a subject</label>
+            <label>Create a topic</label>
             <Input
               placeholder="Enter a subject name"
               value={topic.lessonName}

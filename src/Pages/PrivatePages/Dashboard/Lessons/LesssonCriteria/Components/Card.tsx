@@ -4,15 +4,19 @@ import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import { DeleteOutlined } from "@ant-design/icons";
+import { useApiDelete } from "../../../../../../custom-hooks";
+import { deleteClassUrl } from "../../../../../../Urls";
+import { Loader } from "../../../../../../Ui_elements";
+import { toast } from "react-toastify";
 
 interface CardProps {
   subjects?: string[];
+  id:number
   topics?: string[];
   classname: string;
   index: number;
   isDraggedOver?: any;
-  subjectNumber: number;
-  topicNumber: number;
   item: any;
   onDragStart?: () => void;
   onDragEnter?: () => void;
@@ -27,8 +31,7 @@ export const Card = ({
   topics,
   index,
   item,
-  subjectNumber,
-  topicNumber,
+  id,
   onDragStart,
   onDragEnter,
   onDragEnd,
@@ -37,7 +40,37 @@ export const Card = ({
   ...otherProps
 }: CardProps) => {
   const navigate = useNavigate();
-  
+
+  const onSuccess = () => {
+    toast.success("Successfully Deleted Class", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const onError = (error:any) => {
+    toast.error(`Something went wrong ${error.message}`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  const { mutate: deleteClass, isLoading: isDeleting } = useApiDelete(
+    () => deleteClassUrl(id),
+    onSuccess,
+    onError,
+    ["class"]
+  );
+
   return (
     <OuterContainer
       draggable
@@ -48,28 +81,36 @@ export const Card = ({
       isDraggedOver={isDraggedOver}
       {...otherProps}
     >
-      <Container>
-        <DetailsContainer
-          onClick={() => {
-            navigate(`/lessons_criteria/${classname}`, {
-              state: {
-                title: classname,
-                scope: item,
-              },
-            });
-          }}
-        >
-          <h6>{classname}</h6>
-          <ToolsContainer>
-            <Tools>{subjectNumber} Subjects</Tools>
-            <Tools>{topicNumber} Topics</Tools>
-          </ToolsContainer>
-        </DetailsContainer>
-        <SwitchContainer>
-          <SwitchElement />
-        </SwitchContainer>
-      </Container>
-      <MoveIcon style={{ cursor: "move" }} />
+      <>
+        {isDeleting ? (
+          <Loader />
+        ) : (
+          <>
+            <Container>
+              <DetailsContainer
+                onClick={() => {
+                  navigate(`/lessons_criteria/${classname}`, {
+                    state: {
+                      title: classname,
+                      scope: item,
+                    },
+                  });
+                }}
+              >
+                <h6>{classname}</h6>
+                <ToolsContainer>
+                  <Tools>{subjects} Subjects</Tools>
+                </ToolsContainer>
+              </DetailsContainer>
+              <SwitchContainer>
+                <SwitchElement />
+              </SwitchContainer>
+            </Container>
+            <MoveIcon style={{ cursor: "move" }} />
+            <Delete onClick={() => deleteClass()} />
+          </>
+        )}
+      </>
     </OuterContainer>
   );
 };
@@ -119,7 +160,7 @@ const DetailsContainer = styled.div`
 `;
 const SwitchContainer = styled.div`
   @media ${devices.mobileXS} {
-    display:none;
+    display: none;
   }
 `;
 
@@ -132,4 +173,9 @@ const OuterContainer = styled.div<{ isDraggedOver: boolean }>`
   transition: transform 0.3s ease-in-out;
   transform: ${(props) =>
     props.isDraggedOver ? "translateY(10px)" : "translateY(0)"};
+`;
+
+const Delete = styled(DeleteOutlined)`
+  cursor: pointer;
+  color: red;
 `;

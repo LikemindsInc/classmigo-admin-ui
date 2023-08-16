@@ -8,8 +8,8 @@ interface InputProps {
   placeholder?: string;
   wordCount?: number;
   label?: string;
-  messages: any[];
-  onSend: (e: any) => void;
+  messages?: any[];
+  onSend?: (e: any) => void;
 }
 
 const { TextArea } = Input;
@@ -23,29 +23,31 @@ export const TextAreaElement = ({
 }: InputProps) => {
   const [message, setMessage] = useState("");
 
-  const handleMessage = (e: any) => {
-    setMessage(e.target.value);
+  const handleMessageChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setMessage(event.target.value);
   };
 
   const handleSubmit = () => {
     if (message.trim() !== "") {
-      onSend(message);
+      // onSend(message);
       setMessage("");
     }
   };
 
+
   return (
     <>
       <InputHolder>
-        <label>{label}</label>
-        <TextInput
-          showCount
-          placeholder={placeholder}
-          maxLength={wordCount}
-          allowClear
-          onChange={handleMessage}
+        <StyledTextArea
+          rows={1}
           value={message}
+          onChange={handleMessageChange}
+          placeholder={placeholder}
         />
+        <WordCount>{message.length}</WordCount>
+
         <SendContainer>
           <SendIconStyled />
           <ButtonElement
@@ -61,37 +63,24 @@ export const TextAreaElement = ({
 };
 
 // Styles
-const TextInput = styled(TextArea)`
-  height: 6rem;
-  width: fill;
-  border-color: var(--primary-color);
-  border-width: 1px;
-  padding: clamp(0.5rem, 30vw, 1rem);
-  color: var(--primary-color);
-  :hover {
-    border-width: 2px;
-    border-color: var(--primary-color) !important;
-  }
 
-  :focus {
-    border-color: var(--primary-color);
-    outline: 0;
-    -webkit-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+const InputHolder = styled.div`
+  position: relative;
+  height: 10rem;
+  outline: none;
+  border-radius: 5px;
+  border: 1px solid #eed7ff;
+  &:focus-within {
+    border: 1px solid var(--primary-color);
   }
 `;
 
-const InputHolder = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  position: relative;
-
-  label {
-    font-weight: 600;
-    font-size: 0.8rem;
-    color: var(--primary-color);
-  }
+const WordCount = styled.div`
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #888;
 `;
 
 const SendContainer = styled.div`
@@ -105,6 +94,23 @@ const SendContainer = styled.div`
   button {
     font-size: 0.8rem;
     padding: 0.5rem 1rem;
+  }
+`;
+
+const StyledTextArea = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  resize: none;
+  overflow: hidden;
+  height: 100%;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+
+  &:focus {
+    border: none;
+    outline: none;
   }
 `;
 

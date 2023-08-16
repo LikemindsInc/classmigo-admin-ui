@@ -105,7 +105,7 @@ export const PaymentData = () => {
             options={dateSelectOptions}
             onChange={handleDateChange}
             defaultValue={dateRange}
-            width={130}
+            width={140}
           />
         </SelectContainer>
       </Header>

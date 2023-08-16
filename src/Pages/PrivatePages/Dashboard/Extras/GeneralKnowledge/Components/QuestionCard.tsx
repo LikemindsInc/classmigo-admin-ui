@@ -22,20 +22,23 @@ export const QuestionCard = ({
 }: QuestionCardProp) => {
   return (
     <Container>
-      <Number>
-        <p>{id}</p>
-      </Number>
-      <QuestionContainer>
-        <h5>{question}</h5>
-        <OptionsContainer>
-          {options.map((option: any, index: number) => (
-            <div key={index}>
-              <h6>{option.id}</h6>
-              <p>{option.label}</p>
-            </div>
-          ))}
-        </OptionsContainer>
-      </QuestionContainer>
+      <QuestionHolder>
+        <Number>
+          <p>{id}</p>
+        </Number>
+        <QuestionContainer>
+          <h5>{question}</h5>
+          <OptionsContainer>
+            {options.map((option: any, index: number) => (
+              <div key={index}>
+                <h6>{option.id}</h6>
+                <p>{option.label}</p>
+              </div>
+            ))}
+          </OptionsContainer>
+        </QuestionContainer>
+      </QuestionHolder>
+
       <ImageContainer>
         <img src={imageUrl || Placeholder} alt="" />
         <div>
@@ -49,17 +52,19 @@ export const QuestionCard = ({
 
 const Container = styled.div`
   display: flex;
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 12px;
   gap: 1.5rem;
-  width: fit-content;
+  width: 100%;
   background-color: var(--dashboardBackground);
   margin-bottom: 2rem;
+  justify-content: space-between;
+  
 `;
 const Number = styled.div`
   background-color: var(--primary-color);
-  height: 0.8rem;
-  width: 0.8rem;
+  height: 0.3rem;
+  width: 0.3rem;
   padding: 1rem;
   border-radius: 50%;
   display: flex;
@@ -67,17 +72,20 @@ const Number = styled.div`
   justify-content: center;
   p {
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 600;
   }
 `;
 const QuestionContainer = styled.div`
   h5 {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
   }
 `;
-
+const QuestionHolder = styled.div`
+  display: flex;
+  gap: 20px;
+`
 const OptionsContainer = styled.div`
   margin-top: 1rem;
   cursor: pointer;
@@ -97,7 +105,7 @@ const OptionsContainer = styled.div`
       font-weight: 600;
       transition: all 0.3s ease;
       font-size: 1rem;
-      margin-right: 0.5rem;
+      margin-right: 0.1rem;
       height: 2rem;
       width: 2rem;
       padding: 0.3rem;
@@ -113,6 +121,7 @@ const OptionsContainer = styled.div`
 `;
 
 const ImageContainer = styled.div`
+
   > div {
     display: flex;
     gap: 1rem;
@@ -120,8 +129,9 @@ const ImageContainer = styled.div`
     align-items: center;
     margin-top: 1rem;
     button {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       width: fit-content !important;
+      height: 30px;
     }
   }
 `;

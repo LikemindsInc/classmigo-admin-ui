@@ -3,7 +3,7 @@ import { SearchOutlined } from "@ant-design/icons";
 
 interface SearchProps {
   onSearch?: () => void;
-  width?: string;
+  width?: number;
 }
 
 export const SearchInput = ({ onSearch, width }: SearchProps) => {
@@ -17,20 +17,27 @@ export const SearchInput = ({ onSearch, width }: SearchProps) => {
   );
 };
 
-const SearchContainer = styled.div<{ width?: string }>`
-  width: ${({ width }) => (width ? width : "100%")};
+const SearchContainer = styled.div<{ width?: number }>`
+  width: ${({ width }) => (width ? width + "px" : "100%")};
   display: flex;
   background-color: var(--dashboardBackground);
   border-radius: 10px;
   justify-content: space-between;
+  -webkit-box-shadow: 0 0 0 2px rgba(123, 49, 178, 0.3);
+  box-shadow: 0 0 0 2px rgba(123, 49, 178, 0.3);
+  &:focus-within {
+    border: 1px solid var(--primary-color);
+    background-color: transparent;
+
+  }
 
   input {
     width: 100%;
     border: none;
     outline: none;
     background-color: transparent;
-    font-size: 0.8rem;
-    padding: 0.6rem 1rem;
+    font-size: 14px;
+    padding: 8px 20px;
 
     &::placeholder {
       font-size: 0.8rem;
