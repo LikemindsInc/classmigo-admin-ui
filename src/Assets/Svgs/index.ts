@@ -30,7 +30,16 @@ import { ReactComponent as UploadIcon } from '../Svgs/DashboardIcons/upload.svg'
 import { ReactComponent as ErrorIcon } from '../Svgs/DashboardIcons/error.svg';
 import { ReactComponent as NoDataIcon } from '../Svgs/DashboardIcons/more.svg';
 import { ReactComponent as MoveIcon } from '../Svgs/DashboardIcons/move.svg';
-import { ReactComponent as ToggleIcon} from '../Svgs/DashboardIcons/toggle.svg';
+import { ReactComponent as ToggleIcon } from '../Svgs/DashboardIcons/toggle.svg';
+import { ReactComponent as PlayVideoIcon } from '../Svgs/DashboardIcons/playIcon.svg';
+import { ReactComponent as MicIcon } from '../Svgs/VideoCallIcons/mic.svg';
+import { ReactComponent as VideosIcon} from '../Svgs/VideoCallIcons/video.svg';
+import { ReactComponent as ShareIcon} from '../Svgs/VideoCallIcons/sharedScreen.svg';
+import { ReactComponent as ArtBoardIcon} from '../Svgs/VideoCallIcons/artBoard.svg';
+import { ReactComponent as EndIcon} from '../Svgs/VideoCallIcons/endCall.svg';
+
+
+
 
 
 
@@ -69,5 +78,11 @@ export {
     ErrorIcon,
     NoDataIcon,
     MoveIcon,
-    ToggleIcon
+    ToggleIcon,
+    PlayVideoIcon,
+    MicIcon,
+    VideosIcon,
+    ShareIcon,
+    ArtBoardIcon,
+    EndIcon
 }

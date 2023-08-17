@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "react-toastify/dist/ReactToastify.css";
 import { useContext } from "react";
 import { UserContext } from "./Contexts/Contexts";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const { user } = useContext(UserContext);
@@ -32,7 +33,6 @@ function App() {
     },
   });
 
-
   return (
     <QueryClientProvider client={queryClient}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -41,6 +41,7 @@ function App() {
             <DrawerContextProvider>
               <ModalContextProvider>
                 {user ? <PrivateRoutes /> : <SharedRoutes />}
+                <ToastContainer />
               </ModalContextProvider>
             </DrawerContextProvider>
           </NavbarContextProvider>

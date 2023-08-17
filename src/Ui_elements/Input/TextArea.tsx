@@ -1,67 +1,75 @@
-import { styled } from "styled-components";
-import { Input } from "antd";
+import { useState } from "react";
+import styled from "styled-components";
 
-
-interface InputProps {
+interface TextAreaProps {
+  width?: number;
   placeholder?: string;
   label?: string;
-  handleChange: (e: any) => void;
-  value: string | number;
 }
+export const TextAreaInput = ({ width, placeholder, label }: TextAreaProps) => {
+  const [text, setText] = useState("");
+  console.log(width)
+  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(event.target.value);
+  };
+  const wordCount = text.length;
 
-const { TextArea } = Input;
-
-export const TextAreaInput = ({
-  placeholder,
-  label,
-  value,
-  handleChange,
-}: InputProps) => {
   return (
     <>
-      <InputHolder>
-        <label>{label}</label>
-        <TextInput
+      <Label>{label}</Label>
+      <TextAreWrapper>
+        <StyledTextArea
+          width={width}
+          value={text}
+          onChange={handleTextChange}
           placeholder={placeholder}
-          allowClear
-          onChange={handleChange}
-          value={value}
+          // style={{
+          //   height: `calc(${text.split("\n").length} * 1.5em)`,
+          // }}
         />
-      </InputHolder>
+        <WordCount>{wordCount}</WordCount>
+      </TextAreWrapper>
     </>
   );
 };
 
-// Styles
-const TextInput = styled(TextArea)`
-  height: 6rem;
-  width: fill;
-  border-color: var(--primary-color);
-  border-width: 1px;
-  padding: clamp(0.5rem, 30vw, 1rem);
-  color: var(--primary-color);
-  :hover {
-    border-width: 2px;
-    border-color: var(--primary-color) !important;
+const TextAreWrapper = styled.div`
+  position: relative;
+  height: 10rem;
+  outline: none;
+  border-radius: 5px;
+  border: 1px solid #eed7ff;
+  &:focus-within {
+    border: 1px solid var(--primary-color);
   }
+`;
+const StyledTextArea = styled.textarea<{ width?: number }>`
+  width: ${({ width }) => width ? width + "px" : '100%'};
+  padding: 10px;
+  resize: none;
+  overflow: hidden;
+  height: 100%;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  font-size: 14px;
 
-  :focus {
-    border-color: var(--primary-color);
-    outline: 0;
-    -webkit-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+  &:focus {
+    border: none;
+    outline: none;
   }
 `;
 
-const InputHolder = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  position: relative;
+const WordCount = styled.div`
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #888;
+`;
 
-  label {
-    font-weight: 600;
-    font-size: 0.8rem;
-    color: var(--primary-color);
-  }
+const Label = styled.label`
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin-bottom: 1rem !important;
 `;

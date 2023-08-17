@@ -20,49 +20,100 @@ const LazyPayments = lazy(
 
 //Lessons Menu routes
 const LazyLessonCriteria = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/LessonCriteria")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/LessonCriteria"
+    )
 );
 const LazyVideoLibrary = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/VideoLibrary")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/VideoLibrary/VideoLibrary"
+    )
 );
+const LazyVideoLibraryDetails = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/VideoLibrary/Pages/VideoDetails"
+    )
+);
+
 const LazyQuizLibrary = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary")
+  () =>
+    import("../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/QuizLibrary")
 );
 const LazyScheduleLessons = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/ScheduleLessons")
+  () => import("../../Pages/PrivatePages/Dashboard/Lessons/ScheduleWeeklyLessons/ScheduleLessons")
 );
 const LazyAskTheTeacher = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/AskTheTeacher")
+  () => import("../../Pages/PrivatePages/Dashboard/Lessons/AskTheTeacher/AskTheTeacher")
 );
 const LazyScheduleLiveLessons = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/ScheduleLessons")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LiveSessions/LiveSessions"
+    )
+);
+
+const LazyScheduleLiveLessonsForm = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LiveSessions/Pages/LiveSessionsForm"
+    )
 );
 
 //Extras Menu Routes
 const LazyAssignmentHelp = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Extras/AssignmentHelp/AssignmentHelp")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Extras/AssignmentHelp/AssignmentHelp"
+    )
 );
 const LazyGeneralKnowledge = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/GeneralKnowledge")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/GeneralKnowledge"
+    )
 );
 
 const LazyChat = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Chat/Chat")
 );
 
-const LazyAddQuestion = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion/AddQuestion")
+const LazyAddQuestionGeneralKnowledge = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion/AddQuestion"
+    )
+);
+
+const LazyQuizLibraryAddQuestion = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/AddQuestion"
+    )
 );
 
 const LazyLessonSubject = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Subject")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Subject"
+    )
 );
 
 const LazyLessonTopic = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Topic")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Topic"
+    )
 );
 
-
+const LazyLiveCall = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LiveSessions/Pages/LiveCall"
+    )
+);
 
 export const PrivateRoutes = () => {
   interface RouteConfig {
@@ -98,8 +149,16 @@ export const PrivateRoutes = () => {
       element: <LazyVideoLibrary />,
     },
     {
+      path: "/video_library/:id",
+      element: <LazyVideoLibraryDetails />,
+    },
+    {
       path: "/quiz_library",
       element: <LazyQuizLibrary />,
+    },
+    {
+      path: "/quiz_library/add_question",
+      element: <LazyQuizLibraryAddQuestion />,
     },
     {
       path: "/schedule_lessons",
@@ -115,6 +174,10 @@ export const PrivateRoutes = () => {
       element: <LazyScheduleLiveLessons />,
     },
     {
+      path: "/live_lessons/schedule_session",
+      element: <LazyScheduleLiveLessonsForm />,
+    },
+    {
       path: "/assignment_help",
       element: <LazyAssignmentHelp />,
     },
@@ -124,10 +187,18 @@ export const PrivateRoutes = () => {
     },
     {
       path: "/general_knowledge/add_question",
-      element: <LazyAddQuestion />,
+      element: <LazyAddQuestionGeneralKnowledge />,
+    },
+    {
+      path: "/general_knowledge/add_question",
+      element: <LazyAddQuestionGeneralKnowledge />,
     },
     {
       path: "/assignment_help/:topic/discussion",
+      element: <LazyChat />,
+    },
+    {
+      path: "/ask_the_teacher/:topic/discussion",
       element: <LazyChat />,
     },
     {
@@ -138,9 +209,11 @@ export const PrivateRoutes = () => {
       path: "/lessons_criteria/:subject/:lesson",
       element: <LazyLessonTopic />,
     },
-    
+    {
+      path: "/live_lessons/:id",
+      element: <LazyLiveCall />,
+    },
   ];
-
 
   return (
     <Routes>

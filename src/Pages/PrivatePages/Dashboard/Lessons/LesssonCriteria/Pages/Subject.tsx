@@ -4,9 +4,12 @@ import noData from "../../../../../../Assets/noData.png";
 import { useLocation } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { SubjectCard } from "../Components/SubjectCard";
-import { useApiGet } from "../../../../../../custom-hooks";
+import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import { Skeleton } from "@mui/material";
-import { getAllSubjectsUrl } from "../../../../../../Urls";
+import { createSubjectUrl, getAllSubjectsUrl } from "../../../../../../Urls";
+import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
+import { AddIcon } from "../../../../../../Assets/Svgs";
+import { useForm } from "react-hook-form";
 
 const SelectSubject = () => {
   const location = useLocation();
@@ -15,6 +18,8 @@ const SelectSubject = () => {
   const [selectSubject, setSelectSubject] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
 
+  const { register, handleSubmit } = useForm();
+
   const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
     ["subject"],
     () => getAllSubjectsUrl(scope),
@@ -22,6 +27,16 @@ const SelectSubject = () => {
       refetchOnWindowFocus: false,
       enabled: true,
     }
+  );
+
+
+  const onSuccess = () => {};
+  const onError = () => {};
+  const { mutate: createSubject, isLoading: isCreatingSubject } = useApiPost(
+    createSubjectUrl,
+    onSuccess,
+    onError,
+    ["subject"]
   );
 
   const dragClass = useRef<any>(null);
@@ -42,9 +57,22 @@ const SelectSubject = () => {
     }
   }, [subjects]);
 
+  const onSubmit = (data: any) => {
+    createSubject(data);
+  };
+
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Container>
+        <Header>
+          <InputElement
+            label="Create Subject"
+            placeholder="Enter Subject"
+            register={register}
+            id="name"
+          />
+          <ButtonElement label="Add Class" icon={<AddIcon />} isLoading={isCreatingSubject} />
+        </Header>
         <Body>
           {selectSubject?.subjects?.length > 0 ? (
             selectSubject?.subjects?.map((item: any, index: number) => (
@@ -54,6 +82,7 @@ const SelectSubject = () => {
                 item={item?.name}
                 classTitle={scope}
                 title={title}
+                id={item?._id}
                 index={index}
                 onDragStart={() => (dragClass.current = index)}
                 onDragEnter={() => (dragOverClass.current = index)}
@@ -111,7 +140,7 @@ const SelectSubject = () => {
           )}
         </Body>
       </Container>
-    </>
+    </form>
   );
 };
 
@@ -157,4 +186,24 @@ const NoData = styled.div`
 
 const SkeletonContainer = styled.div`
   margin-bottom: 10px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+
+  input {
+    width: 350px;
+    margin-right: 1rem;
+  }
+  button {
+    font-size: 0.8rem;
+    height: 38px !important;
+    width: 150px;
+    align-self: flex-end !important;
+  }
+  @media ${devices.tabletL} {
+    gap: 4%;
+  }
 `;

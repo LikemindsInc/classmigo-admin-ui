@@ -4,6 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import {
   AdminIcon,
+  AskIcon,
   HomeIcon,
   LessonIcon,
   Logo,
@@ -58,29 +59,24 @@ export const DashboardSidebar = () => {
       title: "Schedule Weekly Lessons",
       icon: <ScheduleIcon />,
     },
-    {
-      path: "/ask_the_teacher",
-      title: "Ask The Teacher",
-      icon: <VideoIcon />,
-    },
     // {
-    //   path: "/quiz_library",
-    //   title: "Quiz Library",
+    //   path: "/ask_the_teacher",
+    //   title: "Ask The Teacher",
     //   icon: <AskIcon />,
     // },
     {
-      path: "/schedule_lessons",
-      title: "Schedule Live Lessons",
+      path: "/live_lessons",
+      title: "Live Lessons",
       icon: <ScheduleIcon />,
     },
   ];
 
   const extrasMenus = [
-    {
-      path: "/assignment_help",
-      title: "Assignment Help",
-      icon: <UserIcon />,
-    },
+    // {
+    //   path: "/assignment_help",
+    //   title: "Assignment Help",
+    //   icon: <UserIcon />,
+    // },
     {
       path: "/general_knowledge",
       title: "General Knowledge",
@@ -164,7 +160,7 @@ export const DashboardSidebar = () => {
 };
 
 const Container = styled.aside<{ show: boolean }>`
-  max-height: 100vh;
+  min-height: 100vh;
   padding: 1.5rem 0 3.4rem 0;
   width: 19vw !important;
   background-color: white;

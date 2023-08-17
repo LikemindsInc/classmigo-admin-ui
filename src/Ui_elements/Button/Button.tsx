@@ -47,11 +47,11 @@ const Button = styled.button<StyledButtonProps>`
     outline ? "transparent" : "var(--primary-color)"};
   color: ${({ outline }) => (outline ? "var(--primary-color)" : "white")};
   font-weight: 700;
-  padding: ${({ outline }) => (outline ? "0.6rem 0.8rem" : "1.1rem")};
+  padding: ${({ outline }) => (outline ? "0.6rem 0.8rem" : "0.5rem")};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size:1vw;
+  font-size:14px;
   width: ${({ width }) => (width ? width + "px" : "100%")};
   border-radius: 6px;
   outline: none;

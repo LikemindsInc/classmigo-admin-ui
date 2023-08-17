@@ -3,13 +3,19 @@ import styled from "styled-components";
 import noData from "../../../../../Assets/noData.png";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Card } from "./Components/Card";
-import { useApiGet} from "../../../../../custom-hooks";
+import { useApiGet, useApiPost } from "../../../../../custom-hooks";
 import { Skeleton } from "@mui/material";
-import { getAllClassesUrl } from "../../../../../Urls";
+import { createClassUrl, getAllClassesUrl } from "../../../../../Urls";
+import { ButtonElement, InputElement } from "../../../../../Ui_elements";
+import { AddIcon } from "../../../../../Assets/Svgs";
+import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
 
 const LessonCriteria = () => {
   const [selectClass, setSelectClass] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
+
+  const { register, handleSubmit } = useForm();
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["classes"],
@@ -18,6 +24,36 @@ const LessonCriteria = () => {
       refetchOnWindowFocus: false,
       enabled: true,
     }
+  );
+
+  const onSuccess = () => {
+    toast.success("Successfully added topic", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const onError = (e: any) => {
+    console.log(e)
+    toast.error(`hj`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const { mutate: createClass, isLoading: isCreatingClass } = useApiPost(
+    createClassUrl,
+    onSuccess,
+    onError,
+    ["classes"]
   );
 
   useEffect(() => {
@@ -38,76 +74,95 @@ const LessonCriteria = () => {
     setSelectClass(items);
   };
 
+  const onSubmit = (data: any) => {
+    createClass(data);
+  };
+
   return (
-    <form>
-      <Container>
-        <Body>
-          {selectClass?.length > 0 ? (
-            selectClass.map((item: any, index: number) => (
-              <Card
-                item={item?.name}
-                classname={item?.value}
-                key={index}
-                index={index}
-                topicNumber={0}
-                subjectNumber={0}
-                onDragStart={() => (dragClass.current = index)}
-                onDragEnter={() => (dragOverClass.current = index)}
-                onDragEnd={handleDragSort}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDraggedOver(true);
-                }}
-                isDraggedOver={isDraggedOver}
-              />
-            ))
-          ) : isLoadingClasses ? (
-            <div>
-              <SkeletonContainer>
-                <Skeleton
-                  animation="wave"
-                  variant="rectangular"
-                  width={"100%"}
-                  height={118}
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Container>
+          <Header>
+            <InputElement
+              label="Create Class"
+              placeholder="Enter Class"
+              register={register}
+              id="name"
+            />
+            <ButtonElement
+              label="Add Class"
+              icon={<AddIcon />}
+              isLoading={isCreatingClass}
+            />
+          </Header>
+          <Body>
+            {selectClass?.length > 0 ? (
+              selectClass.map((item: any, index: number) => (
+                <Card
+                  item={item?.name}
+                  id={item?._id}
+                  classname={item?.value}
+                  key={index}
+                  index={index}
+                  subjects={item?.subjects.length}
+                  onDragStart={() => (dragClass.current = index)}
+                  onDragEnter={() => (dragOverClass.current = index)}
+                  onDragEnd={handleDragSort}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDraggedOver(true);
+                  }}
+                  isDraggedOver={isDraggedOver}
                 />
-              </SkeletonContainer>
-              <SkeletonContainer>
-                <Skeleton
-                  animation="wave"
-                  variant="rectangular"
-                  width={"100%"}
-                  height={118}
-                />
-              </SkeletonContainer>
+              ))
+            ) : isLoadingClasses ? (
+              <div>
+                <SkeletonContainer>
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width={"100%"}
+                    height={118}
+                  />
+                </SkeletonContainer>
+                <SkeletonContainer>
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width={"100%"}
+                    height={118}
+                  />
+                </SkeletonContainer>
 
-              <SkeletonContainer>
-                <Skeleton
-                  animation="wave"
-                  variant="rectangular"
-                  width={"100%"}
-                  height={118}
-                />
-              </SkeletonContainer>
+                <SkeletonContainer>
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width={"100%"}
+                    height={118}
+                  />
+                </SkeletonContainer>
 
-              <SkeletonContainer>
-                <Skeleton
-                  animation="wave"
-                  variant="rectangular"
-                  width={"100%"}
-                  height={118}
-                />
-              </SkeletonContainer>
-            </div>
-          ) : (
-            <NoData>
-              <img src={noData} alt="No data" />
-              <p>You haven’t added any classes yet.</p>
-              <p>Use the create class above to add classes.</p>
-            </NoData>
-          )}
-        </Body>
-      </Container>
-    </form>
+                <SkeletonContainer>
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width={"100%"}
+                    height={118}
+                  />
+                </SkeletonContainer>
+              </div>
+            ) : (
+              <NoData>
+                <img src={noData} alt="No data" />
+                <p>You haven’t added any classes yet.</p>
+                <p>Use the create class above to add classes.</p>
+              </NoData>
+            )}
+          </Body>
+        </Container>
+      </form>
+    </>
   );
 };
 
@@ -129,7 +184,6 @@ const Container = styled.section`
     padding: 1rem;
   }
 `;
-
 
 const Body = styled.section`
   width: 100%;
@@ -154,4 +208,25 @@ const NoData = styled.div`
 
 const SkeletonContainer = styled.div`
   margin-bottom: 10px;
+`;
+
+const Header = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+
+  input {
+    width: 350px;
+    margin-right: 1rem;
+  }
+  button {
+    font-size: 0.8rem;
+    height: 38px !important;
+    width: 150px;
+    align-self: flex-end !important;
+  }
+
+  @media ${devices.tabletL} {
+    gap: 4%;
+  }
 `;

@@ -5,10 +5,12 @@ import { MoveIcon } from "../../../../../../Assets/Svgs";
 import { ImageInput } from "../../../../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import { DeleteOutlined } from "@ant-design/icons";
 
 interface CardProps {
   subjects?: string[];
   topics?: string[];
+  id:number
   classname: string;
   classTitle: string;
   index: number;
@@ -29,6 +31,7 @@ export const SubjectCard = ({
   topics,
   index,
   item,
+  id,
   title,
   onDragStart,
   onDragEnter,
@@ -38,6 +41,7 @@ export const SubjectCard = ({
   ...otherProps
 }: CardProps) => {
   const navigate = useNavigate();
+  
   return (
     <OuterContainer
       draggable   
@@ -71,6 +75,7 @@ export const SubjectCard = ({
         </SwitchContainer>
       </Container>
       <MoveIcon style={{ cursor: "move" }} />
+      <Delete/>
     </OuterContainer>
   );
 };
@@ -128,9 +133,15 @@ const OuterContainer = styled.div<{ isDraggedOver: boolean }>`
 const ImageContainer = styled.div`
   width: 8rem;
   height: auto;
+  margin-right: 1rem;
   /* border: 1px solid gray; */
   img {
     width: 8rem;
     height: auto;
   }
 `;
+
+const Delete = styled(DeleteOutlined)`
+  cursor: pointer;
+  color: red;
+`

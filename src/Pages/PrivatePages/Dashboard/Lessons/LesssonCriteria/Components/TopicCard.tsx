@@ -6,6 +6,7 @@ import { ImageInput } from "../../../../../../Ui_elements";
 import { useApiGet } from "../../../../../../custom-hooks";
 import { getSubTopicsUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import { DeleteOutlined } from "@ant-design/icons";
 
 interface CardProps {
   subjects?: string[];
@@ -115,6 +116,7 @@ export const TopicCard = ({
           </SwitchContainer>
         </Container>
         <MoveIcon style={{ cursor: "move" }} />
+        <Delete/>
       </OuterContainer>{" "}
       {showSubtopic &&
         subtopic.map((item: any, index: number) => (
@@ -307,3 +309,8 @@ const SubtopicCard = styled.div`
     }
   }
 `;
+
+const Delete = styled(DeleteOutlined)`
+  cursor: pointer;
+  color: red;
+`
