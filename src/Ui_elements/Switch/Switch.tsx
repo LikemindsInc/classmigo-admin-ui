@@ -17,7 +17,7 @@ const CustomSwitch = styled(Switch)`
 
     &:hover {
       background: rgba(123, 49, 178, 0.2);
-    }
+    }  
   }
   .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
     background-color: var(--primary-color);
