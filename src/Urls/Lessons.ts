@@ -1,11 +1,18 @@
 import { ADMIN_BASE_URL } from "../utils/constants";
 import { request } from "../utils/requestProcessor";
 
-export const getAllLessonsUrl = (lessonName?: string) =>
-  request({
+export const getAllLessonsUrl = (
+  lessonName?: string,
+  page?: number,
+  size = 5
+) => {
+  return request({
     url: `${ADMIN_BASE_URL}/lessons?subject=${lessonName}`,
     method: "GET",
+    params: { page, size },
   });
+};
+
 export const getAllSubjectsUrl = (className: string) =>
   request({
     url: `class/${className}/subjects`,
@@ -14,7 +21,7 @@ export const getAllSubjectsUrl = (className: string) =>
 
 export const getAllClassesUrl = () =>
   request({
-    url: `class/get-all`,
+    url: `${ADMIN_BASE_URL}/class/get-all`,
     method: "GET",
   });
 
@@ -53,15 +60,27 @@ export const addSubTopicUrl = (data: any, id: number) =>
     data: data,
   });
 
-export const getLessonVideosUrl = () =>
-  request({
-    url: `${ADMIN_BASE_URL}/lesson/videos`,
-    method: "GET",
-  });
 
-  export const deleteClassUrl = (id: number) =>
+export const deleteClassUrl = (id: number) =>
   request({
     url: `class/${id}`,
     method: "DELETE",
   });
-  
+
+export const deactivateUrl = (name: string) =>
+  request({
+    url: `class/${name}/deactivate`,
+    method: "PUT",
+  });
+
+export const activateUrl = (name: string) =>
+  request({
+    url: `class/${name}/activate`,
+    method: "PUT",
+  });
+
+// export const addTopicUrl = (name: string) =>
+//   request({
+//     url: `class/${name}/activate`,
+//     method: "PUT",
+//   });

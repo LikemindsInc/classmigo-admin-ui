@@ -2,17 +2,18 @@ import React from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
-import { ImageInput } from "../../../../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 
 interface CardProps {
   subjects?: string[];
   topics?: string[];
-  id:number
+  id: number;
   classname: string;
   classTitle: string;
+  active?: boolean;
   index: number;
   isDraggedOver?: any;
   item: any;
@@ -41,10 +42,51 @@ export const SubjectCard = ({
   ...otherProps
 }: CardProps) => {
   const navigate = useNavigate();
-  
+
+  const onSuccess = () => {
+    toast.success("Successful", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const onError = (error: any) => {
+    toast.error(`Something went wrong ${error.message}`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  // const toggleActive = () => {
+  //   isActive ? deactivateClass() : activateClass();
+  // };
+
+  // const { mutate: deactivateClass, isLoading: isDeactivating } = useApiPost(
+  //   () => deactivateUrl(item),
+  //   onSuccess,
+  //   onError,
+  //   ["class"]
+  // );
+
+  // const { mutate: activateClass, isLoading: activating } = useApiPost(
+  //   () => activateUrl(item),
+  //   onSuccess,
+  //   onError,
+  //   ["class"]
+  // );
+
   return (
     <OuterContainer
-      draggable   
+      draggable
       onDragStart={onDragStart}
       onDragEnter={onDragEnter}
       onDragEnd={onDragEnd}
@@ -64,9 +106,9 @@ export const SubjectCard = ({
             })
           }
         >
-          <ImageContainer>
+          {/* <ImageContainer>
             <ImageInput />
-          </ImageContainer>
+          </ImageContainer> */}
           {/* <img src={placeholder} alt="Icon" /> */}
           <h6>{classname}</h6>
         </DetailsContainer>
@@ -75,7 +117,7 @@ export const SubjectCard = ({
         </SwitchContainer>
       </Container>
       <MoveIcon style={{ cursor: "move" }} />
-      <Delete/>
+      <Delete />
     </OuterContainer>
   );
 };
@@ -113,7 +155,7 @@ const DetailsContainer = styled.div`
 `;
 const SwitchContainer = styled.div`
   @media ${devices.mobileXS} {
-    display:none;
+    display: none;
   }
 `;
 
@@ -144,4 +186,4 @@ const ImageContainer = styled.div`
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;
   color: red;
-`
+`;

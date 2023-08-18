@@ -1,20 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useApiDelete } from "../../../../../../custom-hooks";
-import { deleteClassUrl } from "../../../../../../Urls";
-import { Loader } from "../../../../../../Ui_elements";
+import { useApiDelete, useApiPost } from "../../../../../../custom-hooks";
+import {
+  activateUrl,
+  deactivateUrl,
+  deleteClassUrl,
+} from "../../../../../../Urls";
+import { Loader, Spinner } from "../../../../../../Ui_elements";
 import { toast } from "react-toastify";
 
 interface CardProps {
   subjects?: string[];
-  id:number
+  id: number;
   topics?: string[];
   classname: string;
+  active: boolean;
   index: number;
   isDraggedOver?: any;
   item: any;
@@ -31,6 +36,7 @@ export const Card = ({
   topics,
   index,
   item,
+  active,
   id,
   onDragStart,
   onDragEnter,
@@ -40,9 +46,9 @@ export const Card = ({
   ...otherProps
 }: CardProps) => {
   const navigate = useNavigate();
-
+  let isActive = active;
   const onSuccess = () => {
-    toast.success("Successfully Deleted Class", {
+    toast.success("Successful", {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -52,7 +58,7 @@ export const Card = ({
       theme: "light",
     });
   };
-  const onError = (error:any) => {
+  const onError = (error: any) => {
     toast.error(`Something went wrong ${error.message}`, {
       position: "top-right",
       autoClose: 3000,
@@ -64,8 +70,25 @@ export const Card = ({
     });
   };
 
-  const { mutate: deleteClass, isLoading: isDeleting } = useApiDelete(
-    () => deleteClassUrl(id),
+  const toggleActive = () => {
+    isActive ? deactivateClass() : activateClass();
+  };
+  // const { mutate: deleteClass, isLoading: isDeleting } = useApiDelete(
+  //   () => deleteClassUrl(id),
+  //   onSuccess,
+  //   onError,
+  //   ["class"]
+  // );
+
+  const { mutate: deactivateClass, isLoading: isDeactivating } = useApiPost(
+    () => deactivateUrl(item),
+    onSuccess,
+    onError,
+    ["class"]
+  );
+
+  const { mutate: activateClass, isLoading: activating } = useApiPost(
+    () => activateUrl(item),
     onSuccess,
     onError,
     ["class"]
@@ -82,34 +105,28 @@ export const Card = ({
       {...otherProps}
     >
       <>
-        {isDeleting ? (
-          <Loader />
-        ) : (
-          <>
-            <Container>
-              <DetailsContainer
-                onClick={() => {
-                  navigate(`/lessons_criteria/${classname}`, {
-                    state: {
-                      title: classname,
-                      scope: item,
-                    },
-                  });
-                }}
-              >
-                <h6>{classname}</h6>
-                <ToolsContainer>
-                  <Tools>{subjects} Subjects</Tools>
-                </ToolsContainer>
-              </DetailsContainer>
-              <SwitchContainer>
-                <SwitchElement />
-              </SwitchContainer>
-            </Container>
-            <MoveIcon style={{ cursor: "move" }} />
-            <Delete onClick={() => deleteClass()} />
-          </>
-        )}
+        <Container>
+          <DetailsContainer
+            onClick={() => {
+              navigate(`/lessons_criteria/${classname}`, {
+                state: {
+                  title: classname,
+                  scope: item,
+                },
+              });
+            }}
+          >
+            <h6>{classname}</h6>
+            <ToolsContainer>
+              <Tools>{subjects} Subjects</Tools>
+            </ToolsContainer>
+          </DetailsContainer>
+          <SwitchContainer>
+            <SwitchElement activeState={isActive} handleChange={toggleActive} />
+          </SwitchContainer>
+        </Container>
+        <MoveIcon style={{ cursor: "move" }} />
+        {/* {isDeleting ? <Spinner color="var(--primary-color)" /> : <Delete onClick={() => deleteClass()} />} */}
       </>
     </OuterContainer>
   );

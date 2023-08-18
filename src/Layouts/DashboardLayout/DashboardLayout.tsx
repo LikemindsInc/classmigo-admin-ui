@@ -20,8 +20,6 @@ export const DashboardLayout = ({children}:DashboardProp) => {
   )
 }
 
-
-
 //styles
 
 const Container = styled.div`
@@ -42,7 +40,7 @@ const Main = styled.main`
 
   @media ${devices.tabletL}{
     padding: 1rem;
-    width: 85%;
+    width: 100vw !important;
     margin-left:3rem;
   }
 

@@ -19,8 +19,8 @@ export const request = async (options: any) => {
   const onSuccess = (response: AxiosResponse) => {
     return response?.data;
   };
-  const onError = (error: AxiosError) => {
-    return Promise.reject(error.message);
+  const onError = (error: any) => {
+    return Promise.reject(error.response?.data?.message);
   };
 
   return client(options).then(onSuccess).catch(onError);

@@ -2,29 +2,33 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { PlayVideoIcon } from "../../../../../../Assets/Svgs";
-import { devices } from '../../../../../../utils/mediaQueryBreakPoints';
+import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import { VideoPlayerElement } from "../../../../../../Ui_elements";
 
 type VideoProps = {
   title?: string;
   index?: number;
+  source: string;
+  details?:any
 };
-export const VideoCard = ({ title, index }: VideoProps) => {
+export const VideoCard = ({ title, index, source, details }: VideoProps) => {
   const navigate = useNavigate();
   return (
-    <Container
-      onClick={() =>
-        navigate(`/video_library/${title}`, {
-          state: {
-            title: title,
-            index: index,
-          },
-        })
-      }
-    >
+    <Container>
       <MainContent>
-        <PlayVideoIcon />
+        {/* <PlayVideoIcon /> */}
+        <VideoPlayerElement source={source} />
       </MainContent>
-      <TopicContainer>
+      <TopicContainer
+        onClick={() =>
+          navigate(`/video_library/${title}`, {
+            state: {
+              details,
+              index: index,
+            },
+          })
+        }
+      >
         <p>
           {index && `0${index + 1}.`} {title}
         </p>
@@ -34,8 +38,8 @@ export const VideoCard = ({ title, index }: VideoProps) => {
 };
 
 const Container = styled.div`
-  width: 20vw;
-  height: 20vh;
+  width: 23vw;
+  height: fit-content;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -44,9 +48,15 @@ const Container = styled.div`
   box-shadow: 1px 3px 5px -1px rgba(0, 0, 0, 0.1);
   -webkit-box-shadow: 1px 3px 5px -1px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 1px 3px 5px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 
-  @media ${devices.tabletL}{
-    width:15rem;
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+  }
+
+  @media ${devices.tabletL} {
+    width: 15rem;
   }
 `;
 
@@ -59,13 +69,13 @@ const TopicContainer = styled.div`
   p {
     font-size: 0.8rem;
     font-weight: 600;
+    height: 100%;
   }
 `;
 
 const MainContent = styled.div`
   width: 100%;
-  height: 100%;
-  padding: 10px;
+  height: fit-content;
   border-radius: 12px 12px 0px 0px;
   display: flex;
   align-items: center;

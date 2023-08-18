@@ -10,6 +10,7 @@ interface InputProps {
   id?: string;
   disabled?: boolean;
   value?: string | number;
+  onChange?:()=>void
 }
 
 export const InputElement = ({
@@ -21,8 +22,9 @@ export const InputElement = ({
   id,
   disabled,
   value,
+  onChange,
   ...otherProps
-}: InputProps) => {
+}: InputProps | any) => {
   return (
     <>
       {type === "password" && (
@@ -52,6 +54,7 @@ export const InputElement = ({
             type={type}
             disabled={disabled}
             placeholder={placeholder}
+            onChange={onChange}
             {...(register && { ...register(id) })}
           />
           {error && id ? (
@@ -74,7 +77,7 @@ const TextInput = styled.input`
   padding: 8px 20px;
   outline: none;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: ${({ disabled }) => (disabled ? 700 : 500)};
   border: ${({ disabled }) => (disabled ? "1px solid #EED7FF" : "1px solid #7b31b2")};
   border-radius: 5px;
   color: ${({ disabled }) => (disabled ? "gray" : "black")};

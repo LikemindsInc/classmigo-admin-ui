@@ -10,6 +10,8 @@ import { createSubjectUrl, getAllSubjectsUrl } from "../../../../../../Urls";
 import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
 import { AddIcon } from "../../../../../../Assets/Svgs";
 import { useForm } from "react-hook-form";
+import { subjectSchema } from "../LessonCriteriaSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const SelectSubject = () => {
   const location = useLocation();
@@ -18,7 +20,13 @@ const SelectSubject = () => {
   const [selectSubject, setSelectSubject] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
 
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(subjectSchema),
+  });
 
   const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
     ["subject"],
@@ -28,7 +36,6 @@ const SelectSubject = () => {
       enabled: true,
     }
   );
-
 
   const onSuccess = () => {};
   const onError = () => {};
@@ -58,7 +65,7 @@ const SelectSubject = () => {
   }, [subjects]);
 
   const onSubmit = (data: any) => {
-    createSubject(data);
+    createSubject({...data, className:scope});
   };
 
   return (
@@ -70,8 +77,13 @@ const SelectSubject = () => {
             placeholder="Enter Subject"
             register={register}
             id="name"
+            error={errors}
           />
-          <ButtonElement label="Add Class" icon={<AddIcon />} isLoading={isCreatingSubject} />
+          <ButtonElement
+            label="Add Class"
+            icon={<AddIcon />}
+            isLoading={isCreatingSubject}
+          />
         </Header>
         <Body>
           {selectSubject?.subjects?.length > 0 ? (

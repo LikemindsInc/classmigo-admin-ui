@@ -2,8 +2,12 @@ import { Switch } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
 
-export const SwitchElement = () => {
-  return <CustomSwitch />;
+interface Props {
+  activeState?: boolean;
+  handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+export const SwitchElement = ({ activeState, handleChange }: Props) => {
+  return <CustomSwitch checked={activeState} onChange={handleChange} />;
 };
 
 const CustomSwitch = styled(Switch)`

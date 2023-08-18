@@ -5,6 +5,7 @@ import { devices } from "../../utils/mediaQueryBreakPoints";
 interface SelectProps {
   options: any;
   onChange?: (value: any) => void;
+  value?: any;
   defaultValue?: string;
   width?: number | string;
 }
@@ -14,6 +15,7 @@ export const SelectInput = ({
   onChange,
   defaultValue,
   width,
+  value
 }: SelectProps) => {
   return (
     <SelectElement
@@ -56,6 +58,8 @@ export const SelectInput = ({
         }),
       }}
       options={options}
+      onChange={onChange}
+      value={value}
     />
   );
 };

@@ -58,7 +58,7 @@ const LiveSessionsForm = () => {
         <h6>Thumbnail</h6>
         <p>Choose or upload an image to show what the video is about</p>
         <ThumbnailList>
-          <ImageInput title="Upload Thumbnail" />
+          <ImageInput title="Upload Thumbnail" type="image" />
         </ThumbnailList>
       </ThumbnailSection>
       <InputHolder>

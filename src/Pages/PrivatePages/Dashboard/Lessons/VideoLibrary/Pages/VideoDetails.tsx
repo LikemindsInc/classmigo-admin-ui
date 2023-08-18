@@ -9,43 +9,70 @@ import {
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { VideoCard } from "../Component/VideoCard";
 import { useLocation } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
+import { fi } from "date-fns/locale";
 
 const VideoDetails = () => {
   const location = useLocation();
   const { state } = location;
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    // formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: state?.details?.title,
+    }
+  });
+  console.log(state);
+
+  const onSubmit = (data: any) => {
+    console.log(data);
+  };
+
   return (
     <Container>
-      <DetailsContainer>
+      <DetailsContainer onSubmit={handleSubmit(onSubmit)}>
         <InputHolders>
-          <InputElement label="Lesson Title" placeholder="Enter Lesson Title" />
+          <InputElement
+            label="Lesson Title"
+            placeholder="Enter Lesson Title"
+            value={`${state?.details?.title}`}
+            disabled={true}
+          />
         </InputHolders>
 
         <InputHolders>
           <TextAreaInput
             label="Description"
             placeholder="Give a little description of the lesson "
+            register={register}
+            id="description"
           />
         </InputHolders>
 
         <InputHolders>
           <p>Upload Video</p>
-          <ImageInput title="Upload Video" />
+          <ImageInput title="Upload Video" type="video" name="video" register={register}  />
         </InputHolders>
         <ThumbnailSection>
           <h6>Thumbnail</h6>
           <p>Choose or upload an image to show what the video is about</p>
           <ThumbnailList>
-            <ImageInput title="Upload Thumbnail" />
-            <ImageInput title="Upload Thumbnail" />
-            <ImageInput title="Upload Thumbnail" />
+            <ImageInput title="Upload Thumbnail" type="image" name="image" register={register}  />
           </ThumbnailList>
         </ThumbnailSection>
-        <ButtonElement label="Save" width={150} />
+        <ButtonElement label="Save" width={150} type="submit" />
       </DetailsContainer>
       <PreviewContainer>
         <h6>Preview</h6>
         <div>
-          <VideoCard title={state?.title} />
+          <VideoCard
+            title={state?.details?.title}
+            source={state?.details?.videoUrl}
+          />
         </div>
       </PreviewContainer>
     </Container>
@@ -72,7 +99,7 @@ const Container = styled.section`
   }
 `;
 
-const DetailsContainer = styled.div`
+const DetailsContainer = styled.form`
   width: 100%;
   margin: 0 !important;
   padding: 0 !important;
