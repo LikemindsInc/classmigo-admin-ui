@@ -1,5 +1,5 @@
-import { Switch } from "@mui/material";
-import React from "react";
+import { Switch, SwitchProps } from "@mui/material";
+import React, { FC } from "react";
 import styled from "styled-components";
 
 interface Props {

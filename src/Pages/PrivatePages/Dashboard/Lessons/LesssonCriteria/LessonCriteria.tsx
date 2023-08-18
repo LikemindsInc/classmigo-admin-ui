@@ -214,7 +214,7 @@ const NoData = styled.div`
   }
 `;
 
-const SkeletonContainer = styled.div`
+export const SkeletonContainer = styled.div`
   margin-bottom: 10px;
 `;
 

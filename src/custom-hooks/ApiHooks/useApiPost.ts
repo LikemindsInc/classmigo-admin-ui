@@ -16,5 +16,6 @@ export const useApiPost = (
       success && success(data);
     },
     onError: error,
+    retry: 1,
   });
 };

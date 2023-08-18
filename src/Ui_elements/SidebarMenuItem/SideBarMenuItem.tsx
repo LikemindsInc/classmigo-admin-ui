@@ -8,23 +8,34 @@ interface ButtonProps {
   icon: any;
   title: string;
   path: string;
-  setShowMenu?:()=>boolean
+  setShowMenu?: () => boolean;
 }
 
-export const SideBarMenuItem = ({ icon, title, path, setShowMenu }: ButtonProps) => {
+export const SideBarMenuItem = ({
+  icon,
+  title,
+  path,
+  setShowMenu,
+}: ButtonProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setTitle } = useContext(NavbarContext);
 
   const handleNavigate = (paths: string, title?: string) => {
     // setShowMenu(false)
+
     setTitle(title);
     navigate(paths);
   };
 
   return (
     <Container
-      activeItem={location.pathname === path}
+      activeItem={
+        (location.pathname.slice(1).trim() === "" &&
+          path.slice(1).trim() === "") ||
+        (location.pathname.slice(1).includes(path.slice(1)) &&
+          path.slice(1).trim() !== "")
+      }
       onClick={() => handleNavigate(path, title)}
     >
       <div>{icon}</div>
@@ -56,11 +67,10 @@ const Container = styled.div<{ activeItem: boolean }>`
   }
 
   @media ${devices.tablet} {
-    p{
+    p {
       display: none;
     }
-    width:fill !important;
+    width: fill !important;
     padding: 11px 1rem;
   }
-
 `;

@@ -26,19 +26,14 @@ const Students = () => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
 
-
   const {
     data: studentData,
     isLoading: isLoadingStudentData,
-    refetch:fetchStudent
-  } = useApiGet(
-    ["Student data"],
-    () => getStudentDataUrl(),
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
+    refetch: fetchStudent,
+  } = useApiGet(["Student data"], () => getStudentDataUrl(), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
 
   useEffect(() => {
     if (studentData) {
@@ -46,10 +41,11 @@ const Students = () => {
         key: item._id,
         name: `${item.firstName} ${item.lastName}`,
         username: item.userName,
-        phoneNumber:item.phoneNumber,
-        class: (item.class &&item.class.length > 0
-          ? item.class.map((classItem: any) => classItem.name)
-          : "" || null) || "",
+        phoneNumber: item.phoneNumber,
+        class:
+          (item.class && item.class.length > 0
+            ? item.class.map((classItem: any) => classItem.name)
+            : "" || null) || "",
         status: item.role,
         subscription: item.subcription,
         image:
@@ -299,7 +295,7 @@ const Students = () => {
               <ButtonElement width={84} outline label={"Update"} />
             </div>
             <div>
-              <InputElement placeholder="08000000000" label="Phone number"/>
+              <InputElement placeholder="08000000000" label="Phone number" />
               <ButtonElement label={"Update"} outline width={84} />
             </div>
           </UpdateDetails>
@@ -352,16 +348,7 @@ const Students = () => {
 
 export default Students;
 
-
-
-
-
-
-
-
-
-
-const Container = styled.section`
+export const Container = styled.section`
   width: 100%;
   height: 85vh;
   background-color: white;

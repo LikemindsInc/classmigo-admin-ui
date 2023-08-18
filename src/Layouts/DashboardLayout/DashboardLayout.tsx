@@ -1,14 +1,14 @@
-import { ReactNode } from 'react'
-import { styled } from 'styled-components'
-import { DashboardSidebar } from './components/DashboardSidebar'
-import { DashboardNavbar } from './components/DashboardNavbar'
-import { devices } from '../../utils/mediaQueryBreakPoints'
+import { ReactNode } from "react";
+import { styled } from "styled-components";
+import { DashboardSidebar } from "./components/DashboardSidebar";
+import { DashboardNavbar } from "./components/DashboardNavbar";
+import { devices } from "../../utils/mediaQueryBreakPoints";
 
-interface DashboardProp{
-    children: ReactNode
+interface DashboardProp {
+  children: ReactNode;
 }
 
-export const DashboardLayout = ({children}:DashboardProp) => {
+export const DashboardLayout = ({ children }: DashboardProp) => {
   return (
     <Container>
       <DashboardSidebar />
@@ -28,20 +28,19 @@ const Container = styled.div`
   min-height: 100vh !important;
   height: auto;
   background-color: var(--dashboardBackground);
-`
+`;
 const Main = styled.main`
   max-height: 100vh;
   overflow-y: hidden;
   width: 100%;
   padding-top: 1.5rem;
-  padding-left: 4rem;
+  padding-left: 2rem;
   padding-right: 2rem;
   padding-bottom: 1.5rem;
 
-  @media ${devices.tabletL}{
+  @media ${devices.tabletL} {
     padding: 1rem;
     width: 100vw !important;
     margin-left:3rem;
   }
-
-`
+`;

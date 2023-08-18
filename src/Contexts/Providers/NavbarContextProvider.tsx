@@ -14,9 +14,9 @@ export const NavbarContextProvider = ({
   const { pathname } = useLocation();
   const pathnames = pathname.split("/").filter((x) => x);
 
-  useEffect(() => {
-    setTitle(formatUrlName(pathnames[0]));
-  }, [pathnames]);
+  // useEffect(() => {
+  //   setTitle(formatUrlName(pathnames[0]));
+  // }, [pathnames]);
 
   return (
     <NavbarContext.Provider value={{ title, setTitle }}>

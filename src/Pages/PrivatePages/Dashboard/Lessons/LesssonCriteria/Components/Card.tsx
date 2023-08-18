@@ -175,7 +175,7 @@ const DetailsContainer = styled.div`
     margin-bottom: 1rem;
   }
 `;
-const SwitchContainer = styled.div`
+export const SwitchContainer = styled.div`
   @media ${devices.mobileXS} {
     display: none;
   }

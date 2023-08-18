@@ -24,8 +24,10 @@ export const DashboardNavbar = () => {
   return (
     <Container>
       <div>
-        <h2>{title}</h2>
-        <Breadcrumbs/>
+        <div>
+          <h2>{title}</h2>
+          <Breadcrumbs />
+        </div>
       </div>
 
       <div>
@@ -53,20 +55,19 @@ const Container = styled.nav`
   h2 {
     font-size: 1.7rem;
     @media ${devices.tabletL} {
-      font-size:1.2rem;
+      font-size: 1.2rem;
     }
   }
 
-  >div {
+  > div {
     display: flex;
-    align-items:center;
+    align-items: center;
     gap: 1rem;
   }
 
-  >div:first-child {
-    align-items:flex-end;
+  > div:first-child {
+    align-items: flex-end;
   }
-
 `;
 
 const Logout = styled.div`

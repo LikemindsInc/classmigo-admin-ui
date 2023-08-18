@@ -146,7 +146,7 @@ export const DashboardSidebar = () => {
             // setShowMenu={setMenuOpen}
             icon={<AdminIcon />}
             title="Admin Access"
-            path={"/admin"}
+            path={"/admin-access"}
           />
         </div>
       </Container>

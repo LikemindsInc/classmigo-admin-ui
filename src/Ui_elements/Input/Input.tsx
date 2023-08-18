@@ -120,7 +120,7 @@ const ErrorContainer = styled.div`
   bottom: -20px;
   left: 0;
   z-index: 2;
-  p{
-    font-size:0.7rem !important;
+  p {
+    font-size: 0.7rem !important;
   }
 `;

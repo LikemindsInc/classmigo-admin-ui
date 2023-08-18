@@ -41,6 +41,7 @@ export const SelectInput = ({
         option: (baseStyles) => ({
           ...baseStyles,
           backgroundColor: "white",
+          color: "black",
           "&:hover": {
             backgroundColor: "var(--primary-color)",
             color: "white",
