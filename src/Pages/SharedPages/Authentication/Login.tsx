@@ -27,17 +27,14 @@ const Login = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  const handleSuccess = ({data}: any) => {
+  const handleSuccess = ({ data }: any) => {
     setUser(data);
     navigate("/");
-  }
+  };
   const handleError = (error: any) => {
-    console.log(error)
-  }
-  const {
-    mutate: login,
-    isLoading: isLogin,
-  } = useApiPost(
+    console.log(error);
+  };
+  const { mutate: login, isLoading: isLogin } = useApiPost(
     loginUrl,
     handleSuccess,
     handleError
@@ -129,7 +126,7 @@ const ResetPassword = styled.p`
   }
 `;
 
-const Form = styled.form`
+export const Form = styled.form`
   margin-top: 1.4rem;
   display: flex;
   flex-direction: column;

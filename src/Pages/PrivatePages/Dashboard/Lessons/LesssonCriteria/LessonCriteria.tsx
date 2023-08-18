@@ -38,7 +38,7 @@ const LessonCriteria = () => {
     });
   };
   const onError = (e: any) => {
-    console.log(e)
+    console.log(e);
     toast.error(`hj`, {
       position: "top-right",
       autoClose: 3000,
@@ -206,7 +206,7 @@ const NoData = styled.div`
   }
 `;
 
-const SkeletonContainer = styled.div`
+export const SkeletonContainer = styled.div`
   margin-bottom: 10px;
 `;
 
