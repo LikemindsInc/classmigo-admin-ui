@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 
 interface CardProps {
   subjects?: string[];
-  id:number
+  id: number;
   topics?: string[];
   classname: string;
   index: number;
@@ -52,7 +52,7 @@ export const Card = ({
       theme: "light",
     });
   };
-  const onError = (error:any) => {
+  const onError = (error: any) => {
     toast.error(`Something went wrong ${error.message}`, {
       position: "top-right",
       autoClose: 3000,
@@ -158,7 +158,7 @@ const DetailsContainer = styled.div`
     margin-bottom: 1rem;
   }
 `;
-const SwitchContainer = styled.div`
+export const SwitchContainer = styled.div`
   @media ${devices.mobileXS} {
     display: none;
   }

@@ -75,7 +75,8 @@ const TextInput = styled.input`
   outline: none;
   font-size: 14px;
   font-weight: 400;
-  border: ${({ disabled }) => (disabled ? "1px solid #EED7FF" : "1px solid #7b31b2")};
+  border: ${({ disabled }) =>
+    disabled ? "1px solid #EED7FF" : "1px solid #7b31b2"};
   border-radius: 5px;
   color: ${({ disabled }) => (disabled ? "gray" : "black")};
   background-color: ${({ disabled }) =>
@@ -117,7 +118,7 @@ const ErrorContainer = styled.div`
   bottom: -20px;
   left: 0;
   z-index: 2;
-  p{
-    font-size:0.7rem !important;
+  p {
+    font-size: 0.7rem !important;
   }
 `;

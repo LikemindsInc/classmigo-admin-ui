@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Loader } from "../../Ui_elements";
 import { DashboardLayout } from "../../Layouts/DashboardLayout/DashboardLayout";
+import { Container } from "../../Pages/PrivatePages/Dashboard/Users/Students/Students";
 
 const LazyHome = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Home/Home")
@@ -43,10 +44,16 @@ const LazyQuizLibrary = lazy(
     import("../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/QuizLibrary")
 );
 const LazyScheduleLessons = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/ScheduleWeeklyLessons/ScheduleLessons")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/ScheduleWeeklyLessons/ScheduleLessons"
+    )
 );
 const LazyAskTheTeacher = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Lessons/AskTheTeacher/AskTheTeacher")
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/AskTheTeacher/AskTheTeacher"
+    )
 );
 const LazyScheduleLiveLessons = lazy(
   () =>
@@ -108,6 +115,19 @@ const LazyLessonTopic = lazy(
     )
 );
 
+const AdminAccess = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Admin/Admin")
+);
+
+const CreateAdmin = lazy(
+  () =>
+    import("../../Pages/PrivatePages/Dashboard/Admin/CreateAdmin/CreateAdmin")
+);
+
+const AdminDetail = lazy(
+  () =>
+    import("../../Pages/PrivatePages/Dashboard/Admin/AdminDetail/AdminDetail")
+);
 const LazyLiveCall = lazy(
   () =>
     import(
@@ -119,6 +139,7 @@ export const PrivateRoutes = () => {
   interface RouteConfig {
     path: string;
     element: any;
+    children?: RouteConfig[];
   }
 
   const privateRoutes: RouteConfig[] = [
@@ -213,6 +234,20 @@ export const PrivateRoutes = () => {
       path: "/live_lessons/:id",
       element: <LazyLiveCall />,
     },
+
+    {
+      path: "/admin-access/create-user",
+      element: <CreateAdmin />,
+    },
+
+    {
+      path: "/admin-access",
+      element: <AdminAccess />,
+    },
+    {
+      path: "/admin-access/:id",
+      element: <AdminDetail />,
+    },
   ];
 
   return (
@@ -226,7 +261,7 @@ export const PrivateRoutes = () => {
               <Suspense fallback={<Loader />}>{route.element}</Suspense>
             </DashboardLayout>
           }
-        />
+        ></Route>
       ))}
     </Routes>
   );

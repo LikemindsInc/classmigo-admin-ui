@@ -20,8 +20,26 @@ export const request = async (options: any) => {
     return response?.data;
   };
   const onError = (error: AxiosError) => {
-    return Promise.reject(error.message);
+    return Promise.reject(extractErrors(error)[0]);
   };
 
   return client(options).then(onSuccess).catch(onError);
+};
+
+export const extractErrors = (error: any) => {
+  if (typeof error.response.data.error === "string")
+    return [error.response.data.message || error.response.data.error];
+  if (error.response) {
+    if (error.response.data.message && error.response.data.message.length > 0) {
+      return error.response.data.message.map((error: any) => {
+        return error;
+      });
+    } else if (error.response.data.message) {
+      return [error.response.data.message];
+    } else {
+      return [error.response.data.error];
+    }
+  } else {
+    return [];
+  }
 };

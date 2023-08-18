@@ -1,9 +1,11 @@
-import { Switch } from "@mui/material";
-import React from "react";
+import { Switch, SwitchProps } from "@mui/material";
+import React, { FC } from "react";
 import styled from "styled-components";
 
-export const SwitchElement = () => {
-  return <CustomSwitch />;
+interface IProps extends SwitchProps {}
+
+export const SwitchElement: FC<IProps> = ({ ...props }) => {
+  return <CustomSwitch {...props} />;
 };
 
 const CustomSwitch = styled(Switch)`

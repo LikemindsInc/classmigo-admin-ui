@@ -39,6 +39,7 @@ export const SelectInput = ({
         option: (baseStyles) => ({
           ...baseStyles,
           backgroundColor: "white",
+          color: "black",
           "&:hover": {
             backgroundColor: "var(--primary-color)",
             color: "white",
@@ -56,6 +57,7 @@ export const SelectInput = ({
         }),
       }}
       options={options}
+      onChange={onChange}
     />
   );
 };
