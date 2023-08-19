@@ -16,7 +16,6 @@ export const formatUrlName = (url: string): string => {
 export const checkFileSize = (file: any, maxSize: number): boolean => {
   return file.size <= maxSize;
 };
-
 export const convertToBase64 = (file: File): Promise<string> =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -70,3 +69,4 @@ export const formatDate = (date: Date): string => {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
   return date.toLocaleDateString(undefined, options);
 };
+

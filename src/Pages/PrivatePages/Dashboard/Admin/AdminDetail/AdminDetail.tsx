@@ -144,6 +144,7 @@ const AdminDetail = () => {
           <SwitchContainer key={index}>
             <p>{item.value}</p>
             <SwitchElement
+
               activeState={
                 admin.assignedClasses.findIndex(
                   (row) => row.studentClass?.name === item.name
