@@ -149,6 +149,7 @@ const AdminDetail = () => {
                   (row) => row.studentClass?.name === item.name
                 ) !== -1
               }
+
               handleChange={(event) =>
                 handleChange(
                   event,

@@ -20,6 +20,7 @@ export const DashboardLayout = ({ children }: DashboardProp) => {
   )
 }
 
+
 //styles
 
 const Container = styled.div`
@@ -42,5 +43,6 @@ const Main = styled.main`
     padding: 1rem;
     width: 100vw !important;
     margin-left:3rem;
+
   }
 `;

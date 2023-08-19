@@ -8,6 +8,7 @@ interface Props {
 }
 export const SwitchElement = ({ activeState, handleChange }: Props) => {
   return <CustomSwitch checked={activeState} onChange={handleChange} />;
+
 };
 
 const CustomSwitch = styled(Switch)`

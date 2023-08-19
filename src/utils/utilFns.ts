@@ -41,7 +41,10 @@ export const checkforValidString = (value:any) =>
 export const generateRandom = (length: number) => {
   return uuidv4().slice(0, length);
 };
-
+export const checkFileType = (file: any, fileType: string): boolean => {
+  const currentType = file.type;
+  return fileType.includes(currentType);
+};
 export const formatOptions = (
   items: any[],
   label: string | string[],
