@@ -144,12 +144,13 @@ const AdminDetail = () => {
           <SwitchContainer key={index}>
             <p>{item.value}</p>
             <SwitchElement
-              checked={
+
+              activeState={
                 admin.assignedClasses.findIndex(
                   (row) => row.studentClass?.name === item.name
                 ) !== -1
               }
-              onChange={(event) =>
+              handleChange={(event) =>
                 handleChange(
                   event,
                   item.name,

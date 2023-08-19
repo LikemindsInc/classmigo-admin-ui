@@ -2,11 +2,18 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon, ToggleIcon } from "../../../../../../Assets/Svgs";
-import { ImageInput } from "../../../../../../Ui_elements";
-import { useApiGet } from "../../../../../../custom-hooks";
-import { getSubTopicsUrl } from "../../../../../../Urls";
+import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
+import {
+  activateTopicUrl,
+  addSubTopicUrl,
+  deactivateTopicUrl,
+  getSubTopicsUrl,
+} from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "../../../../../../Ui_elements";
 
 interface CardProps {
   subjects?: string[];
@@ -15,6 +22,8 @@ interface CardProps {
   index: number;
   id: number;
   item: any;
+  track: number;
+  active?: boolean;
   isDraggedOver?: any;
   onDragStart?: () => void;
   onDragEnter?: () => void;
@@ -30,6 +39,8 @@ export const TopicCard = ({
   index,
   item,
   id,
+  track,
+  active,
   onDragStart,
   onDragEnter,
   onDragEnd,
@@ -41,11 +52,115 @@ export const TopicCard = ({
   const [subtopic, setSubtopic] = useState<any>([]);
   const [showSubtopic, setShowSubtopic] = useState(false);
   const [title, setTitle] = useState("");
+  let isActive = active;
+
+  const queryClient = useQueryClient();
+
+  const handleActivateSuccess = () => {
+    toast.success("Successfully Activated topic", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const handleActivationError = (error: any) => {
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const handleDeactivateSuccess = () => {
+    toast.success("Successfully Activated topic", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const handleDeactivationError = (error: any) => {
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const toggleActive = () => {
+    if (active) {
+      deactivateTopic();
+      queryClient.invalidateQueries(["topic"]);
+    } else {
+      activateTopic();
+      queryClient.invalidateQueries(["topic"]);
+    }
+  };
+  const { refetch: deactivateTopic, isFetching: isLoadingDeactivate } =
+    useApiGet([`subject${id}`], () => deactivateTopicUrl(id), {
+      refetchOnWindowFocus: false,
+      enabled: false,
+      onSuccess: handleDeactivateSuccess,
+      onError: handleDeactivationError,
+    });
+
+  const { refetch: activateTopic, isFetching: isLoadingActivate } = useApiGet(
+    [`subject${id}`],
+    () => activateTopicUrl(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+      onSuccess: handleActivateSuccess,
+      onError: handleActivationError,
+    }
+  );
 
   const handleSubmit = () => {
-    setSubtopic((prevSub: any) => [...prevSub, title]);
+    const requestBody: any = {
+      topic: title,
+      topicDescription: "This is a description",
+      shortNote: "This is a short note",
+    };
+    addSubTopic(requestBody);
     setTitle("");
     setDisplayInput(false);
+  };
+
+  const handleSubTopicSuccess = () => {
+    toast.success("Successfully Add Subtopic", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  const handleSubTopicError = (error: any) => {
+    toast.error(error?.message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
   };
 
   const { data: subtopics } = useApiGet(
@@ -57,11 +172,17 @@ export const TopicCard = ({
     }
   );
 
+  const { mutate: addSubTopic } = useApiPost(
+    (_: any) => addSubTopicUrl(_, item?._id),
+    handleSubTopicSuccess,
+    handleSubTopicError,
+    [`sub_topic${item?._id}`]
+  );
   useEffect(() => {
-    if (id === index && subtopics) {
+    if (track === index && subtopics) {
       setSubtopic(subtopics?.data?.content);
     }
-  }, [id, index, subtopics]);
+  }, [index, subtopics, track]);
 
   return (
     <MainContainer
@@ -76,9 +197,9 @@ export const TopicCard = ({
       <OuterContainer>
         <Container>
           <DetailsContainer>
-            <ImageContainer>
+            {/* <ImageContainer>
               <ImageInput />
-            </ImageContainer>
+            </ImageContainer> */}
             <Details>
               <h6>{classname}</h6>
               <ToolsContainer>
@@ -112,11 +233,19 @@ export const TopicCard = ({
             </Details>
           </DetailsContainer>
           <SwitchContainer>
-            <SwitchElement />
+            {index === track &&
+              (isLoadingActivate || isLoadingDeactivate ? (
+                <Spinner color="var(--primary-color)" />
+              ) : (
+                <SwitchElement
+                  activeState={isActive}
+                  handleChange={toggleActive}
+                />
+              ))}
           </SwitchContainer>
         </Container>
         <MoveIcon style={{ cursor: "move" }} />
-        <Delete/>
+        <Delete />
       </OuterContainer>{" "}
       {showSubtopic &&
         subtopic.map((item: any, index: number) => (
@@ -187,7 +316,7 @@ const OuterContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 5%;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
 `;
 
 const ImageContainer = styled.div`
@@ -256,19 +385,22 @@ const AddInput = styled.input`
   font-weight: 600;
   width: 100%;
   margin-bottom: 10px;
+  height: 100%;
 `;
 
 const AddInputContainer = styled.div`
-  padding: 10px 20px;
+  padding: 5px;
   margin-bottom: 30px !important;
   position: absolute;
   left: 0;
   background-color: white;
   box-shadow: -4px 4px 4px 0px rgba(0, 0, 0, 0.25);
-
+  border: 1px solid var(--primary-color);
   border-radius: 6px;
   width: 478px;
   height: 50px;
+  display: flex;
+  align-items: center;
   p {
     position: absolute;
     top: 10px;
@@ -313,4 +445,4 @@ const SubtopicCard = styled.div`
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;
   color: red;
-`
+`;

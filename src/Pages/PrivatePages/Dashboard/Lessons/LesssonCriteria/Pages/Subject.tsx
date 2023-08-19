@@ -6,10 +6,17 @@ import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { SubjectCard } from "../Components/SubjectCard";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import { Skeleton } from "@mui/material";
-import { createSubjectUrl, getAllSubjectsUrl } from "../../../../../../Urls";
+import {
+  createSubjectUrl,
+  getAllClassesUrl,
+  getAllSubjectsUrl,
+} from "../../../../../../Urls";
 import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
 import { AddIcon } from "../../../../../../Assets/Svgs";
 import { useForm } from "react-hook-form";
+import { subjectSchema } from "../LessonCriteriaSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "react-toastify";
 
 const SelectSubject = () => {
   const location = useLocation();
@@ -18,20 +25,75 @@ const SelectSubject = () => {
   const [selectSubject, setSelectSubject] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
 
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(subjectSchema),
+  });
+
+
+  const handleSuccess = () => {
+    toast.success("Successfully Updated", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  const handleError = (error: any) => {
+    toast.error(error?.message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
 
   const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
-    ["subject"],
-    () => getAllSubjectsUrl(scope),
+    ["subjects"],
+    () => getAllClassesUrl(),
     {
       refetchOnWindowFocus: false,
       enabled: true,
+      onSuccess: handleSuccess,
+      onError: handleError,
     }
   );
 
-
-  const onSuccess = () => {};
-  const onError = () => {};
+  const subject = watch("name");
+  const onSuccess = () => {
+    toast.success(`Successfully Added ${subject}`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const onError = (error: any) => {
+    toast.error(`Something went wrong, couldn't add ${subject}. ${error}`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
   const { mutate: createSubject, isLoading: isCreatingSubject } = useApiPost(
     createSubjectUrl,
     onSuccess,
@@ -58,7 +120,7 @@ const SelectSubject = () => {
   }, [subjects]);
 
   const onSubmit = (data: any) => {
-    createSubject(data);
+    createSubject({ ...data, className: scope });
   };
 
   return (
@@ -70,30 +132,38 @@ const SelectSubject = () => {
             placeholder="Enter Subject"
             register={register}
             id="name"
+            error={errors}
           />
-          <ButtonElement label="Add Class" icon={<AddIcon />} isLoading={isCreatingSubject} />
+          <ButtonElement
+            label="Add Class"
+            icon={<AddIcon />}
+            isLoading={isCreatingSubject}
+          />
         </Header>
         <Body>
-          {selectSubject?.subjects?.length > 0 ? (
-            selectSubject?.subjects?.map((item: any, index: number) => (
-              <SubjectCard
-                classname={item?.name}
-                key={index}
-                item={item?.name}
-                classTitle={scope}
-                title={title}
-                id={item?._id}
-                index={index}
-                onDragStart={() => (dragClass.current = index)}
-                onDragEnter={() => (dragOverClass.current = index)}
-                onDragEnd={handleDragSort}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDraggedOver(true);
-                }}
-                isDraggedOver={isDraggedOver}
-              />
-            ))
+          {selectSubject?.length > 0 ? (
+            selectSubject?.map((item: any, index: number) =>
+              item?.subjects?.map((item: any) => (
+                <SubjectCard
+                  classname={item?.name}
+                  key={index}
+                  item={item?.name}
+                  classTitle={scope}
+                  title={title}
+                  active={item?.isActive}
+                  id={item?._id}
+                  index={index}
+                  onDragStart={() => (dragClass.current = index)}
+                  onDragEnter={() => (dragOverClass.current = index)}
+                  onDragEnd={handleDragSort}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDraggedOver(true);
+                  }}
+                  isDraggedOver={isDraggedOver}
+                />
+              ))
+            )
           ) : isLoadingSubjects ? (
             <div>
               <SkeletonContainer>

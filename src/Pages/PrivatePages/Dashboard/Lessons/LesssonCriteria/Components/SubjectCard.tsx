@@ -2,17 +2,24 @@ import React from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
-import { ImageInput } from "../../../../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
+import {
+  activateSubjectUrl,
+  deactivateSubjectUrl,
+} from "../../../../../../Urls";
+import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CardProps {
   subjects?: string[];
   topics?: string[];
-  id:number
+  id: number;
   classname: string;
   classTitle: string;
+  active?: boolean;
   index: number;
   isDraggedOver?: any;
   item: any;
@@ -32,6 +39,7 @@ export const SubjectCard = ({
   index,
   item,
   id,
+  active,
   title,
   onDragStart,
   onDragEnter,
@@ -41,10 +49,46 @@ export const SubjectCard = ({
   ...otherProps
 }: CardProps) => {
   const navigate = useNavigate();
-  
+  const queryClient = useQueryClient();
+
+
+
+  const toggleActive = () => {
+    if (active) {
+      deactivateSubject();
+      queryClient.invalidateQueries(["subjects"]);
+    } else {
+      activateSubject();
+      queryClient.invalidateQueries(["subjects"]);
+    }
+  };
+  const { refetch: deactivateSubject } = useApiGet(
+    [`subject${id}`],
+    () => deactivateSubjectUrl(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    }
+  );
+
+  const { refetch: activateSubject } = useApiGet(
+    [`subject${id}`],
+    () => activateSubjectUrl(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    }
+  );
+  // const { mutate: activateSubject } = useApiPost(
+  //   () => activateSubjectUrl(id),
+  //   onSuccess,
+  //   onError,
+  //   ["subject"]
+  // );
+
   return (
     <OuterContainer
-      draggable   
+      draggable
       onDragStart={onDragStart}
       onDragEnter={onDragEnter}
       onDragEnd={onDragEnd}
@@ -64,18 +108,18 @@ export const SubjectCard = ({
             })
           }
         >
-          <ImageContainer>
+          {/* <ImageContainer>
             <ImageInput />
-          </ImageContainer>
+          </ImageContainer> */}
           {/* <img src={placeholder} alt="Icon" /> */}
           <h6>{classname}</h6>
         </DetailsContainer>
         <SwitchContainer>
-          <SwitchElement />
+          <SwitchElement activeState={active} handleChange={toggleActive} />
         </SwitchContainer>
       </Container>
       <MoveIcon style={{ cursor: "move" }} />
-      <Delete/>
+      <Delete />
     </OuterContainer>
   );
 };
@@ -113,7 +157,7 @@ const DetailsContainer = styled.div`
 `;
 const SwitchContainer = styled.div`
   @media ${devices.mobileXS} {
-    display:none;
+    display: none;
   }
 `;
 
@@ -144,4 +188,4 @@ const ImageContainer = styled.div`
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;
   color: red;
-`
+`;

@@ -1,124 +1,175 @@
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
-import { ButtonElement, Loader, SelectInput } from "../../../../../Ui_elements";
+import {
+  ButtonElement,
+  Loader,
+  SelectInput,
+  Spinner,
+} from "../../../../../Ui_elements";
 import { VideoCard } from "./Component/VideoCard";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useApiGet } from "../../../../../custom-hooks";
-import { getLessonVideosUrl } from "../../../../../Urls";
-import { Skeleton } from "@mui/material";
+import {
+  getAllClassesUrl,
+  getAllLessonsUrl,
+  getAllSubjectsUrl,
+  getAllVideosUrl,
+} from "../../../../../Urls";
+import { formatOptions } from "../../../../../utils/utilFns";
+import { Controller, useForm } from "react-hook-form";
+import noData from "../../../../../Assets/noData.png";
 
 const VideoLibrary = () => {
   const [videos, setVideos] = useState([]);
-  const handleSearchFilter = (value: string) => {};
 
-  const classOptions = [
-    {
-      value: 0,
-      label: "SSS 1",
-    },
-    {
-      value: 1,
-      label: "SSS 2",
-    },
-    {
-      value: 2,
-      label: "SSS 3",
-    },
-  ];
+  const { handleSubmit, watch, control } = useForm({});
 
-  const subjectOptions = [
-    {
-      value: 0,
-      label: "Mathematics",
-    },
-    {
-      value: 1,
-      label: "Chemistry",
-    },
-    {
-      value: 2,
-      label: "Biology",
-    },
-    {
-      value: 3,
-      label: "Physics",
-    },
-    {
-      value: 4,
-      label: "English",
-    },
-    {
-      value: 5,
-      label: "Government",
-    },
-    {
-      value: 6,
-      label: "Economics",
-    },
-  ];
+  const classValue = watch("class");
+  const subjectValue = watch("subject");
 
-  const topicOptions = [
-    {
-      value: 0,
-      label: "Surds",
-    },
-    {
-      value: 1,
-      label: "Matrices and Determinants",
-    },
-    {
-      value: 2,
-      label: "Logarithms",
-    },
-    {
-      value: 3,
-      label: "Geometry",
-    },
-  ];
-
-  const { data: video } = useApiGet(["video"], () => getLessonVideosUrl(), {
+  const {
+    data: allVideos,
+    isFetching: isFetchingVideos,
+    refetch: getAllVideos,
+  } = useApiGet(["videos"], () => getAllVideosUrl(classValue?.value), {
     refetchOnWindowFocus: false,
-    enabled: true,
+    enabled: false,
   });
 
-  useEffect(() => {
-    if (video) {
-      setVideos(video?.data?.content);
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
     }
-  }, [video]);
+  );
+  const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
+    ["allSubjects"],
+    () => getAllSubjectsUrl(classValue?.value),
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!classValue,
+    }
+  );
+  const { data: topics, isLoading: isLoadingTopics } = useApiGet(
+    ["allTopics"],
+    () => getAllLessonsUrl(subjectValue?.value),
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!subjectValue,
+    }
+  );
+
+  const allClasses = useMemo(
+    () => formatOptions(classes?.data, "value", "name"),
+    [classes?.data]
+  );
+
+  const allSubjects = useMemo(() => {
+    return formatOptions(subjects?.data?.subjects, "name", "name");
+  }, [subjects?.data]);
+
+  const allTopics = useMemo(() => {
+    return formatOptions(topics?.data?.content, "lessonName", "lessonName");
+  }, [topics?.data]);
+
+  useEffect(() => {
+    if (allVideos) {
+      setVideos(allVideos?.data?.content);
+    }
+  }, [allVideos, videos]);
+
+  const onSubmit = (data: any) => {
+    getAllVideos();
+  };
+
+  if (isLoadingClasses) {
+    return <Loader />;
+  }
 
   return (
     <Container>
-      <Header>
-        <SelectInput
-          options={classOptions}
-          onChange={handleSearchFilter}
-          defaultValue="Subject Class"
-          width={200}
-        />
-        <SelectInput
-          options={subjectOptions}
-          onChange={handleSearchFilter}
-          defaultValue="Select Subject"
-          width={200}
-        />
-        <SelectInput
-          options={classOptions}
-          onChange={handleSearchFilter}
-          defaultValue="Select Topic"
-          width={200}
-        />
-        <ButtonElement label="View Video Lessons" />
-      </Header>
-      <VideosHolder>
-        {videos ? (
-          videos?.map((item: any, index: number) => (
-            <VideoCard title={item?.title} index={index} key={index} />
-          ))
-        ) : (
-          <Loader />
-        )}
-      </VideosHolder>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Header>
+          <Controller
+            name="class"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={allClasses}
+                value={classValue}
+                defaultValue="Subject Class"
+                width={200}
+              />
+            )}
+          />
+
+          {classValue && isLoadingSubjects ? (
+            <Spinner color={"var(--primary-color)"} />
+          ) : (
+            <Controller
+              name="subject"
+              control={control}
+              render={({ field }) => (
+                <SelectInput
+                  {...field}
+                  options={allSubjects}
+                  defaultValue="Subject Subject"
+                  width={200}
+                />
+              )}
+            />
+          )}
+
+          {subjectValue && isLoadingTopics ? (
+            <Spinner color={"var(--primary-color)"} />
+          ) : (
+            <Controller
+              name="topic"
+              control={control}
+              render={({ field }) => (
+                <SelectInput
+                  {...field}
+                  options={allTopics}
+                  defaultValue="Subject Topic"
+                  width={200}
+                />
+              )}
+            />
+          )}
+
+          <ButtonElement
+            label="View Video Lessons"
+            type="submit"
+            isLoading={isFetchingVideos}
+          />
+        </Header>
+      </form>
+      {videos?.length > 0 ? (
+        <VideosHolder>
+          {videos ? (
+            videos?.map((item: any, index: number) => (
+              <VideoCard
+                title={item?.title}
+                index={index}
+                key={index}
+                source={item?.videoUrl}
+                details={item}
+              />
+            ))
+          ) : (
+            <Spinner color="var(--primary-color)" />
+          )}
+        </VideosHolder>
+      ) : (
+        <NoData>
+          <img src={noData} alt="No data" />
+          <p>You haven’t selected any videos yet.</p>
+          <p>Use the view video lessons to view videos.</p>
+        </NoData>
+      )}
     </Container>
   );
 };
@@ -154,7 +205,6 @@ const Header = styled.div`
   }
   @media ${devices.tabletL} {
     gap: 4%;
-   
   }
 `;
 
@@ -165,6 +215,7 @@ const VideosHolder = styled.section`
   gap: 5%;
   flex-wrap: wrap; */
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
 
   @media (min-width: 768px) {
@@ -172,4 +223,19 @@ const VideosHolder = styled.section`
   }
 
   gap: 1rem;
+`;
+const NoData = styled.div`
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  img {
+    margin-bottom: 1rem;
+  }
+  p {
+    text-align: center;
+    font-size: 0.8rem;
+  }
 `;

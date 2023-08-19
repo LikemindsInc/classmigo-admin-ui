@@ -3,20 +3,32 @@ import styled from "styled-components";
 import { UploadIcon } from "../../Assets/Svgs";
 import { devices } from "../../utils/mediaQueryBreakPoints";
 import { ButtonElement } from "../Button/Button";
+import { VideoCameraAddOutlined } from "@ant-design/icons";
+import { convertToBase64 } from "../../utils/utilFns";
 
 interface ImageInputProps {
-  onChange?: (file: File | null) => void;
   title?: string;
+  type: string;
+  register?: any;
+  id?: string;
 }
 
-export const ImageInput = ({ onChange, title }: ImageInputProps) => {
+export const ImageInput = ({ title, type, register, id }: ImageInputProps) => {
   const fileInputRef = useRef<any>(null);
   const [preview, setPreview] = useState("");
 
-  const handleInputChange = (event: any) => {
+  const handleInputChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0] || null;
-    // console.log(URL.createObjectURL(file))
-    setPreview(URL.createObjectURL(file));
+    file && setPreview(URL.createObjectURL(file));
+    if (file) {
+      if (register) {
+        register(id, {
+          value: file,
+        });
+      }
+    }
   };
 
   const handleUploadButtonClick = () => {
@@ -30,16 +42,26 @@ export const ImageInput = ({ onChange, title }: ImageInputProps) => {
       <Container onClick={handleUploadButtonClick}>
         <HiddenInput
           type="file"
-          accept="image/*, video/*"
+          accept={type === "image" ? "image/*" : "video" ? "video/*" : ""}
+          // accept="image/*, video/*"
           ref={fileInputRef}
           onChange={handleInputChange}
+          // {...(register && { ...register(id) })}
         />
 
         <Icon />
         <p>{title || "Upload Image"}</p>
-        <Preview preview={!!preview} src={preview} />
+        {type === "image" ? (
+          <Preview preview={!!preview} src={preview} />
+        ) : (
+          <VideoPreview preview={!!preview}>
+            <VideoCameraAddOutlined style={{ fontSize: "4rem" }} />
+          </VideoPreview>
+        )}
       </Container>
-      {!!preview && <ButtonElement onClick={() => setPreview("")} label="Remove" />}
+      {!!preview && (
+        <ButtonElement onClick={() => setPreview("")} label="Remove" />
+      )}
     </OuterWrapper>
   );
 };
@@ -62,7 +84,7 @@ const Container = styled.div`
     color: gray;
     font-size: 0.7rem;
   }
-  @media ${devices.tabletL}{
+  @media ${devices.tabletL} {
     width: auto;
   }
 `;
@@ -86,6 +108,18 @@ const Icon = styled(UploadIcon)`
   height: 1rem;
 `;
 const Preview = styled.img<{ preview: boolean }>`
+  display: ${({ preview }) => (preview ? "block" : "none")};
+  width: 90%;
+  height: 80%;
+  object-fit: contain;
+  position: absolute;
+  background-color: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+const VideoPreview = styled.div<{ preview: boolean }>`
   display: ${({ preview }) => (preview ? "block" : "none")};
   width: 90%;
   height: 80%;

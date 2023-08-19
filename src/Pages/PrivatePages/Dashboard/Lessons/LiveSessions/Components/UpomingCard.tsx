@@ -5,10 +5,11 @@ import { ButtonElement } from "../../../../../../Ui_elements";
 
 interface Props {
   topic: string;
-  time: string;
-  date: string;
+  time?: string;
+  date?: string;
+  item:any
 }
-export const UpcomingCard = ({ topic, time, date }: Props) => {
+export const UpcomingCard = ({ topic, time="5:00", date="25 Dec", item }: Props) => {
   const navigate = useNavigate();
   return (
     <Container>
@@ -31,7 +32,10 @@ export const UpcomingCard = ({ topic, time, date }: Props) => {
       </Details>
       <ButtonElement
         label="Join"
-        onClick={() => navigate(`/live_lessons/${topic}`)}
+        onClick={() => navigate(`/live_lessons/${topic}`, {
+          state: {
+          item:item
+        }})}
       />
     </Container>
   );
