@@ -3,10 +3,17 @@ import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon, ToggleIcon } from "../../../../../../Assets/Svgs";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
-import { addSubTopicUrl, getSubTopicsUrl } from "../../../../../../Urls";
+import {
+  activateTopicUrl,
+  addSubTopicUrl,
+  deactivateTopicUrl,
+  getSubTopicsUrl,
+} from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "../../../../../../Ui_elements";
 
 interface CardProps {
   subjects?: string[];
@@ -15,6 +22,7 @@ interface CardProps {
   index: number;
   id: number;
   item: any;
+  track: number;
   active?: boolean;
   isDraggedOver?: any;
   onDragStart?: () => void;
@@ -31,6 +39,7 @@ export const TopicCard = ({
   index,
   item,
   id,
+  track,
   active,
   onDragStart,
   onDragEnter,
@@ -44,6 +53,80 @@ export const TopicCard = ({
   const [showSubtopic, setShowSubtopic] = useState(false);
   const [title, setTitle] = useState("");
   let isActive = active;
+
+  const queryClient = useQueryClient();
+
+  const handleActivateSuccess = () => {
+    toast.success("Successfully Activated topic", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const handleActivationError = (error: any) => {
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const handleDeactivateSuccess = () => {
+    toast.success("Successfully Activated topic", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const handleDeactivationError = (error: any) => {
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const toggleActive = () => {
+    if (active) {
+      deactivateTopic();
+      queryClient.invalidateQueries(["topic"]);
+    } else {
+      activateTopic();
+      queryClient.invalidateQueries(["topic"]);
+    }
+  };
+  const { refetch: deactivateTopic, isFetching: isLoadingDeactivate } =
+    useApiGet([`subject${id}`], () => deactivateTopicUrl(id), {
+      refetchOnWindowFocus: false,
+      enabled: false,
+      onSuccess: handleDeactivateSuccess,
+      onError: handleDeactivationError,
+    });
+
+  const { refetch: activateTopic, isFetching: isLoadingActivate } = useApiGet(
+    [`subject${id}`],
+    () => activateTopicUrl(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+      onSuccess: handleActivateSuccess,
+      onError: handleActivationError,
+    }
+  );
 
   const handleSubmit = () => {
     const requestBody: any = {
@@ -79,23 +162,6 @@ export const TopicCard = ({
       theme: "light",
     });
   };
-  // const toggleActive = () => {
-  //   isActive ? deactivateClass() : activateClass();
-  // };
-
-  // const { mutate: deactivateClass, isLoading: isDeactivating } = useApiPost(
-  //   () => deactivateUrl(item),
-  //   onSuccess,
-  //   onError,
-  //   ["class"]
-  // );
-
-  // const { mutate: activateClass, isLoading: activating } = useApiPost(
-  //   () => activateUrl(item),
-  //   onSuccess,
-  //   onError,
-  //   ["class"]
-  // );
 
   const { data: subtopics } = useApiGet(
     [`sub_topic${item?._id}`],
@@ -106,17 +172,17 @@ export const TopicCard = ({
     }
   );
 
-  const { mutate: addSubTopic, isLoading: isAddingSubTopic } = useApiPost(
+  const { mutate: addSubTopic } = useApiPost(
     (_: any) => addSubTopicUrl(_, item?._id),
     handleSubTopicSuccess,
     handleSubTopicError,
     [`sub_topic${item?._id}`]
   );
   useEffect(() => {
-    if (id === index && subtopics) {
+    if (track === index && subtopics) {
       setSubtopic(subtopics?.data?.content);
     }
-  }, [id, index, subtopics]);
+  }, [index, subtopics, track]);
 
   return (
     <MainContainer
@@ -167,7 +233,15 @@ export const TopicCard = ({
             </Details>
           </DetailsContainer>
           <SwitchContainer>
-            <SwitchElement activeState={isActive} />
+            {index === track &&
+              (isLoadingActivate || isLoadingDeactivate ? (
+                <Spinner color="var(--primary-color)" />
+              ) : (
+                <SwitchElement
+                  activeState={isActive}
+                  handleChange={toggleActive}
+                />
+              ))}
           </SwitchContainer>
         </Container>
         <MoveIcon style={{ cursor: "move" }} />

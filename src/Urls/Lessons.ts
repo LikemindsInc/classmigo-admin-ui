@@ -4,7 +4,7 @@ import { request } from "../utils/requestProcessor";
 export const getAllLessonsUrl = (
   lessonName?: string,
   page?: number,
-  size = 5
+  size?:number
 ) => {
   return request({
     url: `${ADMIN_BASE_URL}/lessons?subject=${lessonName}`,
@@ -78,6 +78,33 @@ export const activateUrl = (name: string) =>
     url: `class/${name}/activate`,
     method: "PUT",
   });
+
+  export const deactivateSubjectUrl = (id: string | number) =>
+  request({
+    url: `${ADMIN_BASE_URL}/class/subject/${id}/deactivate`,
+    method: "GET",
+  });
+
+export const activateSubjectUrl = (id: string | number) =>
+  request({
+    url: `${ADMIN_BASE_URL}/class/subject/${id}/activate`,
+    method: "GET",
+  });
+
+
+  export const deactivateTopicUrl = (id: string | number) =>
+  request({
+    url: `${ADMIN_BASE_URL}/subject/lesson/${id}/deactivate`,
+    method: "GET",
+  });
+
+export const activateTopicUrl = (id: string | number) =>
+  request({
+    url: `${ADMIN_BASE_URL}/class/lesson/${id}/activate`,
+    method: "GET",
+  });
+
+
 
 // export const addTopicUrl = (name: string) =>
 //   request({

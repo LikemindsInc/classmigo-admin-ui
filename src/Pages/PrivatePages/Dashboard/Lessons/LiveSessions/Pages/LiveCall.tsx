@@ -10,43 +10,46 @@ import {
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { LiveChat } from "../Components/Chat";
 import { ParticipantCard } from "../Components/ParticipantCard";
+import { VideoPlayerElement } from "../../../../../../Ui_elements";
+import { useLocation } from "react-router-dom";
 
 const LiveCall = () => {
   const [active, setActive] = useState(1);
   const [stream, setStream] = useState<any>(null);
   const teacher = useRef<any>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const { state } = useLocation();
 
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: true,
-      })
-      .then((stream) => {
-        setStream(stream);
-        if (teacher.current) {
-          teacher.current.srcObject = stream;
-        }
-      })
-      .catch((e) => console.log(alert(e)));
-  }, []);
+  // useEffect(() => {
+  //   navigator.mediaDevices
+  //     .getUserMedia({
+  //       video: true,
+  //       audio: true,
+  //     })
+  //     .then((stream) => {
+  //       setStream(stream);
+  //       if (teacher.current) {
+  //         teacher.current.srcObject = stream;
+  //       }
+  //     })
+  //     .catch((e) => console.log(alert(e)));
+  // }, []);
 
-  useEffect(() => {
-    const handleUnload = (e: any) => {
-      if (stream) {
-        stream.getTracks().forEach((track: any) => track.stop());
-        setStream(null);
-      }
-      e.returnValue = "Are you sure you want to leave?";
-    };
+  // useEffect(() => {
+  //   const handleUnload = (e: any) => {
+  //     if (stream) {
+  //       stream.getTracks().forEach((track: any) => track.stop());
+  //       setStream(null);
+  //     }
+  //     e.returnValue = "Are you sure you want to leave?";
+  //   };
 
-    window.addEventListener("beforeunload", handleUnload);
+  //   window.addEventListener("beforeunload", handleUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-    };
-  }, [stream]);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleUnload);
+  //   };
+  // }, [stream]);
 
   const toggleCamera = () => {
     if (stream) {
@@ -69,15 +72,16 @@ const LiveCall = () => {
     <Container>
       <VideoLayout>
         <VideoSection>
-          {stream && (
+          {/* {stream && (
             <InstructorVideo
               ref={teacher}
               muted={isMuted}
               autoPlay
               playsInline
             />
-          )}
-          <ToolBox>
+          )} */}
+          <VideoPlayerElement source={state.item.liveUrl} height="50vh" />
+          {/* <ToolBox>
             <ToolCircle onClick={toggleMute}>
               <i>
                 <MicIcon />
@@ -103,7 +107,7 @@ const LiveCall = () => {
                 <EndIcon />
               </i>
             </ToolCircle>
-          </ToolBox>
+          </ToolBox> */}
         </VideoSection>
         <Participants>
           <ParticipantCard />
@@ -228,6 +232,6 @@ const ToolCircle = styled.div`
 
 const VideoSection = styled.section`
   position: relative;
-  height: auto;
+  height: 50vh;
   width: 100%;
 `;

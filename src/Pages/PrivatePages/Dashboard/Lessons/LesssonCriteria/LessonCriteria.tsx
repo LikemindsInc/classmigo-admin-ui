@@ -110,7 +110,7 @@ const LessonCriteria = () => {
                     active={item?.isActive}
                     key={index}
                     index={index}
-                    subjects={item?.subjects.length}
+                    subjectsCount={item?.subjects.length}
                     onDragStart={() => (dragClass.current = index)}
                     onDragEnter={() => (dragOverClass.current = index)}
                     onDragEnd={handleDragSort}

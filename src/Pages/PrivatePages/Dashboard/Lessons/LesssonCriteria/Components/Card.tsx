@@ -5,17 +5,16 @@ import { MoveIcon } from "../../../../../../Assets/Svgs";
 import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useApiDelete, useApiPost } from "../../../../../../custom-hooks";
+import { useApiPost } from "../../../../../../custom-hooks";
 import {
   activateUrl,
   deactivateUrl,
-  deleteClassUrl,
 } from "../../../../../../Urls";
-import { Loader, Spinner } from "../../../../../../Ui_elements";
 import { toast } from "react-toastify";
 
 interface CardProps {
-  subjects?: string[];
+  subjects?: any[];
+  subjectsCount:string[]
   id: number;
   topics?: string[];
   classname: string;
@@ -33,6 +32,7 @@ interface CardProps {
 export const Card = ({
   classname,
   subjects,
+  subjectsCount,
   topics,
   index,
   item,
@@ -80,14 +80,14 @@ export const Card = ({
   //   ["class"]
   // );
 
-  const { mutate: deactivateClass, isLoading: isDeactivating } = useApiPost(
+  const { mutate: deactivateClass } = useApiPost(
     () => deactivateUrl(item),
     onSuccess,
     onError,
     ["class"]
   );
 
-  const { mutate: activateClass, isLoading: activating } = useApiPost(
+  const { mutate: activateClass } = useApiPost(
     () => activateUrl(item),
     onSuccess,
     onError,
@@ -118,7 +118,7 @@ export const Card = ({
           >
             <h6>{classname}</h6>
             <ToolsContainer>
-              <Tools>{subjects} Subjects</Tools>
+              <Tools>{subjectsCount} Subjects</Tools>
             </ToolsContainer>
           </DetailsContainer>
           <SwitchContainer>
@@ -192,7 +192,7 @@ const OuterContainer = styled.div<{ isDraggedOver: boolean }>`
     props.isDraggedOver ? "translateY(10px)" : "translateY(0)"};
 `;
 
-const Delete = styled(DeleteOutlined)`
-  cursor: pointer;
-  color: red;
-`;
+// const Delete = styled(DeleteOutlined)`
+//   cursor: pointer;
+//   color: red;
+// `;

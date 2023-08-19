@@ -10,7 +10,9 @@ import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { VideoCard } from "../Component/VideoCard";
 import { useLocation } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
-import { fi } from "date-fns/locale";
+import { useApiPost } from "../../../../../../custom-hooks";
+import { toast } from "react-toastify";
+import { createVideoUrl } from "../../../../../../Urls";
 
 const VideoDetails = () => {
   const location = useLocation();
@@ -19,17 +21,51 @@ const VideoDetails = () => {
   const {
     register,
     handleSubmit,
-    control,
     // formState: { errors },
   } = useForm({
     defaultValues: {
-      title: state?.details?.title,
-    }
+      lessonName: state?.details?.title,
+    },
   });
   console.log(state);
 
+  const onSuccess = () => {
+    toast.success("Successfully added Video", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const onError = (e: any) => {
+    toast.error(e, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  const { mutate: createVideo, isLoading } = useApiPost(
+    createVideoUrl,
+    onSuccess,
+    onError,
+    ["videos"]
+  );
   const onSubmit = (data: any) => {
-    console.log(data);
+    // console.log(data);
+    const requestBody: any = {
+      title: data.lessonName,
+      file: data.video,
+    };
+
+    createVideo(requestBody);
   };
 
   return (
@@ -49,19 +85,24 @@ const VideoDetails = () => {
             label="Description"
             placeholder="Give a little description of the lesson "
             register={register}
-            id="description"
+            id="lessonDescription"
           />
         </InputHolders>
 
         <InputHolders>
           <p>Upload Video</p>
-          <ImageInput title="Upload Video" type="video" name="video" register={register}  />
+          <ImageInput
+            title="Upload Video"
+            type="video"
+            id="video"
+            register={register}
+          />
         </InputHolders>
         <ThumbnailSection>
           <h6>Thumbnail</h6>
           <p>Choose or upload an image to show what the video is about</p>
           <ThumbnailList>
-            <ImageInput title="Upload Thumbnail" type="image" name="image" register={register}  />
+            <ImageInput title="Upload Thumbnail" type="image" />
           </ThumbnailList>
         </ThumbnailSection>
         <ButtonElement label="Save" width={150} type="submit" />

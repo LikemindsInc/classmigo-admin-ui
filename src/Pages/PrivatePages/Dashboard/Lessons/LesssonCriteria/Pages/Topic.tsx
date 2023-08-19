@@ -42,7 +42,7 @@ const SelectTopic = () => {
     data: topics,
     isLoading: isLoadingTopics,
     refetch: getLessons,
-  } = useApiGet(["topic"], () => getAllLessonsUrl(scope, page), {
+  } = useApiGet(["topic"], () => getAllLessonsUrl(scope), {
     refetchOnWindowFocus: false,
     enabled: true,
   });
@@ -70,6 +70,7 @@ const SelectTopic = () => {
       draggable: true,
       theme: "light",
     });
+    setTopic("");
   };
 
   const { mutate: addTopic, isLoading: isAddingTopic } = useApiPost(
@@ -87,12 +88,24 @@ const SelectTopic = () => {
   }, [topics]);
 
   const onSubmit = () => {
-    const requestBody: any = {
-      lessonName: topic,
-      schoolSubject: scope,
-      studentClass: classTitle,
-    };
-    addTopic(requestBody);
+    if (topic === "") {
+      toast.error("Please enter a topic", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    } else {
+      const requestBody: any = {
+        lessonName: topic,
+        schoolSubject: scope,
+        studentClass: classTitle,
+      };
+      addTopic(requestBody);
+    }
   };
   return (
     <Container>
@@ -117,8 +130,9 @@ const SelectTopic = () => {
                 item={item}
                 classname={item?.lessonName}
                 key={index}
-                id={index}
+                id={item?._id}
                 index={index}
+                track={index}
                 active={item?.schoolSubject?.isActive}
                 onDragStart={() => (dragTopic.current = index)}
                 onDragEnter={() => (dragOverTopic.current = index)}
@@ -131,14 +145,14 @@ const SelectTopic = () => {
                 // onClick={() => navigate(`/lessons_criteria`)}
               />
             ))}
-            <PaginationContainer>
+            {/* <PaginationContainer>
               <Pagination
                 count={totalPages}
                 variant="outlined"
                 shape="rounded"
                 onChange={handlePageChange}
               />
-            </PaginationContainer>
+            </PaginationContainer> */}
           </CardContainer>
         ) : isLoadingTopics ? (
           <div>

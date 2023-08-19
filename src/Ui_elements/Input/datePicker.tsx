@@ -4,16 +4,18 @@ import styled from "styled-components";
 import { devices } from "../../utils/mediaQueryBreakPoints";
 
 export const DatePickerInput = ({
-  defaultDate,
   label,
   iconHidden,
+  onChange,
   width,
 }: any) => {
   return (
     <Container width={width}>
       <label>{label}</label>
       <StyledDatePickerWrapper iconHidden={iconHidden}>
-        <StyledDatePicker defaultValue={defaultDate} />
+        <StyledDatePicker
+          onChange={onChange}
+        />
       </StyledDatePickerWrapper>
     </Container>
   );
