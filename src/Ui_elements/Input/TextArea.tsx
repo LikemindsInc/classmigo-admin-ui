@@ -5,14 +5,22 @@ interface TextAreaProps {
   width?: number;
   placeholder?: string;
   label?: string;
+  register?: any;
+  id?: string;
 }
-export const TextAreaInput = ({ width, placeholder, label }: TextAreaProps) => {
-  const [text, setText] = useState("");
-  console.log(width)
-  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(event.target.value);
-  };
-  const wordCount = text.length;
+export const TextAreaInput = ({
+  width,
+  placeholder,
+  label,
+  register,
+  id,
+}: TextAreaProps) => {
+  // const [text, setText] = useState("");
+  // console.log(width);
+  // const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  //   setText(event.target.value);
+  // };
+  // const wordCount = text.length;
 
   return (
     <>
@@ -20,14 +28,16 @@ export const TextAreaInput = ({ width, placeholder, label }: TextAreaProps) => {
       <TextAreWrapper>
         <StyledTextArea
           width={width}
-          value={text}
-          onChange={handleTextChange}
+          // value={text}
+          // onChange={handleTextChange}
           placeholder={placeholder}
+          {...(register && { ...register(id) })}
+
           // style={{
           //   height: `calc(${text.split("\n").length} * 1.5em)`,
           // }}
         />
-        <WordCount>{wordCount}</WordCount>
+        {/* <WordCount>{wordCount}</WordCount> */}
       </TextAreWrapper>
     </>
   );
@@ -44,7 +54,7 @@ const TextAreWrapper = styled.div`
   }
 `;
 const StyledTextArea = styled.textarea<{ width?: number }>`
-  width: ${({ width }) => width ? width + "px" : '100%'};
+  width: ${({ width }) => (width ? width + "px" : "100%")};
   padding: 10px;
   resize: none;
   overflow: hidden;

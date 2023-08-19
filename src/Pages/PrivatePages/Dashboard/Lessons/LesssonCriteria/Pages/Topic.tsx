@@ -1,28 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../Assets/noData.png";
-import { useLocation} from "react-router-dom";
-import {
-  ButtonElement,
-} from "../../../../../../Ui_elements";
+import { useLocation } from "react-router-dom";
+import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { TopicCard } from "../Components/TopicCard";
 import { addTopicUrl, getAllLessonsUrl } from "../../../../../../Urls";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
-import { Skeleton } from "@mui/material";
+import { Pagination, Skeleton } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
+import { AddIcon } from "../../../../../../Assets/Svgs";
 
 const SelectTopic = () => {
   const [selectTopic, setSelecttopic] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [page, setPage] = useState(1);
   const location = useLocation();
   const { state } = location;
   const { scope, classTitle } = state;
-  const [topic, setTopic] = useState<any>({
-    lessonName: "",
-    lessonDescription: "",
-    lessonWeek: "",
-  });
+  const [topic, setTopic] = useState<any>("");
 
   const dragTopic = useRef<any>(null);
   const dragOverTopic = useRef<any>(null);
@@ -36,14 +33,19 @@ const SelectTopic = () => {
     setSelecttopic(items);
   };
 
-  const { data: topics, isLoading: isLoadingTopics } = useApiGet(
-    ["topic"],
-    () => getAllLessonsUrl(scope),
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
+  const handlePageChange = (e: any, p: any) => {
+    setPage(p);
+    getLessons();
+  };
+
+  const {
+    data: topics,
+    isLoading: isLoadingTopics,
+    refetch: getLessons,
+  } = useApiGet(["topic"], () => getAllLessonsUrl(scope), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
 
   const handleSuccess = () => {
     toast.success("Successfully added topic", {
@@ -56,11 +58,7 @@ const SelectTopic = () => {
       theme: "light",
     });
 
-    setTopic({
-      lessonName: "",
-      lessonDescription: "",
-      lessonWeek: "",
-    });
+    setTopic("");
   };
   const handleError = (error: any) => {
     toast.error(error?.message, {
@@ -72,6 +70,7 @@ const SelectTopic = () => {
       draggable: true,
       theme: "light",
     });
+    setTopic("");
   };
 
   const { mutate: addTopic, isLoading: isAddingTopic } = useApiPost(
@@ -84,73 +83,77 @@ const SelectTopic = () => {
   useEffect(() => {
     if (topics) {
       setSelecttopic(topics?.data?.content);
+      setTotalPages(topics?.data?.pagination?.numberOfPages);
     }
   }, [topics]);
 
-  const onSubmit = (data: any) => {
-    addTopic({
-      ...data,
-      schoolSubject: scope,
-      studentClass: classTitle,
-      lessonWeek: "1",
-    });
+  const onSubmit = () => {
+    if (topic === "") {
+      toast.error("Please enter a topic", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    } else {
+      const requestBody: any = {
+        lessonName: topic,
+        schoolSubject: scope,
+        studentClass: classTitle,
+      };
+      addTopic(requestBody);
+    }
   };
-
   return (
     <Container>
       <Header>
-        <div>
-          <div>
-            <label>Create a topic</label>
-            <Input
-              placeholder="Enter a subject name"
-              value={topic.lessonName}
-              onChange={(e) =>
-                setTopic({ ...topic, lessonName: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <label>Add a description</label>
-            <Input
-              placeholder="Enter a description"
-              value={topic.lessonDescription}
-              onChange={(e) =>
-                setTopic({ ...topic, lessonDescription: e.target.value })
-              }
-            />
-          </div>
-
-          <ButtonElement
-            isLoading={isAddingTopic}
-            type="submit"
-            label="Add Subject +"
-            width={200}
-            onClick={() => onSubmit(topic)}
-          />
-        </div>
+        <InputElement
+          label="Create Topic"
+          placeholder="Enter Topic"
+          onChange={(e: any) => setTopic(e.target.value)}
+        />
+        <ButtonElement
+          label="Add Topic"
+          icon={<AddIcon />}
+          onClick={onSubmit}
+          isLoading={isAddingTopic}
+        />
       </Header>
       <Body>
         {selectTopic.length > 0 ? (
-          selectTopic.map((item: any, index: number) => (
-            <TopicCard
-              item={item}
-              classname={item?.lessonName}
-              key={index}
-              id={index}
-              index={index}
-              onDragStart={() => (dragTopic.current = index)}
-              onDragEnter={() => (dragOverTopic.current = index)}
-              onDragEnd={handleDragSort}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDraggedOver(true);
-              }}
-              isDraggedOver={isDraggedOver}
-              // onClick={() => navigate(`/lessons_criteria`)}
-            />
-          ))
+          <CardContainer>
+            {selectTopic.map((item: any, index: number) => (
+              <TopicCard
+                item={item}
+                classname={item?.lessonName}
+                key={index}
+                id={item?._id}
+                index={index}
+                track={index}
+                active={item?.schoolSubject?.isActive}
+                onDragStart={() => (dragTopic.current = index)}
+                onDragEnter={() => (dragOverTopic.current = index)}
+                onDragEnd={handleDragSort}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDraggedOver(true);
+                }}
+                isDraggedOver={isDraggedOver}
+                // onClick={() => navigate(`/lessons_criteria`)}
+              />
+            ))}
+            {/* <PaginationContainer>
+              <Pagination
+                count={totalPages}
+                variant="outlined"
+                shape="rounded"
+                onChange={handlePageChange}
+              />
+            </PaginationContainer> */}
+          </CardContainer>
         ) : isLoadingTopics ? (
           <div>
             <SkeletonContainer>
@@ -205,13 +208,14 @@ export default SelectTopic;
 
 const Container = styled.section`
   width: 100%;
-  height: 85vh;
+  max-height: 85vh;
+  height: 100%;
   background-color: white;
   border-radius: 12px;
   padding: 3rem 10%;
   display: flex;
   flex-direction: column;
-  gap: 10%;
+  /* gap: 10%; */
   overflow-y: scroll;
   position: relative !important;
 
@@ -221,47 +225,26 @@ const Container = styled.section`
 `;
 
 const Header = styled.div`
+  display: flex;
   width: 100%;
-  > div {
-    display: flex;
-    justify-content: space-between;
-    width: fill !important;
+  align-items: flex-end;
+  margin-bottom: 2rem;
 
-    @media ${devices.tabletL} {
-      flex-wrap: wrap;
-      width: 100%;
-    }
-    label {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      @media ${devices.tabletL} {
-        margin-right: 10px;
-      }
-    }
-    input {
-      width: 23vw;
-      height: 40px;
-      @media ${devices.tabletL} {
-        width: 100%;
-      }
-    }
-    button {
-      margin-top: 25px;
-      height: 40px;
-      font-size: 1vw;
-      @media ${devices.tabletL} {
-        width: 200px !important;
-        font-size: 1rem;
-      }
-    }
-    width: 100%;
-    display: flex;
-    gap: 2rem;
-    align-items: flex-end;
+  input {
+    width: 350px;
+    margin-right: 1rem;
+  }
+  button {
+    font-size: 0.8rem;
+    height: 38px !important;
+    width: 150px;
+    align-self: flex-end !important;
+  }
+
+  @media ${devices.tabletL} {
+    gap: 4%;
   }
 `;
-
 const Body = styled.section`
   width: 100%;
   height: 100%;
@@ -319,4 +302,12 @@ const Input = styled.input`
 
 const SkeletonContainer = styled.div`
   margin-bottom: 10px;
+`;
+
+const CardContainer = styled.section``;
+const PaginationContainer = styled.div`
+  margin-bottom: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 `;

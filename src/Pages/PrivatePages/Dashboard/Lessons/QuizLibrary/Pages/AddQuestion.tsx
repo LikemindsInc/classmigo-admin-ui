@@ -33,7 +33,7 @@ const AddQuestion = () => {
         <TextAreaInput label="Question" width={300} />
       </InputHolder>
       <InputHolder>
-        <ImageInput />
+        <ImageInput type="image"/>
       </InputHolder>
       <OptionsContainer>
         <h3>Select an Option:</h3>

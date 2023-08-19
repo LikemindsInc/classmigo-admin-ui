@@ -9,13 +9,17 @@ import { createClassUrl, getAllClassesUrl } from "../../../../../Urls";
 import { ButtonElement, InputElement } from "../../../../../Ui_elements";
 import { AddIcon } from "../../../../../Assets/Svgs";
 import { useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
+import { classSchema } from "./LessonCriteriaSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const LessonCriteria = () => {
   const [selectClass, setSelectClass] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
 
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, formState:{errors} } = useForm({
+    resolver: yupResolver(classSchema),
+  });
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["classes"],
@@ -38,8 +42,7 @@ const LessonCriteria = () => {
     });
   };
   const onError = (e: any) => {
-    console.log(e);
-    toast.error(`hj`, {
+    toast.error(e, {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -88,6 +91,7 @@ const LessonCriteria = () => {
               placeholder="Enter Class"
               register={register}
               id="name"
+              error={errors}
             />
             <ButtonElement
               label="Add Class"
@@ -97,24 +101,27 @@ const LessonCriteria = () => {
           </Header>
           <Body>
             {selectClass?.length > 0 ? (
-              selectClass.map((item: any, index: number) => (
-                <Card
-                  item={item?.name}
-                  id={item?._id}
-                  classname={item?.value}
-                  key={index}
-                  index={index}
-                  subjects={item?.subjects.length}
-                  onDragStart={() => (dragClass.current = index)}
-                  onDragEnter={() => (dragOverClass.current = index)}
-                  onDragEnd={handleDragSort}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDraggedOver(true);
-                  }}
-                  isDraggedOver={isDraggedOver}
-                />
-              ))
+              <div>
+                {selectClass.map((item: any, index: number) => (
+                  <Card
+                    item={item?.name}
+                    id={item?._id}
+                    classname={item?.value}
+                    active={item?.isActive}
+                    key={index}
+                    index={index}
+                    subjectsCount={item?.subjects.length}
+                    onDragStart={() => (dragClass.current = index)}
+                    onDragEnter={() => (dragOverClass.current = index)}
+                    onDragEnd={handleDragSort}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDraggedOver(true);
+                    }}
+                    isDraggedOver={isDraggedOver}
+                  />
+                ))}
+              </div>
             ) : isLoadingClasses ? (
               <div>
                 <SkeletonContainer>
@@ -170,13 +177,13 @@ export default LessonCriteria;
 
 const Container = styled.section`
   width: 100%;
-  height: 85vh;
+  max-height: 85vh;
+  height: 100%;
   background-color: white;
   border-radius: 12px;
   padding: 3rem 10%;
   display: flex;
   flex-direction: column;
-  gap: 10%;
   overflow-y: scroll;
   position: relative !important;
 
@@ -188,6 +195,7 @@ const Container = styled.section`
 const Body = styled.section`
   width: 100%;
   height: 100%;
+  margin-bottom: 2rem;
 `;
 
 const NoData = styled.div`
@@ -214,6 +222,7 @@ const Header = styled.div`
   display: flex;
   width: 100%;
   align-items: flex-end;
+  margin-bottom: 2rem;
 
   input {
     width: 350px;
@@ -226,7 +235,12 @@ const Header = styled.div`
     align-self: flex-end !important;
   }
 
+
   @media ${devices.tabletL} {
     gap: 4%;
   }
+`;
+
+const PaginationContainer = styled.div`
+  /* margin: 2rem 0; */
 `;

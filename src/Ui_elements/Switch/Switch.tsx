@@ -2,10 +2,13 @@ import { Switch, SwitchProps } from "@mui/material";
 import React, { FC } from "react";
 import styled from "styled-components";
 
-interface IProps extends SwitchProps {}
+interface Props {
+  activeState?: boolean;
+  handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+export const SwitchElement = ({ activeState, handleChange }: Props) => {
+  return <CustomSwitch checked={activeState} onChange={handleChange} />;
 
-export const SwitchElement: FC<IProps> = ({ ...props }) => {
-  return <CustomSwitch {...props} />;
 };
 
 const CustomSwitch = styled(Switch)`
@@ -15,7 +18,7 @@ const CustomSwitch = styled(Switch)`
 
     &:hover {
       background: rgba(123, 49, 178, 0.2);
-    }
+    }  
   }
   .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
     background-color: var(--primary-color);

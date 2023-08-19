@@ -17,8 +17,9 @@ export const DashboardLayout = ({ children }: DashboardProp) => {
         {children}
       </Main>
     </Container>
-  );
-};
+  )
+}
+
 
 //styles
 
@@ -40,7 +41,8 @@ const Main = styled.main`
 
   @media ${devices.tabletL} {
     padding: 1rem;
-    width: 85%;
-    margin-left: 3rem;
+    width: 100vw !important;
+    margin-left:3rem;
+
   }
 `;
