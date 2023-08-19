@@ -6,6 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import {
+  activateSubjectUrl,
+  deactivateSubjectUrl,
+} from "../../../../../../Urls";
+import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CardProps {
   subjects?: string[];
@@ -33,6 +39,7 @@ export const SubjectCard = ({
   index,
   item,
   id,
+  active,
   title,
   onDragStart,
   onDragEnter,
@@ -42,46 +49,41 @@ export const SubjectCard = ({
   ...otherProps
 }: CardProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const onSuccess = () => {
-    toast.success("Successful", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
+
+
+  const toggleActive = () => {
+    if (active) {
+      deactivateSubject();
+      queryClient.invalidateQueries(["subjects"]);
+    } else {
+      activateSubject();
+      queryClient.invalidateQueries(["subjects"]);
+    }
   };
-  const onError = (error: any) => {
-    toast.error(`Something went wrong ${error.message}`, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-  };
+  const { refetch: deactivateSubject } = useApiGet(
+    [`subject${id}`],
+    () => deactivateSubjectUrl(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    }
+  );
 
-  // const toggleActive = () => {
-  //   isActive ? deactivateClass() : activateClass();
-  // };
-
-  // const { mutate: deactivateClass, isLoading: isDeactivating } = useApiPost(
-  //   () => deactivateUrl(item),
+  const { refetch: activateSubject } = useApiGet(
+    [`subject${id}`],
+    () => activateSubjectUrl(id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+    }
+  );
+  // const { mutate: activateSubject } = useApiPost(
+  //   () => activateSubjectUrl(id),
   //   onSuccess,
   //   onError,
-  //   ["class"]
-  // );
-
-  // const { mutate: activateClass, isLoading: activating } = useApiPost(
-  //   () => activateUrl(item),
-  //   onSuccess,
-  //   onError,
-  //   ["class"]
+  //   ["subject"]
   // );
 
   return (
@@ -113,7 +115,7 @@ export const SubjectCard = ({
           <h6>{classname}</h6>
         </DetailsContainer>
         <SwitchContainer>
-          <SwitchElement />
+          <SwitchElement activeState={active} handleChange={toggleActive} />
         </SwitchContainer>
       </Container>
       <MoveIcon style={{ cursor: "move" }} />

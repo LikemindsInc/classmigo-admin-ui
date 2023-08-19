@@ -7,20 +7,13 @@ import { VideoCameraAddOutlined } from "@ant-design/icons";
 import { convertToBase64 } from "../../utils/utilFns";
 
 interface ImageInputProps {
-  onChange?: (file: File | null) => void;
   title?: string;
   type: string;
   register?: any;
-  name?: string;
+  id?: string;
 }
 
-export const ImageInput = ({
-  onChange,
-  title,
-  type,
-  register,
-  name,
-}: ImageInputProps) => {
+export const ImageInput = ({ title, type, register, id }: ImageInputProps) => {
   const fileInputRef = useRef<any>(null);
   const [preview, setPreview] = useState("");
 
@@ -28,13 +21,12 @@ export const ImageInput = ({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0] || null;
+    file && setPreview(URL.createObjectURL(file));
     if (file) {
-      try {
-        const base64 = await convertToBase64(file);
-        setPreview(base64);
-        // onChange(base64);
-      } catch (error) {
-        console.error(error);
+      if (register) {
+        register(id, {
+          value: file,
+        });
       }
     }
   };
@@ -54,7 +46,7 @@ export const ImageInput = ({
           // accept="image/*, video/*"
           ref={fileInputRef}
           onChange={handleInputChange}
-          // {...(register && register(name))}
+          // {...(register && { ...register(id) })}
         />
 
         <Icon />

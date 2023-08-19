@@ -8,9 +8,9 @@ export const getAllVideosUrl = (className: string) =>
     params: { className },
   });
 
-export const createVideo = (className: string) =>
+export const createVideoUrl = (data:any) =>
   request({
-    url: `${ADMIN_BASE_URL}/lesson/videos`,
-    method: "GET",
-    params: { className },
+    url: `${ADMIN_BASE_URL}/lesson/video/create`,
+    method: "POST",
+    data: { data },
   });
