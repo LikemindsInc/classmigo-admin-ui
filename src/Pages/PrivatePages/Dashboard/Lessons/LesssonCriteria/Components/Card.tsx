@@ -6,15 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useApiPost } from "../../../../../../custom-hooks";
-import {
-  activateUrl,
-  deactivateUrl,
-} from "../../../../../../Urls";
+import { activateUrl, deactivateUrl } from "../../../../../../Urls";
 import { toast } from "react-toastify";
 
 interface CardProps {
   subjects?: any[];
-  subjectsCount:string[]
+  subjectsCount: string[];
   id: number;
   topics?: string[];
   classname: string;
@@ -125,7 +122,7 @@ export const Card = ({
             <SwitchElement activeState={isActive} handleChange={toggleActive} />
           </SwitchContainer>
         </Container>
-        <MoveIcon style={{ cursor: "move" }} />
+        <Move />
         {/* {isDeleting ? <Spinner color="var(--primary-color)" /> : <Delete onClick={() => deleteClass()} />} */}
       </>
     </OuterContainer>
@@ -141,6 +138,10 @@ const Container = styled.div`
   border-radius: 14px;
   width: 100%;
   transition: all 0.3s ease-in-out;
+
+  @media ${devices.tabletL} {
+    padding: 0.6rem 0.3rem;
+  }
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.07);
@@ -173,6 +174,9 @@ const DetailsContainer = styled.div`
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    @media ${devices.tablet} {
+      background-colo: red !important;
+    }
   }
 `;
 export const SwitchContainer = styled.div`
@@ -196,3 +200,10 @@ const OuterContainer = styled.div<{ isDraggedOver: boolean }>`
 //   cursor: pointer;
 //   color: red;
 // `;
+
+const Move = styled(MoveIcon)`
+  cursor: move;
+  @media ${devices.tabletL} {
+    display: none;
+  }
+`;

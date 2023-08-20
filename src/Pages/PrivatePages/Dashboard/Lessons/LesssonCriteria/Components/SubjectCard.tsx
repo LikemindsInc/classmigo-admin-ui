@@ -51,8 +51,6 @@ export const SubjectCard = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-
-
   const toggleActive = () => {
     if (active) {
       deactivateSubject();
@@ -102,24 +100,21 @@ export const SubjectCard = ({
             navigate(`/lessons_criteria/${title}/${classname}`, {
               state: {
                 title: classname,
+                className: title,
                 scope: item,
                 classTitle: classTitle,
               },
             })
           }
         >
-          {/* <ImageContainer>
-            <ImageInput />
-          </ImageContainer> */}
-          {/* <img src={placeholder} alt="Icon" /> */}
           <h6>{classname}</h6>
         </DetailsContainer>
         <SwitchContainer>
           <SwitchElement activeState={active} handleChange={toggleActive} />
         </SwitchContainer>
       </Container>
-      <MoveIcon style={{ cursor: "move" }} />
-      <Delete />
+        <Move />
+      {/* <Delete /> */}
     </OuterContainer>
   );
 };
@@ -167,25 +162,20 @@ const OuterContainer = styled.div<{ isDraggedOver: boolean }>`
   align-items: center;
   gap: 5%;
   margin-bottom: 1.5rem;
-  transition: transform 0.3s ease-in-out; /* Add transition for smooth animation */
+  transition: transform 0.3s ease-in-out;
   transform: ${(props) =>
-    props.isDraggedOver
-      ? "translateY(10px)"
-      : "translateY(0)"}; /* Apply transform when dragged over */
+    props.isDraggedOver ? "translateY(10px)" : "translateY(0)"};
 `;
 
-const ImageContainer = styled.div`
-  width: 8rem;
-  height: auto;
-  margin-right: 1rem;
-  /* border: 1px solid gray; */
-  img {
-    width: 8rem;
-    height: auto;
-  }
-`;
 
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;
   color: red;
+`;
+
+const Move = styled(MoveIcon)`
+  cursor: move;
+  @media ${devices.tabletL} {
+    display: none;
+  }
 `;

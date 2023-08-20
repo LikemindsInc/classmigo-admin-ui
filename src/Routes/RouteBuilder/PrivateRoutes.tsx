@@ -135,6 +135,14 @@ const LazyLiveCall = lazy(
     )
 );
 
+const LazyAddSubtopic = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Subtopic"
+    )
+);
+
+
 export const PrivateRoutes = () => {
   interface RouteConfig {
     path: string;
@@ -231,6 +239,10 @@ export const PrivateRoutes = () => {
       element: <LazyLessonTopic />,
     },
     {
+      path: "/lessons_criteria/:subject/:lesson/:topic",
+      element: <LazyAddSubtopic />,
+    },
+    {
       path: "/live_lessons/:id",
       element: <LazyLiveCall />,
     },
@@ -248,6 +260,7 @@ export const PrivateRoutes = () => {
       path: "/admin-access/:id",
       element: <AdminDetail />,
     },
+    
   ];
 
   return (
