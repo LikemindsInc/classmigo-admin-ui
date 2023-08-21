@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { ErrorIcon } from "../../Assets/Svgs";
 
 interface TextAreaProps {
   width?: number;
@@ -7,6 +8,9 @@ interface TextAreaProps {
   label?: string;
   register?: any;
   id?: string;
+  disabled?: boolean;
+  error?: any;
+  value?: string | number;
 }
 export const TextAreaInput = ({
   width,
@@ -14,30 +18,27 @@ export const TextAreaInput = ({
   label,
   register,
   id,
+  disabled,
+  error,
+  value,
 }: TextAreaProps) => {
-  // const [text, setText] = useState("");
-  // console.log(width);
-  // const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-  //   setText(event.target.value);
-  // };
-  // const wordCount = text.length;
-
   return (
     <>
       <Label>{label}</Label>
       <TextAreWrapper>
         <StyledTextArea
           width={width}
-          // value={text}
-          // onChange={handleTextChange}
+          value={value}
+          disabled={disabled}
           placeholder={placeholder}
           {...(register && { ...register(id) })}
-
-          // style={{
-          //   height: `calc(${text.split("\n").length} * 1.5em)`,
-          // }}
         />
-        {/* <WordCount>{wordCount}</WordCount> */}
+        {error && id ? (
+          <ErrorContainer>
+            {error[id]?.message && <Error />}
+            <p>{error[id]?.message}</p>
+          </ErrorContainer>
+        ) : null}
       </TextAreWrapper>
     </>
   );
@@ -49,6 +50,8 @@ const TextAreWrapper = styled.div`
   outline: none;
   border-radius: 5px;
   border: 1px solid #eed7ff;
+  position: relative;
+
   &:focus-within {
     border: 1px solid var(--primary-color);
   }
@@ -70,16 +73,27 @@ const StyledTextArea = styled.textarea<{ width?: number }>`
   }
 `;
 
-const WordCount = styled.div`
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  font-size: 12px;
-  color: #888;
-`;
-
 const Label = styled.label`
   font-weight: 600;
   font-size: 0.8rem;
   margin-bottom: 1rem !important;
+`;
+
+const ErrorContainer = styled.div`
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  p {
+    font-size: 0.7rem !important;
+    color: red;
+  }
+`;
+
+const Error = styled(ErrorIcon)`
+  width: 0.8rem;
+  height: 0.8rem;
 `;

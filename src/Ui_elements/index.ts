@@ -15,3 +15,4 @@ export * from "./Charts/BarChart"
 export * from "./Input/datePicker"
 export * from "./Breadcrumbs/Breadcrumbs"
 export * from './VideoPlayer/VideoPlayer'
+export * from "./Tag/Tag"

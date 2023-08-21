@@ -10,6 +10,9 @@ import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import { Pagination, Skeleton } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import { AddIcon } from "../../../../../../Assets/Svgs";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { topicSchema } from "../LessonCriteriaSchema";
 
 const SelectTopic = () => {
   const [selectTopic, setSelecttopic] = useState<any>([]);
@@ -19,8 +22,6 @@ const SelectTopic = () => {
   const location = useLocation();
   const { state } = location;
   const { scope, classTitle } = state;
-  const [topic, setTopic] = useState<any>("");
-
   const dragTopic = useRef<any>(null);
   const dragOverTopic = useRef<any>(null);
 
@@ -33,18 +34,26 @@ const SelectTopic = () => {
     setSelecttopic(items);
   };
 
-  const handlePageChange = (e: any, p: any) => {
+  const PAGE_SIZE = 6;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(topicSchema),
+  });
+  const handlePageChange = (e: any, p: number) => {
     setPage(p);
-    getLessons();
   };
 
   const {
     data: topics,
     isLoading: isLoadingTopics,
     refetch: getLessons,
-  } = useApiGet(["topic"], () => getAllLessonsUrl(scope), {
+  } = useApiGet(["topic"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
     refetchOnWindowFocus: false,
-    enabled: true,
+    enabled: false,
   });
 
   const handleSuccess = () => {
@@ -57,8 +66,6 @@ const SelectTopic = () => {
       draggable: true,
       theme: "light",
     });
-
-    setTopic("");
   };
   const handleError = (error: any) => {
     toast.error(error?.message, {
@@ -70,7 +77,6 @@ const SelectTopic = () => {
       draggable: true,
       theme: "light",
     });
-    setTopic("");
   };
 
   const { mutate: addTopic, isLoading: isAddingTopic } = useApiPost(
@@ -81,55 +87,70 @@ const SelectTopic = () => {
   );
 
   useEffect(() => {
+    if (page !== null) {
+      getLessons();
+    }
+  }, [page, getLessons]);
+  useEffect(() => {
     if (topics) {
       setSelecttopic(topics?.data?.content);
       setTotalPages(topics?.data?.pagination?.numberOfPages);
     }
   }, [topics]);
 
-  const onSubmit = () => {
-    if (topic === "") {
-      toast.error("Please enter a topic", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        theme: "light",
-      });
-    } else {
-      const requestBody: any = {
-        lessonName: topic,
-        schoolSubject: scope,
-        studentClass: classTitle,
-      };
-      addTopic(requestBody);
-    }
+  const onSubmit = (data: any) => {
+    const requestBody: any = {
+      lessonName: data?.topic,
+      schoolSubject: scope,
+      studentClass: classTitle,
+    };
+    addTopic(requestBody);
   };
   return (
-    <Container>
+    <Container onSubmit={handleSubmit(onSubmit)}>
       <Header>
         <InputElement
           label="Create Topic"
           placeholder="Enter Topic"
-          onChange={(e: any) => setTopic(e.target.value)}
+          register={register}
+          id="topic"
+          error={errors}
         />
         <ButtonElement
           label="Add Topic"
           icon={<AddIcon />}
-          onClick={onSubmit}
           isLoading={isAddingTopic}
         />
       </Header>
       <Body>
-        {selectTopic.length > 0 ? (
+        {isLoadingTopics ? (
+          <div>
+            {[...Array(4)].map((_, index) => (
+              <SkeletonContainer key={index}>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+            ))}
+          </div>
+        ) : selectTopic.length === 0 ? (
+          <NoData>
+            <img src={noData} alt="No data" />
+            <p>You haven’t added any classes yet.</p>
+            <p>Use the create class above to add classes.</p>
+          </NoData>
+        ) : (
           <CardContainer>
             {selectTopic.map((item: any, index: number) => (
               <TopicCard
                 item={item}
                 classname={item?.lessonName}
                 key={index}
+                classTitle={scope}
+                subjectTitle={classTitle}
                 id={item?._id}
                 index={index}
                 track={index}
@@ -142,71 +163,26 @@ const SelectTopic = () => {
                   setIsDraggedOver(true);
                 }}
                 isDraggedOver={isDraggedOver}
-                // onClick={() => navigate(`/lessons_criteria`)}
               />
             ))}
-            {/* <PaginationContainer>
+            <PaginationContainer>
               <Pagination
                 count={totalPages}
                 variant="outlined"
                 shape="rounded"
                 onChange={handlePageChange}
               />
-            </PaginationContainer> */}
+            </PaginationContainer>
           </CardContainer>
-        ) : isLoadingTopics ? (
-          <div>
-            <SkeletonContainer>
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={"100%"}
-                height={118}
-              />
-            </SkeletonContainer>
-            <SkeletonContainer>
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={"100%"}
-                height={118}
-              />
-            </SkeletonContainer>
-
-            <SkeletonContainer>
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={"100%"}
-                height={118}
-              />
-            </SkeletonContainer>
-
-            <SkeletonContainer>
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={"100%"}
-                height={118}
-              />
-            </SkeletonContainer>
-          </div>
-        ) : (
-          <NoData>
-            <img src={noData} alt="No data" />
-            <p>You haven’t added any classes yet.</p>
-            <p>Use the create class above to add classes.</p>
-          </NoData>
         )}
       </Body>
-      <ToastContainer />
     </Container>
   );
 };
 
 export default SelectTopic;
 
-const Container = styled.section`
+const Container = styled.form`
   width: 100%;
   max-height: 85vh;
   height: 100%;
@@ -215,12 +191,11 @@ const Container = styled.section`
   padding: 3rem 10%;
   display: flex;
   flex-direction: column;
-  /* gap: 10%; */
   overflow-y: scroll;
   position: relative !important;
 
   @media ${devices.tablet} {
-    padding: 0 1rem 1rem 1rem;
+    padding: 2rem 1rem;
   }
 `;
 
@@ -229,16 +204,27 @@ const Header = styled.div`
   width: 100%;
   align-items: flex-end;
   margin-bottom: 2rem;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    gap: 10px !important;
+  }
 
   input {
     width: 350px;
     margin-right: 1rem;
+    @media ${devices.tabletL} {
+      width: 100%;
+      margin-right: 0;
+    }
   }
   button {
     font-size: 0.8rem;
     height: 38px !important;
     width: 150px;
     align-self: flex-end !important;
+    @media ${devices.tabletL} {
+      width: 100%;
+    }
   }
 
   @media ${devices.tabletL} {
@@ -263,21 +249,6 @@ const NoData = styled.div`
   p {
     text-align: center;
     font-size: 0.8rem;
-  }
-`;
-
-const Input = styled.input`
-  width: fill;
-  border-color: var(--primary-color);
-  border-width: 1px;
-  padding: clamp(0.5rem, 30vw, 1rem);
-  outline: none;
-  border: 1px solid #7b31b2;
-  border-radius: 5px;
-  &:focus {
-    border: 1px solid #7b31b2;
-    -webkit-box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -306,7 +277,7 @@ const SkeletonContainer = styled.div`
 
 const CardContainer = styled.section``;
 const PaginationContainer = styled.div`
-  margin-bottom: 1rem;
+  margin-top: 2rem;
   width: 100%;
   display: flex;
   justify-content: flex-end;

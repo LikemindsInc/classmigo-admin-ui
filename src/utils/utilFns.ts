@@ -2,15 +2,13 @@ import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
 export const formatUrlName = (url: string): string => {
-  const hasUnderscoreOrSpaceEncoding = /_| |-/.test(url);
-  if (hasUnderscoreOrSpaceEncoding) {
-    let removeUnderscore = url.replace(/_/g, " ");
-    removeUnderscore = removeUnderscore.replaceAll(/-/g, " ");
-    const decoded = decodeURIComponent(removeUnderscore.replace(/\+/g, " "));
-    return _.capitalize(decoded);
-  } else {
-    return _.capitalize(url);
-  }
+  const removePercentage = url.replace(/%20/g, " ");
+  let removeUnderscoreHyphen = removePercentage.replace(/_/g, " ");
+  removeUnderscoreHyphen = removeUnderscoreHyphen.replace(/-/g, " ");
+  const decoded = decodeURIComponent(
+    removeUnderscoreHyphen.replace(/\+/g, " ")
+  );
+  return _.capitalize(decoded);
 };
 
 export const checkFileSize = (file: any, maxSize: number): boolean => {
@@ -21,21 +19,17 @@ export const convertToBase64 = (file: File): Promise<string> =>
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
-      if (typeof reader.result === 'string') {
+      if (typeof reader.result === "string") {
         resolve(reader.result);
       } else {
-        reject(new Error('Couldn\'t read file as base64.'));
+        reject(new Error("Couldn't read file as base64."));
       }
     };
     reader.onerror = (error) => reject(error);
   });
 
-
-export const checkforValidString = (value:any) =>
-	value
-		? /^[\w ]*[a-zA-Z]+(([', -][a-zA-Z])?[a-zA-Z]*)\s*$/.test(value)
-		: true;
-
+export const checkforValidString = (value: any) =>
+  value ? /^[\w ]*[a-zA-Z]+(([', -][a-zA-Z])?[a-zA-Z]*)\s*$/.test(value) : true;
 
 export const generateRandom = (length: number) => {
   return uuidv4().slice(0, length);
@@ -58,15 +52,17 @@ export const formatOptions = (
           value: Array.isArray(value) ? newObj : sessionData[value],
           label: Array.isArray(label)
             ? `${sessionData[label[0]]} (${sessionData[label[1]]})`
-            : sessionData[label]
+            : sessionData[label],
         };
       })
     : [];
 };
 
-
 export const formatDate = (date: Date): string => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
   return date.toLocaleDateString(undefined, options);
 };
-

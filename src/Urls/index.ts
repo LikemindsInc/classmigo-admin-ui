@@ -5,3 +5,5 @@ export * from "./Students";
 export * from "./Lessons";
 export * from "./VideoLibrary";
 export * from "./AdminAccess";
+export * from "./QuizLibrary";
+

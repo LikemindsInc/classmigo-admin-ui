@@ -5,11 +5,10 @@ import { useLocation } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { SubjectCard } from "../Components/SubjectCard";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
-import { Skeleton } from "@mui/material";
+import { Pagination, Skeleton } from "@mui/material";
 import {
   createSubjectUrl,
   getAllClassesUrl,
-  getAllSubjectsUrl,
 } from "../../../../../../Urls";
 import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
 import { AddIcon } from "../../../../../../Assets/Svgs";
@@ -34,7 +33,6 @@ const SelectSubject = () => {
     resolver: yupResolver(subjectSchema),
   });
 
-
   const handleSuccess = () => {
     toast.success("Successfully Updated", {
       position: "top-right",
@@ -58,7 +56,6 @@ const SelectSubject = () => {
       theme: "light",
     });
   };
-
 
   const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
     ["subjects"],
@@ -142,28 +139,33 @@ const SelectSubject = () => {
         </Header>
         <Body>
           {selectSubject?.length > 0 ? (
-            selectSubject?.map((item: any, index: number) =>
-              item?.subjects?.map((item: any) => (
-                <SubjectCard
-                  classname={item?.name}
-                  key={index}
-                  item={item?.name}
-                  classTitle={scope}
-                  title={title}
-                  active={item?.isActive}
-                  id={item?._id}
-                  index={index}
-                  onDragStart={() => (dragClass.current = index)}
-                  onDragEnter={() => (dragOverClass.current = index)}
-                  onDragEnd={handleDragSort}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDraggedOver(true);
-                  }}
-                  isDraggedOver={isDraggedOver}
-                />
-              ))
-            )
+            <>
+              {selectSubject?.map((item: any, index: number) =>
+                item?.subjects?.map((item: any) => (
+                  <SubjectCard
+                    classname={item?.name}
+                    key={index}
+                    item={item?.name}
+                    classTitle={scope}
+                    title={title}
+                    active={item?.isActive}
+                    id={item?._id}
+                    index={index}
+                    onDragStart={() => (dragClass.current = index)}
+                    onDragEnter={() => (dragOverClass.current = index)}
+                    onDragEnd={handleDragSort}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDraggedOver(true);
+                    }}
+                    isDraggedOver={isDraggedOver}
+                  />
+                ))
+              )}
+              <PaginationContainer>
+                <Pagination count={10} shape="rounded" />
+              </PaginationContainer>
+            </>
           ) : isLoadingSubjects ? (
             <div>
               <SkeletonContainer>
@@ -218,18 +220,18 @@ export default SelectSubject;
 
 const Container = styled.section`
   width: 100%;
-  height: 85vh;
+  max-height: 85vh;
+  height:100%;
   background-color: white;
   border-radius: 12px;
   padding: 3rem 10%;
   display: flex;
   flex-direction: column;
-  gap: 10%;
   overflow-y: scroll;
   position: relative !important;
 
   @media ${devices.tablet} {
-    padding: 0 1rem 1rem 1rem;
+    padding: 2rem 1rem;
   }
 `;
 
@@ -262,18 +264,37 @@ const Header = styled.div`
   display: flex;
   width: 100%;
   align-items: flex-end;
+  margin-bottom: 2rem;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    gap: 10px !important;
+  }
 
   input {
     width: 350px;
     margin-right: 1rem;
+    @media ${devices.tabletL} {
+      width: 100%;
+      margin-right: 0;
+    }
   }
   button {
     font-size: 0.8rem;
     height: 38px !important;
     width: 150px;
     align-self: flex-end !important;
+    @media ${devices.tabletL} {
+      width: 100%;
+    }
   }
   @media ${devices.tabletL} {
     gap: 4%;
   }
+`;
+
+const PaginationContainer = styled.div`
+  margin-top: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 `;

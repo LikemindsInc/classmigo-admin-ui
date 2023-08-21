@@ -17,7 +17,12 @@ const LessonCriteria = () => {
   const [selectClass, setSelectClass] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
 
-  const { register, handleSubmit, formState:{errors} } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(classSchema),
   });
 
@@ -79,6 +84,7 @@ const LessonCriteria = () => {
 
   const onSubmit = (data: any) => {
     createClass(data);
+    reset()
   };
 
   return (
@@ -124,40 +130,16 @@ const LessonCriteria = () => {
               </div>
             ) : isLoadingClasses ? (
               <div>
-                <SkeletonContainer>
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    width={"100%"}
-                    height={118}
-                  />
-                </SkeletonContainer>
-                <SkeletonContainer>
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    width={"100%"}
-                    height={118}
-                  />
-                </SkeletonContainer>
-
-                <SkeletonContainer>
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    width={"100%"}
-                    height={118}
-                  />
-                </SkeletonContainer>
-
-                <SkeletonContainer>
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    width={"100%"}
-                    height={118}
-                  />
-                </SkeletonContainer>
+                {[...Array(4)].map((_, index) => (
+                  <SkeletonContainer key={index}>
+                    <Skeleton
+                      animation="wave"
+                      variant="rectangular"
+                      width={"100%"}
+                      height={118}
+                    />
+                  </SkeletonContainer>
+                ))}
               </div>
             ) : (
               <NoData>
@@ -188,7 +170,7 @@ const Container = styled.section`
   position: relative !important;
 
   @media ${devices.tablet} {
-    padding: 1rem;
+    padding: 2rem 1rem;
   }
 `;
 
@@ -223,18 +205,28 @@ const Header = styled.div`
   width: 100%;
   align-items: flex-end;
   margin-bottom: 2rem;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    gap: 10px !important;
+  }
 
   input {
     width: 350px;
     margin-right: 1rem;
+    @media ${devices.tabletL} {
+      width: 100%;
+      margin-right: 0;
+    }
   }
   button {
     font-size: 0.8rem;
     height: 38px !important;
     width: 150px;
     align-self: flex-end !important;
+    @media ${devices.tabletL} {
+      width: 100%;
+    }
   }
-
 
   @media ${devices.tabletL} {
     gap: 4%;

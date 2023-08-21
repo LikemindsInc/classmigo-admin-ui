@@ -21,8 +21,11 @@ request({
   method: "GET",
 });
 
-export const cancelLiveLesson = (id:string | number) =>
-request({
-  url: `${ADMIN_BASE_URL}/live-lessons/${id}/cancel`,
-  method: "PUT",
-});
+export const cancelLiveLesson = (id: string | number) => {
+  console.log(id, "siiiiuuu")
+  return request({
+    url: `${ADMIN_BASE_URL}/live-lessons/${id}/cancel`,
+    method: "PUT",
+  });
+}
+

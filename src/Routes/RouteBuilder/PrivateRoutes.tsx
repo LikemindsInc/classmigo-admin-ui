@@ -119,6 +119,10 @@ const AdminAccess = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Admin/Admin")
 );
 
+const LazyQuizDetails = lazy(
+  ()=>import("../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/QuizDetails")
+)
+
 const CreateAdmin = lazy(
   () =>
     import("../../Pages/PrivatePages/Dashboard/Admin/CreateAdmin/CreateAdmin")
@@ -134,6 +138,14 @@ const LazyLiveCall = lazy(
       "../../Pages/PrivatePages/Dashboard/Lessons/LiveSessions/Pages/LiveCall"
     )
 );
+
+const LazyAddSubtopic = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Subtopic"
+    )
+);
+
 
 export const PrivateRoutes = () => {
   interface RouteConfig {
@@ -176,6 +188,10 @@ export const PrivateRoutes = () => {
     {
       path: "/quiz_library",
       element: <LazyQuizLibrary />,
+    },
+    {
+      path: "/quiz_library/:id",
+      element: <LazyQuizDetails />,
     },
     {
       path: "/quiz_library/add_question",
@@ -231,6 +247,10 @@ export const PrivateRoutes = () => {
       element: <LazyLessonTopic />,
     },
     {
+      path: "/lessons_criteria/:subject/:lesson/:topic",
+      element: <LazyAddSubtopic />,
+    },
+    {
       path: "/live_lessons/:id",
       element: <LazyLiveCall />,
     },
@@ -248,6 +268,7 @@ export const PrivateRoutes = () => {
       path: "/admin-access/:id",
       element: <AdminDetail />,
     },
+    
   ];
 
   return (

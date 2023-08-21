@@ -41,6 +41,6 @@ const Main = styled.main`
   @media ${devices.tabletL} {
     padding: 1rem;
     width: 100vw !important;
-    margin-left:3rem;
+    /* margin-left:3rem; */
   }
 `;

@@ -1,16 +1,44 @@
+import { Menu, MenuItem } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { ButtonElement } from "../../../../../../Ui_elements";
+import { MoreIcon } from "../../../../../../Assets/Svgs";
+import {
+  useApiPost,
+  useFormattedDateTime,
+} from "../../../../../../custom-hooks";
+import { ButtonElement, Options, Tag } from "../../../../../../Ui_elements";
+import { cancelLiveLesson } from "../../../../../../Urls/LiveSessions";
 
 interface Props {
   topic: string;
   time?: string;
   date?: string;
-  item:any
+  item: any;
 }
-export const UpcomingCard = ({ topic, time="5:00", date="25 Dec", item }: Props) => {
+
+export const UpcomingCard = ({ topic, time, date, item }: Props) => {
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const newTimeFormat = useFormattedDateTime(item?.date);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  console.log(item)
+
+  const { mutate: cancelSession } = useApiPost(
+    cancelLiveLesson,
+    () => {},
+    () => {},
+    ["live-sessions"]
+  );
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Container>
       <Details>
@@ -21,21 +49,50 @@ export const UpcomingCard = ({ topic, time="5:00", date="25 Dec", item }: Props)
         <div>
           <h6>{topic}</h6>
           <Time>
-            <p>{date}</p>
-            <p>{time}</p>
+            <p>{newTimeFormat?.formattedDate}</p>
+            <p>{newTimeFormat?.formattedTime}</p>
           </Time>
           <Start>
             <p>Starts in 5 Days</p>
-            <ButtonElement outline={true} label="Edit" />
+            <button id="basic-button" onClick={handleClick}>
+              <MoreIcon />
+            </button>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              <Item
+                onClick={()=>navigate("/live_lessons/schedule_session", {
+                  state: item
+                })}
+              >
+                Edit
+              </Item>
+              <Item
+                style={{ color: "red" }}
+                onClick={() => cancelSession(item?._id)}
+              >
+                Cancel
+              </Item>
+            </Menu>
           </Start>
+          <Tag>{item?.subject}</Tag>
         </div>
       </Details>
       <ButtonElement
         label="Join"
-        onClick={() => navigate(`/live_lessons/${topic}`, {
-          state: {
-          item:item
-        }})}
+        onClick={() =>
+          navigate(`/live_lessons/${topic}`, {
+            state: {
+              item: item,
+            },
+          })
+        }
       />
     </Container>
   );
@@ -49,21 +106,22 @@ const Container = styled.div`
   padding: 1rem;
 
   > button {
-    margin-top: 1.5rem;
+    margin-top: 0.8rem;
   }
 `;
 
 const Details = styled.div`
   img {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     border-radius: 8px;
     object-fit: cover;
   }
   > div {
+    width: 100%;
     h6 {
-      font-size: 0.9rem;
-      font-weight: 700;
+      font-size: 1rem;
+      font-weight: 800;
     }
   }
   display: flex;
@@ -73,26 +131,30 @@ const Details = styled.div`
 const Time = styled.div`
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 5px;
   p {
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 00;
     color: #585858;
   }
 `;
 const Start = styled.div`
-  margin-top: 2rem;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   p {
     font-size: 0.8rem;
     color: var(--primary-color);
     font-weight: 700;
   }
   button {
-    width: 50px;
-    font-size: 0.8rem;
-    padding: 5px !important;
+    background-color: transparent;
   }
+`;
+
+const Item = styled(MenuItem)`
+  font-size: 0.8rem;
+  font-weight: 700;
 `;

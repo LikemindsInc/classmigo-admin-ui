@@ -1,5 +1,6 @@
 import { styled } from "styled-components";
 import { ErrorIcon } from "../../Assets/Svgs";
+import { devices } from "../../utils/mediaQueryBreakPoints";
 
 interface InputProps {
   placeholder?: string;
@@ -95,6 +96,7 @@ const InputHolder = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   position: relative;
+  width: 100%;
 
   label {
     font-weight: 600;
@@ -109,6 +111,9 @@ const InputHolder = styled.div`
     font-size: 0.8rem;
     color: red;
   }
+  @media ${devices.tabletL} {
+      width:100%;
+    }
 `;
 
 const Error = styled(ErrorIcon)`

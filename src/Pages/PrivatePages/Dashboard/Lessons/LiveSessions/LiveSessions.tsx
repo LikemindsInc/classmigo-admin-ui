@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import {
   ButtonElement,
@@ -14,9 +14,13 @@ import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import zIndex from "@mui/material/styles/zIndex";
 import { useApiGet } from "../../../../../custom-hooks";
 import { getLiveLessons } from "../../../../../Urls/LiveSessions";
+import { Controller, useForm } from "react-hook-form";
+import { getAllClassesUrl } from "../../../../../Urls";
+import { formatOptions } from "../../../../../utils/utilFns";
 const LiveSessions = () => {
   const navigate = useNavigate();
 
+  const { control, getValues } = useForm();
   const { data: liveLessons, isFetching: isLoadingLiveLessons } = useApiGet(
     ["live-sessions"],
     () => getLiveLessons(),
@@ -26,28 +30,37 @@ const LiveSessions = () => {
     }
   );
 
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  const allClasses = useMemo(
+    () => formatOptions(classes?.data, "value", "name"),
+    [classes?.data]
+  );
+
   if (isLoadingLiveLessons) {
     return <Loader />;
   }
-  const sessions = [
-    {
-      title: "Partial Fractions of Non Linear Factors",
-      time: "8:00PM",
-      date: "21 Dec",
-    },
-    {
-      title: "Partial Fractions of Non Linear Factors",
-      time: "8:00PM",
-      date: "21 Dec",
-    },
-  ];
   return (
     <Container>
       <Body>
         {liveLessons ? (
           <>
             <Upcoming>
-              <h4>Upcoming Live Lessons</h4>
+              <CreateContainer>
+                <h4>Upcoming Live Lessons</h4>
+                <ButtonElement
+                  label="Create live session"
+                  onClick={() => navigate("/live_lessons/schedule_session")}
+                />
+              </CreateContainer>
+
               <div>
                 <UpcomingCard
                   topic={liveLessons?.data[0]?.title}
@@ -61,11 +74,30 @@ const LiveSessions = () => {
                 />
               </div>
             </Upcoming>
-            <PastHeader>Past Live Lessons</PastHeader>
+            <Utilities>
+              <PastHeader>Past Live Lessons</PastHeader>
+              <aside>
+                <Controller
+                  name="class"
+                  control={control}
+                  render={({ field }) => (
+                    <SelectInput
+                      {...field}
+                      options={allClasses}
+                      defaultValue="Select a class"
+                      isLoading={isLoadingClasses}
+                      width={200}
+                    />
+                  )}
+                />
+                <ButtonElement label="View Videos" />
+              </aside>
+            </Utilities>
             <LiveSection>
               {liveLessons?.data?.map((item: any, index: number) => (
                 <LiveSessionCard
                   title={item?.title}
+                  item={item}
                   key={index}
                   link={item?.liveUrl}
                 />
@@ -164,8 +196,33 @@ const LiveSection = styled.section`
 `;
 
 const PastHeader = styled.h4`
-  margin: 2rem 0;
   text-align: left;
   font-size: 1.3rem;
+`;
+
+const Utilities = styled.section`
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0;
+  > aside {
+    display: flex;
+    gap: 20px;
+  }
+  button {
+    font-size: 0.8rem;
+    height: 38px !important;
+    width: 200px;
+  }
+`;
+
+const CreateContainer = styled.section`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  button {
+    font-size: 0.8rem;
+    height: 38px !important;
+    width: 200px;
+  }
 `;

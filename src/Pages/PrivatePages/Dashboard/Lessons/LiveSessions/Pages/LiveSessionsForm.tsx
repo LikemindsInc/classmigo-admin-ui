@@ -16,24 +16,41 @@ import {
   convertToBase64,
   formatOptions,
 } from "../../../../../../utils/utilFns";
-import { createLiveLessonUrl } from "../../../../../../Urls/LiveSessions";
+import {
+  createLiveLessonUrl,
+  updateLiveLesson,
+} from "../../../../../../Urls/LiveSessions";
 import { toast } from "react-toastify";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { liveSessionSchema } from "../LiveSessionsSchema";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const LiveSessionsForm = () => {
   const currentDate = new Date();
   const [timeLine, setTimeLine] = useState<any>(null);
-  const navigate = useNavigate()
-  const { register, control, watch, handleSubmit } = useForm({
-    // resolver: yupResolver(liveSessionSchema)
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const {
+    register,
+    control,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(liveSessionSchema),
+    defaultValues: {
+      class: state?.class.label || null,
+      subject: state?.subject?.label || null,
+      title: state?.title || null,
+      note: state?.note || null,
+      date: state?.date || null,
+      liveUrl: state?.liveUrl || null,
+    },
   });
 
-  const classValue = watch("class");
-  const subjectValue = watch("subject");
+  const classValue: any = watch("class");
+  const subjectValue: any = watch("subject");
 
   const onSuccess = () => {
-
     toast.success("Successfully added topic", {
       position: "top-right",
       autoClose: 3000,
@@ -44,7 +61,7 @@ const LiveSessionsForm = () => {
       theme: "light",
     });
 
-    navigate(-1)
+    navigate(-1);
   };
   const onError = (e: any) => {
     toast.error(e, {
@@ -58,7 +75,7 @@ const LiveSessionsForm = () => {
     });
   };
 
-  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+  const { data: classes, isFetching: isLoadingClasses } = useApiGet(
     ["allClasses"],
     () => getAllClassesUrl(),
     {
@@ -66,7 +83,7 @@ const LiveSessionsForm = () => {
       enabled: true,
     }
   );
-  const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
+  const { data: subjects, isFetching: isLoadingSubjects } = useApiGet(
     ["allSubjects"],
     () => getAllSubjectsUrl(classValue?.value),
     {
@@ -74,6 +91,9 @@ const LiveSessionsForm = () => {
       enabled: !!classValue,
     }
   );
+
+  const { mutate: updateSession, isLoading: isUpdatingLiveLesson } =
+    useApiPost(updateLiveLesson);
 
   const { mutate: createLiveLesson, isLoading: isCreatingLiveLesson } =
     useApiPost(createLiveLessonUrl, onSuccess, onError, ["classes"]);
@@ -87,8 +107,23 @@ const LiveSessionsForm = () => {
     return formatOptions(subjects?.data?.subjects, "name", "name");
   }, [subjects?.data]);
 
+
+  const handleUpdate = (data: any) => {
+    console.log(data);
+    const requestBody: any = {
+      subject: data?.subject?.value,
+      class: data?.class?.value,
+      note: data?.note,
+      date: data?.date,
+      liveUrl: data?.liveUrl,
+      title: data?.title,
+      // image: data?.thumbnail,
+    };
+    updateSession(requestBody);
+  };
+
   const onSubmit = (data: any) => {
-    const requestBody:any = {
+    const requestBody: any = {
       subject: data?.subject?.value,
       class: data?.class?.value,
       note: data?.note,
@@ -100,35 +135,43 @@ const LiveSessionsForm = () => {
     createLiveLesson(requestBody);
   };
   return (
-    <Container onSubmit={handleSubmit(onSubmit)}>
+    <Container onSubmit={handleSubmit(state ? handleUpdate : onSubmit)}>
       <Header>
-        <Controller
-          name="class"
-          control={control}
-          render={({ field }) => (
-            <SelectInput
-              {...field}
-              options={allClasses}
-              value={classValue}
-              defaultValue="Subject Class"
-              width={200}
-            />
-          )}
-        />
+        <div>
+          <Controller
+            name="class"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={allClasses}
+                value={classValue}
+                defaultValue="Subject Class"
+                width={200}
+                error={errors?.class}
+                isLoading={isLoadingClasses}
+              />
+            )}
+          />
+        </div>
 
-        <Controller
-          name="subject"
-          control={control}
-          render={({ field }) => (
-            <SelectInput
-              {...field}
-              options={allSubjects}
-              value={subjectValue}
-              defaultValue="Select Subject"
-              width={200}
-            />
-          )}
-        />
+        <div>
+          <Controller
+            name="subject"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={allSubjects}
+                value={subjectValue}
+                defaultValue="Select Subject"
+                width={200}
+                error={errors?.subject}
+                isLoading={isLoadingSubjects}
+              />
+            )}
+          />
+        </div>
       </Header>
 
       <InputHolder>
@@ -136,10 +179,16 @@ const LiveSessionsForm = () => {
           label="Live Lesson Title"
           id="title"
           register={register}
+          error={errors}
         />
       </InputHolder>
       <InputHolder>
-        <TextAreaInput label="Description" id="note" register={register} />
+        <TextAreaInput
+          label="Description"
+          id="note"
+          register={register}
+          error={errors}
+        />
       </InputHolder>
       <TimeSelect>
         <Controller
@@ -189,10 +238,15 @@ const LiveSessionsForm = () => {
           placeholder="Enter the URL to the live lesson here"
           id="liveUrl"
           register={register}
+          error={errors}
         />
       </InputHolder>
       <InputHolder>
-        <ButtonElement label="Schedule" width={150} isLoading={isCreatingLiveLesson} />
+        <ButtonElement
+          label={state ? "Update" : "Schedule"}
+          width={150}
+          isLoading={isCreatingLiveLesson}
+        />
       </InputHolder>
     </Container>
   );
@@ -222,15 +276,10 @@ const Header = styled.div`
   width: 100%;
   align-items: center;
   gap: 2%;
-  > div {
-    display: flex;
-    gap: 1%;
-  }
   button {
     font-size: 0.8rem;
     height: 38px !important;
     width: 200px;
-
   }
   @media ${devices.tabletL} {
     gap: 4%;

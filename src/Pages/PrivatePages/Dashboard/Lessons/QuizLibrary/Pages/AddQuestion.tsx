@@ -1,63 +1,124 @@
-import React, { useContext, useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import React, { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { UploadTick } from "../../../../../../Assets/Svgs";
 import { ModalContext } from "../../../../../../Contexts/Contexts";
+import { useApiPost } from "../../../../../../custom-hooks";
 import {
   ButtonElement,
   ImageInput,
+  InputElement,
   TextAreaInput,
 } from "../../../../../../Ui_elements";
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
+import { addQuestionUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import { convertToBase64 } from "../../../../../../utils/utilFns";
+import { OptionsCard } from "../Components/OptionsCard";
+import { addQuestionSchema } from "../QuizLibrarySchema";
+import { useLocation } from "react-router-dom";
 
 const AddQuestion = () => {
-  const options = [
-    { text: "Option 1" },
-    { text: "Option 2" },
-    { text: "Option 3" },
-    { text: "Option 4" },
-  ];
   const [selectedOption, setSelectedOption] = useState<any>(null);
+  const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const { setOpenModal } = useContext(ModalContext);
+  const {state} = useLocation()
 
-  const handleOptionSelect = (index: number, text: string) => {
-    setSelectedOption({ index, text });
-  };
   const handleCancel = () => {
     setOpenModal(false);
   };
 
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(addQuestionSchema),
+  });
+
+  const { mutate: addQuestion } = useApiPost(
+    addQuestionUrl,
+    () => {},
+    () => {}
+  );
+
+  const onSubmit = (data: any) => {
+    const options = ["A", "B", "C", "D"];
+
+    const image = convertToBase64(data?.image)
+    console.log(image)
+    const requestBody: any = {
+      questions: [
+        {
+          question: data.question,
+          // image: convertToBase64(),
+          options: options.map((label) => ({
+            label,
+            value: data[`option${label}`],
+          })),
+          correctOption: selectedOption,
+          explanation: "haba",
+          score: data.score,
+        },
+      ],
+      quizId: "one"
+    };
+    addQuestion(requestBody);
+  };
+
   return (
-    <Container>
-      <InputHolder>
-        <TextAreaInput label="Question" width={300} />
-      </InputHolder>
-      <InputHolder>
-        <ImageInput type="image"/>
-      </InputHolder>
-      <OptionsContainer>
-        <h3>Select an Option:</h3>
-        {options.map((option, index) => (
-          <OptionButton
-            key={index}
-            onClick={() => handleOptionSelect(index, option.text)}
-            isSelected={selectedOption?.index === index}
-          >
-            <p>{option.text}</p>
-            <OptionHolder>
-              <IconContainer>&#10003;</IconContainer>
-              <p>Correct Answer</p>
-            </OptionHolder>
-          </OptionButton>
-        ))}
-      </OptionsContainer>
-      <ButtonHolder>
-        <ButtonElement
-          label="Add Question"
-          width={140}
-          onClick={() => setOpenModal(true)}
-        />
-      </ButtonHolder>
+    <>
+      <Container onSubmit={handleSubmit(onSubmit)}>
+        <NumberHolder>
+          <InputElement
+            label="Number"
+            register={register}
+            id="quizId"
+            error={errors}
+          />
+        </NumberHolder>
+        <InputHolder>
+          <TextAreaInput
+            label="Question"
+            width={300}
+            register={register}
+            id="question"
+            error={errors?.question}
+          />
+        </InputHolder>
+        <InputHolder>
+          <ImageInput type="image" register={register} id="image" />
+        </InputHolder>
+        <OptionsContainer>
+          <h3>Select an Option:</h3>
+
+          {["A", "B", "C", "D"].map((label, index) => (
+            <OptionsCard
+              key={index}
+              indexId={index}
+              value={`Option ${label}`}
+              register={register}
+              id={`option${label}`}
+              selectionId={selectionOptionId}
+              setSelectionId={setSelectionOptionId}
+              setSelected={setSelectedOption}
+              getValue={getValues}
+              error={errors}
+            />
+          ))}
+        </OptionsContainer>
+        <ButtonHolder>
+          <InputElement
+            placeholder="Score"
+            register={register}
+            id="score"
+            error={errors}
+          />
+          <ButtonElement label="Add Question" width={140} type="submit" />
+        </ButtonHolder>
+      </Container>
       <Modal cancel={handleCancel} width={"40%"}>
         <ModalContent>
           <UploadTick />
@@ -69,13 +130,14 @@ const AddQuestion = () => {
           />
         </ModalContent>
       </Modal>
-    </Container>
+      ;
+    </>
   );
 };
 
 export default AddQuestion;
 
-const Container = styled.section`
+const Container = styled.form`
   width: 100%;
   height: 85vh;
   background-color: white;
@@ -97,55 +159,6 @@ const OptionsContainer = styled.div`
   flex-direction: column;
 `;
 
-const OptionButton = styled.div<{ isSelected: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  margin-top: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  background-color: ${({ isSelected }) =>
-    isSelected ? "var(--hover-color)" : "transparent"};
-  color: ${({ isSelected }) => (isSelected ? "white" : "black")};
-  cursor: pointer;
-  p {
-    font-size: 0.8rem;
-  }
-  aside {
-    background-color: ${({ isSelected }) =>
-      isSelected ? "#4ecb71" : "rgba(0, 0, 0, 0.1)"};
-  }
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: var(--hover-color);
-    aside {
-      background-color: #4ecb71;
-      color: white;
-    }
-  }
-`;
-
-const OptionHolder = styled.div`
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  border-radius: 10px;
-`;
-const IconContainer = styled.aside`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.1);
-  height: 20px;
-  width: 20px;
-  font-size: 0.7rem;
-`;
-
 const InputHolder = styled.div`
   margin-bottom: 2rem;
 `;
@@ -153,8 +166,11 @@ const InputHolder = styled.div`
 const ButtonHolder = styled.div`
   width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 2rem;
+  input {
+    width: 5vw;
+  }
 `;
 
 const Modal = styled(CenteredDialog)``;
@@ -169,3 +185,11 @@ const ModalContent = styled.div`
     font-weight: 600;
   }
 `;
+
+const NumberHolder = styled(InputHolder)`
+  input{
+    width:50px;
+    padding:7px;
+    text-align: center;
+  }
+`

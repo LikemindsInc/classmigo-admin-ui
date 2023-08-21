@@ -5,7 +5,6 @@ import { MoveIcon, ToggleIcon } from "../../../../../../Assets/Svgs";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import {
   activateTopicUrl,
-  addSubTopicUrl,
   deactivateTopicUrl,
   getSubTopicsUrl,
 } from "../../../../../../Urls";
@@ -14,11 +13,15 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../../../../../../Ui_elements";
+import { useNavigate } from "react-router-dom";
+import { SubtopicCard } from "./SubtopicCard";
 
 interface CardProps {
   subjects?: string[];
   topics?: string[];
   classname: string;
+  classTitle?: any;
+  subjectTitle?: any;
   index: number;
   id: number;
   item: any;
@@ -41,6 +44,8 @@ export const TopicCard = ({
   id,
   track,
   active,
+  classTitle,
+  subjectTitle,
   onDragStart,
   onDragEnter,
   onDragEnd,
@@ -48,12 +53,10 @@ export const TopicCard = ({
   isDraggedOver,
   ...otherProps
 }: CardProps) => {
-  const [displayInput, setDisplayInput] = useState(false);
   const [subtopic, setSubtopic] = useState<any>([]);
   const [showSubtopic, setShowSubtopic] = useState(false);
-  const [title, setTitle] = useState("");
   let isActive = active;
-
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const handleActivateSuccess = () => {
@@ -109,6 +112,7 @@ export const TopicCard = ({
       queryClient.invalidateQueries(["topic"]);
     }
   };
+
   const { refetch: deactivateTopic, isFetching: isLoadingDeactivate } =
     useApiGet([`subject${id}`], () => deactivateTopicUrl(id), {
       refetchOnWindowFocus: false,
@@ -128,41 +132,6 @@ export const TopicCard = ({
     }
   );
 
-  const handleSubmit = () => {
-    const requestBody: any = {
-      topic: title,
-      topicDescription: "This is a description",
-      shortNote: "This is a short note",
-    };
-    addSubTopic(requestBody);
-    setTitle("");
-    setDisplayInput(false);
-  };
-
-  const handleSubTopicSuccess = () => {
-    toast.success("Successfully Add Subtopic", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-  };
-
-  const handleSubTopicError = (error: any) => {
-    toast.error(error?.message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-  };
-
   const { data: subtopics } = useApiGet(
     [`sub_topic${item?._id}`],
     () => getSubTopicsUrl(item?._id),
@@ -172,12 +141,6 @@ export const TopicCard = ({
     }
   );
 
-  const { mutate: addSubTopic } = useApiPost(
-    (_: any) => addSubTopicUrl(_, item?._id),
-    handleSubTopicSuccess,
-    handleSubTopicError,
-    [`sub_topic${item?._id}`]
-  );
   useEffect(() => {
     if (track === index && subtopics) {
       setSubtopic(subtopics?.data?.content);
@@ -197,31 +160,19 @@ export const TopicCard = ({
       <OuterContainer>
         <Container>
           <DetailsContainer>
-            {/* <ImageContainer>
-              <ImageInput />
-            </ImageContainer> */}
             <Details>
               <h6>{classname}</h6>
               <ToolsContainer>
                 <Tools>{subtopic?.length} subtopics</Tools>
-                <AddSub onClick={() => setDisplayInput(!displayInput)}>
+                <AddSub
+                  onClick={() =>
+                    navigate(
+                      `/lessons_criteria/${classTitle}/${subjectTitle}/${classname}`,
+                      { state: id }
+                    )
+                  }
+                >
                   Add Subtopic
-                  {displayInput && (
-                    <AddInputContainer>
-                      <p onClick={() => setDisplayInput(false)}>&#127335;</p>
-                      <AddInput
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter") {
-                            handleSubmit();
-                            setShowSubtopic(true);
-                          }
-                        }}
-                        autoFocus
-                      />
-                    </AddInputContainer>
-                  )}
                 </AddSub>
                 <DropIcon
                   open={showSubtopic}
@@ -245,22 +196,18 @@ export const TopicCard = ({
           </SwitchContainer>
         </Container>
         <MoveIcon style={{ cursor: "move" }} />
-        <Delete />
+        {/* <Delete /> */}
       </OuterContainer>{" "}
       {showSubtopic &&
-        subtopic.map((item: any, index: number) => (
-          <SubtopicContainer>
-            <SubtopicCard>
-              <div>
-                <p>0{index}.</p>
-                <h6>{item?.topic}</h6>
-              </div>
-              <SwitchContainer>
-                <SwitchElement />
-              </SwitchContainer>
-            </SubtopicCard>
-            <MoveIcon style={{ cursor: "move" }} />
-          </SubtopicContainer>
+        subtopic.map((items: any, index: number) => (
+          <SubtopicCard
+            indexCount={index}
+            title={items?.topic}
+            active={items?.isActive}
+            parentItem={item?._id}
+            id={items?._id}
+            key={index}
+          />
         ))}
     </MainContainer>
   );
@@ -275,6 +222,12 @@ const Container = styled.div`
   border-radius: 14px;
   width: 100%;
   transition: all 0.3s ease-in-out;
+  @media ${devices.tablet} {
+    padding: 0.6rem 0rem;
+    flex-direction: column;
+    align-items: flex-start;
+    width: fill;
+  }
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.07);
@@ -291,6 +244,9 @@ const DetailsContainer = styled.div`
   /* gap:10%; */
   width: 100%;
   height: 100%;
+  @media ${devices.tabletL} {
+    width: 100vw;
+  }
 
   h6 {
     font-size: 1rem;
@@ -319,19 +275,11 @@ const OuterContainer = styled.div`
   margin-bottom: 2.5rem;
 `;
 
-const ImageContainer = styled.div`
-  width: 8rem;
-  height: auto;
-  /* border: 1px solid gray; */
-  img {
-    width: 8rem;
-    height: auto;
-  }
-`;
 const Tools = styled.p`
   padding: 0.5rem 0.7rem;
   font-size: 0.7rem;
   width: 114px;
+  font-weight: 600;
   border-radius: 25px;
   background-color: white;
   border: 1px solid gray;
@@ -377,42 +325,6 @@ const Details = styled.div`
   }
 `;
 
-const AddInput = styled.input`
-  background-color: white;
-  border: none;
-  outline: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  width: 100%;
-  margin-bottom: 10px;
-  height: 100%;
-`;
-
-const AddInputContainer = styled.div`
-  padding: 5px;
-  margin-bottom: 30px !important;
-  position: absolute;
-  left: 0;
-  background-color: white;
-  box-shadow: -4px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--primary-color);
-  border-radius: 6px;
-  width: 478px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  p {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    float: right;
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: gray;
-    cursor: pointer;
-  }
-`;
-
 const SubtopicContainer = styled.div`
   width: 70%;
   margin: 0 auto;
@@ -422,27 +334,15 @@ const SubtopicContainer = styled.div`
   justify-content: center;
   margin-bottom: 20px;
 `;
-const SubtopicCard = styled.div`
-  padding: 0 20px;
-  align-items: center;
-  justify-content: space-between;
-  display: flex;
-  width: 90%;
-  border-radius: 12px;
-  height: 50px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  margin: 0 auto;
-  > div {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    h6 {
-      font-size: 1rem;
-    }
-  }
-`;
 
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;
   color: red;
+`;
+
+const Move = styled(MoveIcon)`
+  cursor: move;
+  @media ${devices.tabletL} {
+    display: none;
+  }
 `;
