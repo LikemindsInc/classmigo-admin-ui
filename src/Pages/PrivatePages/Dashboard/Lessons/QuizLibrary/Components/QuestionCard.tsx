@@ -7,9 +7,9 @@ import { ButtonElement } from "../../../../../../Ui_elements";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
-  id: number;
-  question: string;
-  options: any;
+  id?: number;
+  question?: string;
+  options?: any;
   answer?: any;
 }
 

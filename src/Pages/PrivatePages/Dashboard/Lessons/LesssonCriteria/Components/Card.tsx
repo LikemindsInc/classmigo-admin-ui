@@ -156,6 +156,7 @@ const Tools = styled.p`
   padding: 0.5rem 0.7rem;
   font-size: 0.7rem;
   width: 114px;
+  font-weight: 600;
   border-radius: 25px;
   background-color: white;
   border: 1px solid gray;

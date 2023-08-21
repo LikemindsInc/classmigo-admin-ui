@@ -14,13 +14,16 @@ import {
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
 import { addQuestionUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import { convertToBase64 } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { addQuestionSchema } from "../QuizLibrarySchema";
+import { useLocation } from "react-router-dom";
 
 const AddQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const { setOpenModal } = useContext(ModalContext);
+  const {state} = useLocation()
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -44,11 +47,13 @@ const AddQuestion = () => {
   const onSubmit = (data: any) => {
     const options = ["A", "B", "C", "D"];
 
+    const image = convertToBase64(data?.image)
+    console.log(image)
     const requestBody: any = {
       questions: [
         {
           question: data.question,
-          image: data.image,
+          // image: convertToBase64(),
           options: options.map((label) => ({
             label,
             value: data[`option${label}`],
@@ -60,10 +65,7 @@ const AddQuestion = () => {
       ],
       quizId: "one"
     };
-
     addQuestion(requestBody);
-
-    // Use requestBody as needed
   };
 
   return (
@@ -75,7 +77,6 @@ const AddQuestion = () => {
             register={register}
             id="quizId"
             error={errors}
-            
           />
         </NumberHolder>
         <InputHolder>
@@ -84,7 +85,7 @@ const AddQuestion = () => {
             width={300}
             register={register}
             id="question"
-            error={errors}
+            error={errors?.question}
           />
         </InputHolder>
         <InputHolder>

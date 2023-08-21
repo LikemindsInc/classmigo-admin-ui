@@ -1,169 +1,122 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { AddIcon, CsvIcon } from "../../../../../Assets/Svgs";
+import { ModalContext } from "../../../../../Contexts/Contexts";
+import { useApiGet } from "../../../../../custom-hooks";
 import {
   ButtonElement,
+  Loader,
   SearchInput,
   SelectInput,
 } from "../../../../../Ui_elements";
+import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
+import { getAllClassesUrl, getAllQuizUrl } from "../../../../../Urls";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
+import { CreateQuiz } from "./Components/CreateQuiz";
 import { QuestionCard } from "./Components/QuestionCard";
+import { Card } from "./Components/QuizCard";
+import { Skeleton } from "@mui/material";
+import noData from "../../../../../Assets/noData.png";
+import { formatOptions } from "../../../../../utils/utilFns";
 
 const QuizLibrary = () => {
   const navigate = useNavigate();
-  const classOptions = [
-    {
-      value: 0,
-      label: "SSS 1",
-    },
-    {
-      value: 1,
-      label: "SSS 2",
-    },
-    {
-      value: 2,
-      label: "SSS 3",
-    },
-  ];
+  const { setOpenModal } = useContext(ModalContext);
+  const [quiz, setQuiz] = useState<any>([]);
+  const handleCancel = () => {
+    setOpenModal(false);
+  };
 
-  const [questions, setQuestions] = useState<any>([
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
     {
-      question:
-        "Two immiscible liquids with different boiling points can be separated by",
-      options: [
-        {
-          id: "A",
-          label: "The use of Separation Funnel",
-        },
-        {
-          id: "B",
-          label: "Evaporation",
-        },
-        {
-          id: "C",
-          label: "Distillation",
-        },
-        {
-          id: "D",
-          label: "Decantation",
-        },
-      ],
-      answer: {
-        id: "A",
-        label: "The use of Separation Funnel",
-      },
-      imageUrl: null,
-    },
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
-    {
-      question:
-        "Two immiscible liquids with different boiling points can be separated by",
-      options: [
-        {
-          id: "A",
-          label: "The use of Separation Funnel",
-        },
-        {
-          id: "B",
-          label: "Evaporation",
-        },
-        {
-          id: "C",
-          label: "Distillation",
-        },
-        {
-          id: "D",
-          label: "Decantation",
-        },
-      ],
-      answer: {
-        id: "A",
-        label: "The use of Separation Funnel",
-      },
-      imageUrl: null,
-    },
-
-    {
-      question:
-        "Two immiscible liquids with different boiling points can be separated by",
-      options: [
-        {
-          id: "A",
-          label: "The use of Separation Funnel",
-        },
-        {
-          id: "B",
-          label: "Evaporation",
-        },
-        {
-          id: "C",
-          label: "Distillation",
-        },
-        {
-          id: "D",
-          label: "Decantation",
-        },
-      ],
-      answer: {
-        id: "A",
-        label: "The use of Separation Funnel",
-      },
-      imageUrl: null,
-    },
-  ]);
+  const allClasses = useMemo(
+    () => formatOptions(classes?.data, "value", "name"),
+    [classes?.data]
+  );
 
   const handleSearchFilter = (value: string) => {};
 
-  return (
-    <Container>
-      <Header>
-        <div>
-          <SelectInput
-            options={classOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Subject Class"
-            width={180}
-          />
-          <SelectInput
-            options={classOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Select Subject"
-            width={180}
-          />
-          <SelectInput
-            options={classOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Select Topic"
-            width={180}
-          />
-          <ButtonElement label="Upload CSV" icon={<CsvIcon />} />
-          <ButtonElement
-            label="Add New Question"
-            icon={<AddIcon />}
-            onClick={() => navigate("/quiz_library/add_question")}
-          />
-        </div>
-        <ButtonElement outline={true} label="Download CSV Format" />
-      </Header>
-      <Body>
-        <SearchContainer>
-          <SearchInput width={300} />
-          <p>250 Results</p>
-        </SearchContainer>
+  const { data: quizes, isLoading: isLoadingQuizes } = useApiGet(
+    ["quizes"],
+    () => getAllQuizUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
-        {questions.map((item: any, index: number) => (
-          <QuestionCard
-            id={index + 1}
-            imageUrl={item?.imageUrl}
-            key={index}
-            question={item?.question}
-            options={item?.options}
-            answer={item?.answer}
-          />
-        ))}
-      </Body>
-    </Container>
+  useEffect(() => {
+    if (quizes) {
+      setQuiz(quizes?.data?.content);
+    }
+  }, [quizes]);
+
+  return (
+    <>
+      <Container>
+        <Body>
+          <ToolsContainer>
+            <SearchContainer>
+              <SearchInput width={300} />
+              <p>250 Results</p>
+            </SearchContainer>
+            <Utility>
+              <SelectInput
+                options={allClasses}
+                defaultValue="Filter Class"
+                width={180}
+              />
+              <ButtonElement
+                label="Create a quiz"
+                icon={<AddIcon />}
+                onClick={() => setOpenModal(true)}
+              />
+            </Utility>
+          </ToolsContainer>
+
+          <QuestionsContainer>
+            {quiz?.length > 0 ? (
+              <div>
+                {quiz.map((item: any, index: number) => (
+                  <Card details={item} key={index} quizId={item?._id} />
+                ))}
+              </div>
+            ) : isLoadingQuizes ? (
+              <div>
+                {[...Array(4)].map((_, index) => (
+                  <SkeletonContainer key={index}>
+                    <Skeleton
+                      animation="wave"
+                      variant="rectangular"
+                      width={"100%"}
+                      height={118}
+                    />
+                  </SkeletonContainer>
+                ))}
+              </div>
+            ) : (
+              <NoData>
+                <img src={noData} alt="No data" />
+                <p>You haven’t added any quiz yet.</p>
+                <p>Use the create quiz above to add a quiz.</p>
+              </NoData>
+            )}
+          </QuestionsContainer>
+        </Body>
+      </Container>
+
+      <Modal cancel={handleCancel} width={"35%"}>
+        <CreateQuiz />
+      </Modal>
+    </>
   );
 };
 
@@ -219,3 +172,39 @@ const Body = styled.section`
   width: 100%;
   padding: 0 15%;
 `;
+
+const ToolsContainer = styled.section`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Utility = styled.aside`
+  button {
+    font-size: 0.8rem;
+    height: 38px !important;
+    width: 200px;
+  }
+  display: flex;
+  gap: 10px;
+`;
+const NoData = styled.div`
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  img {
+    margin-bottom: 1rem;
+  }
+  p {
+    text-align: center;
+    font-size: 0.8rem;
+  }
+`;
+export const SkeletonContainer = styled.div`
+  margin-bottom: 10px;
+`;
+const QuestionsContainer = styled.section``;
+const Modal = styled(CenteredDialog)``;

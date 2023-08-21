@@ -119,6 +119,10 @@ const AdminAccess = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Admin/Admin")
 );
 
+const LazyQuizDetails = lazy(
+  ()=>import("../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/QuizDetails")
+)
+
 const CreateAdmin = lazy(
   () =>
     import("../../Pages/PrivatePages/Dashboard/Admin/CreateAdmin/CreateAdmin")
@@ -184,6 +188,10 @@ export const PrivateRoutes = () => {
     {
       path: "/quiz_library",
       element: <LazyQuizLibrary />,
+    },
+    {
+      path: "/quiz_library/:id",
+      element: <LazyQuizDetails />,
     },
     {
       path: "/quiz_library/add_question",

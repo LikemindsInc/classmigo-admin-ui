@@ -20,6 +20,7 @@ const LessonCriteria = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(classSchema),
@@ -83,6 +84,7 @@ const LessonCriteria = () => {
 
   const onSubmit = (data: any) => {
     createClass(data);
+    reset()
   };
 
   return (

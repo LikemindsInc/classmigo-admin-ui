@@ -96,6 +96,7 @@ const InputHolder = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   position: relative;
+  width: 100%;
 
   label {
     font-weight: 600;

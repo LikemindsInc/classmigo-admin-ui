@@ -3,42 +3,39 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { PlayVideoIcon } from "../../../../../../Assets/Svgs";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
-import { VideoPlayerElement } from "../../../../../../Ui_elements";
+import { Tag, VideoPlayerElement } from "../../../../../../Ui_elements";
+import { useFormattedDateTime } from "../../../../../../custom-hooks";
 
 type VideoProps = {
   title?: string;
   index?: number;
   link?: any;
+  item?: any;
 };
-export const LiveSessionCard = ({ title, index, link }: VideoProps) => {
-  const navigate = useNavigate();
+export const LiveSessionCard = ({ title, index, link, item }: VideoProps) => {
+  const newTimeFormat = useFormattedDateTime(item?.date);
+
   return (
-    <Container
-      onClick={() =>
-        navigate(`/video_library/${title}`, {
-          state: {
-            title: title,
-            index: index,
-          },
-        })
-      }
-    >
+    <Container>
       <MainContent>
         <VideoPlayerElement source={link} />
       </MainContent>
       <TopicContainer>
-        <p>{title}</p>
         <div>
-          <p>21 Dec </p>
-          <p>8:00PM</p>
+          <strong>{title}</strong>
+          <TimeDetails>
+            <p>{newTimeFormat?.formattedDate}</p>
+            <p>{newTimeFormat?.formattedTime}</p>
+          </TimeDetails>
         </div>
+        <Tag>{item?.subject}</Tag>
       </TopicContainer>
     </Container>
   );
 };
 
 const Container = styled.div`
-  width: 20vw;
+  width: 22vw;
   max-height: 29vh;
   border-radius: 12px;
   display: flex;
@@ -63,19 +60,19 @@ const Container = styled.div`
 
 const TopicContainer = styled.div`
   width: 100%;
-  height: 60px;
+  height: 70px;
   border-radius: 0px 0px 12px 12px;
   background-color: white;
   padding: 1rem 2rem;
-  p {
-    font-size: 0.8rem;
-    font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  strong {
+    font-size: 1rem;
   }
-  > div {
-    margin-top: 0.4rem;
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  p {
+    font-size: 0.7rem;
+    font-weight: 600;
   }
 `;
 
@@ -93,4 +90,11 @@ const MainContent = styled.div`
   &:hover {
     background-color: rgba(0, 0, 0, 0.15);
   }
+`;
+
+const TimeDetails = styled.div`
+  margin-top: 0.4rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 `;
