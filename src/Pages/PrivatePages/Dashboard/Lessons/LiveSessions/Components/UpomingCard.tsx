@@ -14,7 +14,7 @@ interface Props {
   topic: string;
   time?: string;
   date?: string;
-  item: any;
+  item?: any;
 }
 
 export const UpcomingCard = ({ topic, time, date, item }: Props) => {
@@ -81,7 +81,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
               </Item>
             </Menu>
           </Start>
-          <Tag>{item?.subject}</Tag>
+          <Tag>{item?.subject?.name}</Tag>
         </div>
       </Details>
       <ButtonElement
@@ -99,7 +99,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
 };
 
 const Container = styled.div`
-  width: 100%;
+  min-width: 24vw;
   background-color: white;
   box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.15);
   border-radius: 12px;

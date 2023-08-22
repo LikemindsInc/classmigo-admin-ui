@@ -6,10 +6,7 @@ import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { SubjectCard } from "../Components/SubjectCard";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import { Pagination, Skeleton } from "@mui/material";
-import {
-  createSubjectUrl,
-  getAllClassesUrl,
-} from "../../../../../../Urls";
+import { createSubjectUrl, getAllClassesUrl } from "../../../../../../Urls";
 import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
 import { AddIcon } from "../../../../../../Assets/Svgs";
 import { useForm } from "react-hook-form";
@@ -23,6 +20,7 @@ const SelectSubject = () => {
   const { title, scope } = state;
   const [selectSubject, setSelectSubject] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
+
 
   const {
     register,
@@ -140,31 +138,33 @@ const SelectSubject = () => {
         <Body>
           {selectSubject?.length > 0 ? (
             <>
-              {selectSubject?.map((item: any, index: number) =>
-                item?.subjects?.map((item: any) => (
-                  <SubjectCard
-                    classname={item?.name}
-                    key={index}
-                    item={item?.name}
-                    classTitle={scope}
-                    title={title}
-                    active={item?.isActive}
-                    id={item?._id}
-                    index={index}
-                    onDragStart={() => (dragClass.current = index)}
-                    onDragEnter={() => (dragOverClass.current = index)}
-                    onDragEnd={handleDragSort}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDraggedOver(true);
-                    }}
-                    isDraggedOver={isDraggedOver}
-                  />
-                ))
+              {selectSubject?.map(
+                (item: any, index: number) =>
+                  item?.name === scope &&
+                  item?.subjects?.map((item: any) => (
+                    <SubjectCard
+                      classname={item?.name}
+                      key={index}
+                      item={item?.name}
+                      classTitle={scope}
+                      title={title}
+                      active={item?.isActive}
+                      id={item?._id}
+                      index={index}
+                      onDragStart={() => (dragClass.current = index)}
+                      onDragEnter={() => (dragOverClass.current = index)}
+                      onDragEnd={handleDragSort}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setIsDraggedOver(true);
+                      }}
+                      isDraggedOver={isDraggedOver}
+                    />
+                  ))
               )}
-              <PaginationContainer>
+              {/* <PaginationContainer>
                 <Pagination count={10} shape="rounded" />
-              </PaginationContainer>
+              </PaginationContainer> */}
             </>
           ) : isLoadingSubjects ? (
             <div>
@@ -221,7 +221,7 @@ export default SelectSubject;
 const Container = styled.section`
   width: 100%;
   max-height: 85vh;
-  height:100%;
+  height: 100%;
   background-color: white;
   border-radius: 12px;
   padding: 3rem 10%;

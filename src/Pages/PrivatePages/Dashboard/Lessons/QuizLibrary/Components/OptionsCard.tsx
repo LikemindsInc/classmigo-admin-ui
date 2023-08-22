@@ -8,12 +8,13 @@ interface Props {
   register: any;
   value: string;
   id: string;
-  error: any;
+  error?: any;
   setSelected: any;
   getValue: any;
   selectionId: any;
   setSelectionId: any;
   indexId: number;
+  option:string
 }
 export const OptionsCard = ({
   value,
@@ -24,17 +25,19 @@ export const OptionsCard = ({
   selectionId,
   setSelectionId,
   indexId,
+  option,
   error,
 }: Props) => {
   const handleSelection = () => {
     setSelectionId(indexId);
+
   };
 
   useEffect(() => {
     if (selectionId === indexId) {
-      setSelected(getValue(id));
+      setSelected(option);
     }
-  }, [getValue, id, indexId, selectionId, setSelected]);
+  }, [ id, indexId, option, selectionId, setSelected]);
 
   return (
     <Wrapper>
@@ -71,7 +74,6 @@ const Container = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
   input {
     border: none;
-    width: 500px;
     cursor: pointer;
     &:focus {
       border: none;
@@ -98,6 +100,7 @@ const Container = styled.div<{ isSelected: boolean }>`
 
 const OptionHolder = styled.div`
   display: flex;
+  width:200px;
   gap: 20px;
   align-items: center;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -121,15 +124,16 @@ const Error = styled(ErrorIcon)`
   height: 0.8rem;
 `;
 const ErrorContainer = styled.div`
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-  z-index: 2;
+  margin-top:10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   p {
+    color:red;
     font-size: 0.7rem !important;
   }
 `;
 
 const Wrapper = styled.div`
-  position: relative;
 `;

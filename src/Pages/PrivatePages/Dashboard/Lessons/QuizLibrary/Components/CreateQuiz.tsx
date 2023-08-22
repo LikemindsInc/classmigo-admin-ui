@@ -16,7 +16,7 @@ import {
 } from "../../../../../../Urls";
 import { formatOptions } from "../../../../../../utils/utilFns";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { createQuestionSchema } from "../QuizLibrarySchema";
+import { createQuizSchema } from "../QuizLibrarySchema";
 
 export const CreateQuiz = () => {
   const {
@@ -27,7 +27,7 @@ export const CreateQuiz = () => {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(createQuestionSchema),
+    resolver: yupResolver(createQuizSchema),
   });
 
   let classValue: any = watch("class");

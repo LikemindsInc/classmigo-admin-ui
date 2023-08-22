@@ -19,6 +19,8 @@ const QuizDetails = () => {
   const { state } = useLocation();
   const [questions, setQuestions] = useState<any>([])
 
+  console.log(state)
+
   const handleSearchFilter = (value: string) => {};
 
   const { data: quizQuestions, isLoading: isLoadingQuizQuestions } = useApiGet(

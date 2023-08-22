@@ -18,12 +18,15 @@ import { convertToBase64 } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { addQuestionSchema } from "../QuizLibrarySchema";
 import { useLocation } from "react-router-dom";
+import { uploadImageUrl } from "../../../../../../Urls/Utils";
+
 
 const AddQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const { setOpenModal } = useContext(ModalContext);
-  const {state} = useLocation()
+  const [image, setImage] = useState("")
+  const { state } = useLocation();
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -38,54 +41,78 @@ const AddQuestion = () => {
     resolver: yupResolver(addQuestionSchema),
   });
 
+  // console.log(errors);
+
   const { mutate: addQuestion } = useApiPost(
     addQuestionUrl,
     () => {},
     () => {}
   );
 
-  const onSubmit = (data: any) => {
+  const onImageUpload = (data:any) => {
+    console.log(data,"op")
+  }
+  const { mutate: addImage} = useApiPost(
+    uploadImageUrl,
+    onImageUpload,
+    undefined
+  );
+
+  const onSubmit = async(data: any) => {
     const options = ["A", "B", "C", "D"];
 
-    const image = convertToBase64(data?.image)
-    console.log(image)
-    const requestBody: any = {
-      questions: [
-        {
-          question: data.question,
-          // image: convertToBase64(),
-          options: options.map((label) => ({
-            label,
-            value: data[`option${label}`],
-          })),
-          correctOption: selectedOption,
-          explanation: "haba",
-          score: data.score,
-        },
-      ],
-      quizId: "one"
-    };
-    addQuestion(requestBody);
+    if (data?.image) {
+      const formData = new FormData();
+      formData.append("file", data?.image);
+      addImage(formData as any);
+      
+      const requestBody: any = {
+        questions: [
+          {
+            question: data.question,
+            // imageUrl: newImageUrl?.data?.url,
+            explanation: "You go explain tire",
+            options: options.map((label) => ({
+              label,
+              value: data[`option${label}`],
+            })),
+            correctOption: selectedOption,
+            score: data.score,
+          },
+        ],
+        quizId: state,
+      };
+      // addQuestion(requestBody);
+    } else {
+      const requestBody: any = {
+        questions: [
+          {
+            question: data.question,
+            explanation: "You go explain tire",
+            options: options.map((label) => ({
+              label,
+              value: data[`option${label}`],
+            })),
+            correctOption: selectedOption,
+            score: data.score,
+          },
+        ],
+        quizId: state,
+      };
+      addQuestion(requestBody);
+    }
   };
 
   return (
     <>
       <Container onSubmit={handleSubmit(onSubmit)}>
-        <NumberHolder>
-          <InputElement
-            label="Number"
-            register={register}
-            id="quizId"
-            error={errors}
-          />
-        </NumberHolder>
         <InputHolder>
           <TextAreaInput
             label="Question"
-            width={300}
+            // width={300}
             register={register}
             id="question"
-            error={errors?.question}
+            error={errors}
           />
         </InputHolder>
         <InputHolder>
@@ -96,6 +123,7 @@ const AddQuestion = () => {
 
           {["A", "B", "C", "D"].map((label, index) => (
             <OptionsCard
+              option={label}
               key={index}
               indexId={index}
               value={`Option ${label}`}
@@ -161,6 +189,9 @@ const OptionsContainer = styled.div`
 
 const InputHolder = styled.div`
   margin-bottom: 2rem;
+  button {
+    width: 170px;
+  }
 `;
 
 const ButtonHolder = styled.div`
@@ -185,11 +216,3 @@ const ModalContent = styled.div`
     font-weight: 600;
   }
 `;
-
-const NumberHolder = styled(InputHolder)`
-  input{
-    width:50px;
-    padding:7px;
-    text-align: center;
-  }
-`

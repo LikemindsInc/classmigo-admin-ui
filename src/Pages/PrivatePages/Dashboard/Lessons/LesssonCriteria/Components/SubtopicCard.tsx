@@ -4,7 +4,10 @@ import styled from "styled-components";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
 import { useApiGet } from "../../../../../../custom-hooks";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
-import { activateSubtopicUrl } from "../../../../../../Urls";
+import {
+  activateSubtopicUrl,
+  deactivateSubtopicUrl,
+} from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -24,6 +27,7 @@ export const SubtopicCard = ({
   parentItem,
   handleChange,
 }: Props) => {
+  console.log(active);
   const handleActivateSuccess = () => {
     toast.success("Successfully Activated topic", {
       position: "top-right",
@@ -47,7 +51,7 @@ export const SubtopicCard = ({
     });
   };
   const handleDeactivateSuccess = () => {
-    toast.success("Successfully Activated topic", {
+    toast.success("Successfully Deactivated topic", {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -77,17 +81,17 @@ export const SubtopicCard = ({
       onError: handleActivationError,
     });
 
-//   const { refetch: deactivateSubtopic, isFetching: isLoadingDeactivate } =
-//     useApiGet([`subject${id}`], () => activateTopicUrl(id), {
-//       refetchOnWindowFocus: false,
-//       enabled: false,
-//       onSuccess: handleDeactivateSuccess,
-//       onError: handleDeactivationError,
-//     });
+  const { refetch: deactivateSubtopic, isFetching: isLoadingDeactivate } =
+    useApiGet([`subject${id}`], () => deactivateSubtopicUrl(id), {
+      refetchOnWindowFocus: false,
+      enabled: false,
+      onSuccess: handleDeactivateSuccess,
+      onError: handleDeactivationError,
+    });
 
   const toggleSubtopicActive = () => {
     if (active) {
-    //   deactivateSubtopic();
+      deactivateSubtopic();
       queryClient.invalidateQueries([`sub_topic${parentItem}`]);
     } else {
       activateSubtopic();
@@ -102,7 +106,10 @@ export const SubtopicCard = ({
           <h6>{title}</h6>
         </div>
         <SwitchContainer>
-          <SwitchElement activeState={active} handleChange={handleChange} />
+          <SwitchElement
+            activeState={active}
+            handleChange={toggleSubtopicActive}
+          />
         </SwitchContainer>
       </Card>
       <Move />

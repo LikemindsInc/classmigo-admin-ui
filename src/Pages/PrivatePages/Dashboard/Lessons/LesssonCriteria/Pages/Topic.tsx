@@ -18,7 +18,7 @@ const SelectTopic = () => {
   const [selectTopic, setSelecttopic] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const location = useLocation();
   const { state } = location;
   const { scope, classTitle } = state;
@@ -52,7 +52,7 @@ const SelectTopic = () => {
     isLoading: isLoadingTopics,
     refetch: getLessons,
   } = useApiGet(["topic"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     enabled: false,
   });
 
@@ -91,6 +91,7 @@ const SelectTopic = () => {
       getLessons();
     }
   }, [page, getLessons]);
+
   useEffect(() => {
     if (topics) {
       setSelecttopic(topics?.data?.content);

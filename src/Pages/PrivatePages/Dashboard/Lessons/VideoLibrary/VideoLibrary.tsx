@@ -33,7 +33,7 @@ const VideoLibrary = () => {
     refetch: getAllVideos,
   } = useApiGet(["videos"], () => getAllVideosUrl(classValue?.value), {
     refetchOnWindowFocus: false,
-    enabled: false,
+    enabled: true
   });
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(

@@ -25,18 +25,12 @@ const ScheduleLessons = () => {
             defaultValue="Select Subject"
             width={200}
           />
-          <SelectInput
-            options={[]}
-            onChange={() => {}}
-            defaultValue="Select Topic"
-            width={200}
-          />
           <ButtonElement label="View Video Lessons" />
         </div>
-        <WeekContainer>
+        {/* <WeekContainer>
           <p>Set Week No</p>
           <InputElement />
-        </WeekContainer>
+        </WeekContainer> */}
       </Header>
       <Body>
         <SelectInput
@@ -82,6 +76,7 @@ const Header = styled.div`
   display: flex;
   width: 100%;
   flex-wrap: wrap;
+  padding: 0 12%;
   justify-content: space-between;
   gap: 1%;
   button {

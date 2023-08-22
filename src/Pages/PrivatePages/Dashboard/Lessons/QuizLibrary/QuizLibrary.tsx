@@ -19,6 +19,7 @@ import { Card } from "./Components/QuizCard";
 import { Skeleton } from "@mui/material";
 import noData from "../../../../../Assets/noData.png";
 import { formatOptions } from "../../../../../utils/utilFns";
+import { Controller, useForm } from "react-hook-form";
 
 const QuizLibrary = () => {
   const navigate = useNavigate();
@@ -27,6 +28,12 @@ const QuizLibrary = () => {
   const handleCancel = () => {
     setOpenModal(false);
   };
+
+
+  const { control, watch } = useForm();
+
+
+  let classValue : any = watch("className")
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -44,14 +51,20 @@ const QuizLibrary = () => {
 
   const handleSearchFilter = (value: string) => {};
 
-  const { data: quizes, isLoading: isLoadingQuizes } = useApiGet(
+  const { data: quizes, isLoading: isLoadingQuizes, refetch:fetchQuiz } = useApiGet(
     ["quizes"],
-    () => getAllQuizUrl(),
+    () => getAllQuizUrl(classValue && classValue?.value),
     {
       refetchOnWindowFocus: false,
       enabled: true,
     }
   );
+
+  useEffect(() => {
+    if (classValue) {
+      fetchQuiz()
+    }
+  },[classValue, fetchQuiz])
 
   useEffect(() => {
     if (quizes) {
@@ -69,10 +82,17 @@ const QuizLibrary = () => {
               <p>250 Results</p>
             </SearchContainer>
             <Utility>
-              <SelectInput
-                options={allClasses}
-                defaultValue="Filter Class"
-                width={180}
+              <Controller
+                name="className"
+                control={control}
+                render={({ field }) => (
+                  <SelectInput
+                    {...field}
+                    options={allClasses}
+                    defaultValue="Filter with class"
+                    isLoading={isLoadingClasses}
+                  />
+                )}
               />
               <ButtonElement
                 label="Create a quiz"
@@ -183,7 +203,7 @@ const Utility = styled.aside`
   button {
     font-size: 0.8rem;
     height: 38px !important;
-    width: 200px;
+    width: 250px;
   }
   display: flex;
   gap: 10px;

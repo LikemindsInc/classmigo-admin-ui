@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
@@ -12,6 +12,7 @@ import {
 } from "../../../../../../Urls";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "../../../../../../Ui_elements";
 
 interface CardProps {
   subjects?: string[];
@@ -51,25 +52,26 @@ export const SubjectCard = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const [isActive, setIsActive] = useState(active)
+
   const toggleActive = () => {
     if (active) {
       deactivateSubject();
-      queryClient.invalidateQueries(["subjects"]);
+      setIsActive(false);
+      queryClient.invalidateQueries([`subjects`]);
     } else {
       activateSubject();
-      queryClient.invalidateQueries(["subjects"]);
+      setIsActive(true);
+      queryClient.invalidateQueries([`subjects`]);
     }
   };
-  const { refetch: deactivateSubject } = useApiGet(
-    [`subject${id}`],
-    () => deactivateSubjectUrl(id),
-    {
+  const { refetch: deactivateSubject, isFetching: isLoadingDeactivate } =
+    useApiGet([`subject${id}`], () => deactivateSubjectUrl(id), {
       refetchOnWindowFocus: false,
       enabled: false,
-    }
-  );
+    });
 
-  const { refetch: activateSubject } = useApiGet(
+  const { refetch: activateSubject, isFetching: isLoadingActivate } = useApiGet(
     [`subject${id}`],
     () => activateSubjectUrl(id),
     {
@@ -77,12 +79,6 @@ export const SubjectCard = ({
       enabled: false,
     }
   );
-  // const { mutate: activateSubject } = useApiPost(
-  //   () => activateSubjectUrl(id),
-  //   onSuccess,
-  //   onError,
-  //   ["subject"]
-  // );
 
   return (
     <OuterContainer
@@ -110,11 +106,14 @@ export const SubjectCard = ({
           <h6>{classname}</h6>
         </DetailsContainer>
         <SwitchContainer>
-          <SwitchElement activeState={active} handleChange={toggleActive} />
+          <SwitchElement activeState={isActive} handleChange={toggleActive} />
         </SwitchContainer>
       </Container>
+      {isLoadingActivate || isLoadingDeactivate ? (
+        <Spinner color="var(--primary-color)" />
+      ) : (
         <Move />
-      {/* <Delete /> */}
+      )}
     </OuterContainer>
   );
 };
@@ -166,7 +165,6 @@ const OuterContainer = styled.div<{ isDraggedOver: boolean }>`
   transform: ${(props) =>
     props.isDraggedOver ? "translateY(10px)" : "translateY(0)"};
 `;
-
 
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;

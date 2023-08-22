@@ -8,14 +8,14 @@ export const ScheduleCard = () => {
     <Container>
       <div>
         <div>
-          <Checkbox
+          {/* <Checkbox
             sx={{
               color: "var(--primary-color)",
               "&.Mui-checked": {
                 color: "var(--primary-color)",
               },
             }}
-          />
+          /> */}
           <h6>Trigonometry</h6>
         </div>
 

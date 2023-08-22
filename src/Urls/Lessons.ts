@@ -92,7 +92,7 @@ export const activateSubjectUrl = (id: string | number) =>
 
 export const deactivateTopicUrl = (id: string | number) =>
   request({
-    url: `${ADMIN_BASE_URL}/subject/lesson/${id}/deactivate`,
+    url: `${ADMIN_BASE_URL}/class/lesson/${id}/deactivate`,
     method: "GET",
   });
 
@@ -104,7 +104,7 @@ export const activateTopicUrl = (id: string | number) =>
 
 export const deactivateSubtopicUrl = (id: string | number) =>
   request({
-    url: `${ADMIN_BASE_URL}/subject/lesson/${id}/deactivate`,
+    url: `${ADMIN_BASE_URL}/class/sub-topic/${id}/deactivate`,
     method: "GET",
   });
 
