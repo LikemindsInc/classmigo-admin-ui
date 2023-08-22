@@ -21,4 +21,43 @@ declare module "@appModel" {
     password: string;
     class?: any;
   }
+
+  interface ISubscription {
+    _id: string;
+    className: string;
+    subscription: string;
+    amount: number;
+    student: string;
+    dateSubscribed: string;
+    isActive: boolean;
+    nextDueDate: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  interface IParent {
+    createdAt: string;
+    dependents: [];
+    email: sting;
+    fullName: string;
+    isActive: boolean;
+    phoneNumber: string;
+    role: "PARENT";
+    updatedAt: string;
+    _id: string;
+  }
+
+  interface IStudent {
+    createdAt: string;
+    firstName: string;
+    isActive: boolean;
+    lastName: string;
+    parentCode: string;
+    phoneNumber: string;
+    profileImageUrl: string;
+    role: "STUDENT";
+    subcription: ISubscription[];
+    updatedAt: string;
+    userName: string;
+  }
 }

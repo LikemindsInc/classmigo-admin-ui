@@ -8,7 +8,7 @@ import {
   SelectInput,
 } from "../../../../../Ui_elements";
 import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
-import { Drawer, Switch } from "antd";
+import { Drawer, Empty, Switch, Tag } from "antd";
 import { useContext, useEffect, useState } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
@@ -16,11 +16,15 @@ import { getStudentDataUrl } from "../../../../../Urls/Students";
 import { useApiGet } from "../../../../../custom-hooks";
 import { UserDetails } from "./Components/UserDetails";
 import { ColumnsType } from "antd/es/table";
+import { IParent, ISubscription } from "@appModel";
+import moment from "moment";
 const Students = () => {
   const handleSearchFilter = (value: string) => {};
   //drawer handler
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [student, setStudent] = useState<any>([]);
+
+  const [user, setUser] = useState<DataType | null>(null);
 
   useEffect(() => {
     setOpenDrawer(false);
@@ -47,7 +51,9 @@ const Students = () => {
             ? item.class.map((classItem: any) => classItem.name)
             : "" || null) || "",
         status: item.role,
+        isActive: item.isActive,
         subscription: item.subcription,
+        parent: item.parent,
         image:
           item.image ||
           "https://img.freepik.com/free-photo/portrait-handsome-man-with-dark-hairstyle-bristle-toothy-smile-dressed-white-sweatshirt-feels-very-glad-poses-indoor-pleased-european-guy-being-good-mood-smiles-positively-emotions-concept_273609-61405.jpg?w=2000",
@@ -65,6 +71,7 @@ const Students = () => {
     fontSize: "12px",
     fontWeight: 700,
   };
+
   interface DataType {
     key: string;
     name: string;
@@ -72,8 +79,10 @@ const Students = () => {
     class: string;
     phoneNumber: number;
     status: string;
-    subscription: string;
+    subscription: ISubscription[];
     image: string;
+    isActive: boolean;
+    parent?: IParent | null;
   }
   const columns: ColumnsType<DataType> = [
     {
@@ -91,12 +100,12 @@ const Students = () => {
       key: "username",
       ellipsis: true,
     },
-    {
-      title: "CLASS",
-      dataIndex: "class",
-      key: "class",
-      ellipsis: true,
-    },
+    // {
+    //   title: "CLASS",
+    //   dataIndex: "class",
+    //   key: "class",
+    //   ellipsis: true,
+    // },
     {
       title: "PHONE NUMBER",
       dataIndex: "phoneNumber",
@@ -114,13 +123,26 @@ const Students = () => {
       dataIndex: "subscription",
       key: "subscription",
       ellipsis: true,
+      render: (data: ISubscription[]) => {
+        return (
+          <div style={{ maxWidth: 300 }}>
+            {data.map((item) => (
+              <Tag>{item.className} </Tag>
+            ))}
+          </div>
+        );
+      },
     },
     {
       title: "",
       dataIndex: "options",
       key: "options",
       ellipsis: true,
-      render: () => <Options />,
+      render: (data, row) => (
+        <div onClick={() => handleRowClick(row)}>
+          <Options />
+        </div>
+      ),
     },
   ];
   const updatedColumns = columns.map((column: any) => {
@@ -150,6 +172,10 @@ const Students = () => {
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
+
+  const handleRowClick = (data: DataType) => {
+    setUser(data);
+  };
 
   const classOptions = [
     {
@@ -285,8 +311,14 @@ const Students = () => {
               alt=""
             />
             <div>
-              <p>John Chukwuemeka</p>
-              <p>SSS3</p>
+              <p>{user?.name}</p>
+              <p>
+                {user?.subscription.map((item, i) => (
+                  <span key={i} style={{ paddingLeft: 4 }}>
+                    {item.className}
+                  </span>
+                ))}
+              </p>
             </div>
           </UserInfo>
           <UpdateDetails>
@@ -304,40 +336,44 @@ const Students = () => {
             <div>
               <h4>Subscription Details</h4>
 
-              <div>
-                <h6>
-                  SSS1 <span>-</span> <span>3 Months</span>
-                </h6>
+              {user?.subscription.map((item, i) => (
+                <div key={i}>
+                  <h6>{item.className}</h6>
 
-                <div>
-                  <p>Subscription Started: 01/01/2023</p>
-                  <p>Subscription End: 31/06/2023</p>
+                  <div>
+                    <p>
+                      Subscription Started:{" "}
+                      {moment(item.dateSubscribed).format("DD/MM/YYYY")}
+                    </p>
+                    <p>
+                      Subscription End:{" "}
+                      {moment(item.nextDueDate).format("DD/MM/YYYY")}
+                    </p>
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <h6>
-                  SSS1 <span>-</span> <span>3 Months</span>
-                </h6>
-                <div>
-                  <p>Subscription Started: 01/01/2023</p>
-                  <p>Subscription End: 31/06/2023</p>
-                </div>
-              </div>
+              ))}
             </div>
             <div>
-              <h4>Verification</h4>
+              <h4>Status</h4>
               <SwitchContainer>
-                <p>Unverified</p>
-                <Switch defaultChecked onChange={onChange} />
+                <p>{user?.isActive ? "Active" : "InActive"}</p>
+                <Switch defaultChecked={user?.isActive} onChange={onChange} />
               </SwitchContainer>
             </div>
 
             <ParentContainer>
               <h4>Parent</h4>
-              <h5>John Chukwuemeka</h5>
-              <p>0808994637</p>
-              <ButtonElement outline width={84} label={"Unlink"} />
+              {user?.parent ? (
+                <>
+                  <h5>{user?.parent?.fullName}</h5>
+
+                  <p>{user?.parent?.email}</p>
+                  <p>{user?.parent?.phoneNumber}</p>
+                  <ButtonElement outline width={84} label={"Unlink"} />
+                </>
+              ) : (
+                <Empty />
+              )}
             </ParentContainer>
           </Details>
         </DrawerContentContainer>

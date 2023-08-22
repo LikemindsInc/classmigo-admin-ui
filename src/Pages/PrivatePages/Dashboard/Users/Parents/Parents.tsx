@@ -1,23 +1,70 @@
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
-import { Drawer, Switch } from "antd";
+import { Drawer, Empty, Switch } from "antd";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
+import { ColumnsType } from "antd/es/table";
 import {
   ButtonElement,
   InputElement,
+  Options,
   SearchInput,
 } from "../../../../../Ui_elements";
-import { columns} from "../../../../../utils/dummyDataParents";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
 import { useApiGet } from "../../../../../custom-hooks";
 import { getParentDataUrl } from "../../../../../Urls";
+import { UserDetails } from "./Components/UserDetails";
+import { IStudent } from "@appModel";
 
 const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [parent, setParent] = useState<any>([]);
 
+  const [user, setUser] = useState<DataType | null>(null);
+
+  interface DataType {
+    key: string;
+    name: string;
+    email: string;
+    phoneNumber: number;
+    status: string;
+    dependents?: IStudent[];
+  }
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "NAME",
+      dataIndex: "name",
+      key: "name",
+      render: (name: string) => <UserDetails name={name} />,
+    },
+    {
+      title: "EMAIL",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "PHONE NUMBER",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+    },
+    {
+      title: "STATUS",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "",
+      dataIndex: "options",
+      key: "options",
+      render: (value, data) => (
+        <div onClick={() => handleRowItemClick(data)}>
+          <Options />
+        </div>
+      ),
+    },
+  ];
 
   useEffect(() => {
     setOpenDrawer(false);
@@ -25,6 +72,10 @@ const Parents = () => {
 
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
+  };
+
+  const handleRowItemClick = (data: DataType) => {
+    setUser(data);
   };
 
   const {
@@ -44,6 +95,7 @@ const Parents = () => {
         email: item.email,
         phoneNumber: item.phoneNumber,
         status: item.role,
+        dependents: item.dependents,
       }));
       setParent(newData);
     }
@@ -117,8 +169,8 @@ const Parents = () => {
               alt=""
             />
             <div>
-              <p>John Chukwuemeka</p>
-              <p>SSS3</p>
+              <p>{user?.name}</p>
+              <p>{user?.email}</p>
             </div>
           </UserInfo>
           <UpdateDetails>
@@ -126,58 +178,24 @@ const Parents = () => {
               <InputElement placeholder="John Chukwuemeka" label="Name" />
               <ButtonElement width={84} outline label={"Update"} />
             </div>
-            <div>
-              <InputElement placeholder="08000000000" label="Phone number" />
-              <ButtonElement label={"Update"} outline width={84} />
-            </div>
-            <div>
-              <InputElement placeholder="johnchuka87@gmail.com" label="Email" />
-              <ButtonElement label={"Update"} outline width={84} />
-            </div>
           </UpdateDetails>
 
           <Details>
-            <div>
-              <h4>Subscription Details</h4>
-
-              <div>
-                <h6>
-                  SSS1 <span>-</span> <span>3 Months</span>
-                </h6>
-
-                <div>
-                  <p>Subscription Started: 01/01/2023</p>
-                  <p>Subscription End: 31/06/2023</p>
-                </div>
-              </div>
-
-              <div>
-                <h6>
-                  SSS1 <span>-</span> <span>3 Months</span>
-                </h6>
-                <div>
-                  <p>Subscription Started: 01/01/2023</p>
-                  <p>Subscription End: 31/06/2023</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h4>Verification</h4>
-              <Switch defaultChecked onChange={onChange} />
-            </div>
-
             <StudentContainer>
-              <h4>Student</h4>
-              <h5>John Chukwuemeka</h5>
-              <p>0808994637</p>
-              <ButtonElement outline width={84} label={"Unlink"} />
-            </StudentContainer>
-
-            <StudentContainer>
-              <h4>Student</h4>
-              <h5>John Chukwuemeka</h5>
-              <p>0808994637</p>
-              <ButtonElement outline width={84} label={"Unlink"} />
+              <h4>Dependents</h4>
+              {user && user.dependents && user.dependents.length > 0 ? (
+                user?.dependents?.map((item) => (
+                  <div>
+                    <h5>
+                      {item.firstName} {item.lastName}
+                    </h5>
+                    <p>{item.phoneNumber}</p>
+                    <ButtonElement outline width={84} label={"Unlink"} />
+                  </div>
+                ))
+              ) : (
+                <Empty />
+              )}
             </StudentContainer>
           </Details>
         </DrawerContentContainer>
