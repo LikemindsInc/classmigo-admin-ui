@@ -64,7 +64,8 @@ const AddQuestion = () => {
     if (data?.image) {
       const formData = new FormData();
       formData.append("file", data?.image);
-      addImage(formData as any);
+      console.log(addImage(formData as any));
+
       
       const requestBody: any = {
         questions: [
