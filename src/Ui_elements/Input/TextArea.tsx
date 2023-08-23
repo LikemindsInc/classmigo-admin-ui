@@ -25,39 +25,38 @@ export const TextAreaInput = ({
   return (
     <>
       <Label>{label}</Label>
-      <TextAreWrapper>
+      <TextAreWrapper width={width}>
         <StyledTextArea
-          width={width}
           value={value}
           disabled={disabled}
           placeholder={placeholder}
           {...(register && { ...register(id) })}
         />
-        {error && id ? (
-          <ErrorContainer>
-            {error[id]?.message && <Error />}
-            <p>{error[id]?.message}</p>
-          </ErrorContainer>
-        ) : null}
       </TextAreWrapper>
+      {error && id ? (
+        <ErrorContainer>
+          {error[id]?.message && <Error />}
+          <p>{error[id]?.message}</p>
+        </ErrorContainer>
+      ) : null}
     </>
   );
 };
 
-const TextAreWrapper = styled.div`
-  position: relative;
+const TextAreWrapper = styled.div<{ width?: number }>`
   height: 10rem;
   outline: none;
   border-radius: 5px;
   border: 1px solid #eed7ff;
   position: relative;
+  width: ${({ width }) => (width ? width + "px" : "100%")};
 
   &:focus-within {
     border: 1px solid var(--primary-color);
   }
 `;
-const StyledTextArea = styled.textarea<{ width?: number }>`
-  width: ${({ width }) => (width ? width + "px" : "100%")};
+const StyledTextArea = styled.textarea`
+  width: 100%;
   padding: 10px;
   resize: none;
   overflow: hidden;
@@ -80,10 +79,7 @@ const Label = styled.label`
 `;
 
 const ErrorContainer = styled.div`
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-  z-index: 2;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 5px;

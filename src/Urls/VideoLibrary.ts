@@ -5,7 +5,7 @@ export const getAllVideosUrl = (className: string) =>
   request({
     url: `${ADMIN_BASE_URL}/lesson/videos`,
     method: "GET",
-    params: { className },
+    params: { lessonId: className },
   });
 
 export const createVideoUrl = (data:any) =>

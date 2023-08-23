@@ -14,17 +14,19 @@ import {
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
 import { addQuestionUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
-import { convertToBase64 } from "../../../../../../utils/utilFns";
+import { convertToBase64, customPost } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { addQuestionSchema } from "../QuizLibrarySchema";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { uploadImageUrl } from "../../../../../../Urls/Utils";
+import { toast } from "react-toastify";
 
 const AddQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const { setOpenModal } = useContext(ModalContext);
-  const {state} = useLocation()
-
+  const { state } = useLocation();
+  const navigate = useNavigate();
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -38,54 +40,98 @@ const AddQuestion = () => {
     resolver: yupResolver(addQuestionSchema),
   });
 
-  const { mutate: addQuestion } = useApiPost(
+  const onSuccess = () => {
+    toast.success("Successfully added question", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+    navigate(-1)
+  }
+
+  const onError = () => {
+    toast.error("Something went wrong", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  }
+
+  const { mutate: addQuestion, isLoading:isAddingQuestion } = useApiPost(
     addQuestionUrl,
-    () => {},
-    () => {}
+    onSuccess,
+    onError
   );
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     const options = ["A", "B", "C", "D"];
 
-    const image = convertToBase64(data?.image)
-    console.log(image)
-    const requestBody: any = {
-      questions: [
-        {
-          question: data.question,
-          // image: convertToBase64(),
-          options: options.map((label) => ({
-            label,
-            value: data[`option${label}`],
-          })),
-          correctOption: selectedOption,
-          explanation: "haba",
-          score: data.score,
-        },
-      ],
-      quizId: "one"
-    };
-    addQuestion(requestBody);
+    const imageUploadUrl =
+      "https://classmigo.herokuapp.com/api/v1/admin/upload";
+
+    if (data?.image) {
+      const formData = new FormData();
+      formData.append("file", data?.image);
+      try {
+        const response: any = await customPost(imageUploadUrl, formData);
+        const requestBody: any = {
+          questions: [
+            {
+              question: data.question,
+              imageUrl: response?.data?.data?.url,
+              explanation: "You go explain tire",
+              options: options.map((label) => ({
+                label,
+                value: data[`option${label}`],
+              })),
+              correctOption: selectedOption,
+              score: data.score,
+            },
+          ],
+          quizId: state,
+        };
+        addQuestion(requestBody);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      const requestBody: any = {
+        questions: [
+          {
+            question: data.question,
+            explanation: "You go explain tire",
+            options: options.map((label) => ({
+              label,
+              value: data[`option${label}`],
+            })),
+            correctOption: selectedOption,
+            score: data.score,
+          },
+        ],
+        quizId: state,
+      };
+      addQuestion(requestBody);
+    }
   };
 
   return (
     <>
       <Container onSubmit={handleSubmit(onSubmit)}>
-        <NumberHolder>
-          <InputElement
-            label="Number"
-            register={register}
-            id="quizId"
-            error={errors}
-          />
-        </NumberHolder>
         <InputHolder>
           <TextAreaInput
             label="Question"
-            width={300}
+            // width={300}
             register={register}
             id="question"
-            error={errors?.question}
+            error={errors}
           />
         </InputHolder>
         <InputHolder>
@@ -96,6 +142,7 @@ const AddQuestion = () => {
 
           {["A", "B", "C", "D"].map((label, index) => (
             <OptionsCard
+              option={label}
               key={index}
               indexId={index}
               value={`Option ${label}`}
@@ -116,7 +163,7 @@ const AddQuestion = () => {
             id="score"
             error={errors}
           />
-          <ButtonElement label="Add Question" width={140} type="submit" />
+          <ButtonElement label="Add Question" width={140} type="submit" isLoading={isAddingQuestion} />
         </ButtonHolder>
       </Container>
       <Modal cancel={handleCancel} width={"40%"}>
@@ -161,6 +208,9 @@ const OptionsContainer = styled.div`
 
 const InputHolder = styled.div`
   margin-bottom: 2rem;
+  button {
+    width: 170px;
+  }
 `;
 
 const ButtonHolder = styled.div`
@@ -185,11 +235,3 @@ const ModalContent = styled.div`
     font-weight: 600;
   }
 `;
-
-const NumberHolder = styled(InputHolder)`
-  input{
-    width:50px;
-    padding:7px;
-    text-align: center;
-  }
-`

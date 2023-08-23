@@ -11,7 +11,7 @@ interface InputProps {
   id?: string;
   disabled?: boolean;
   value?: string | number;
-  onChange?:()=>void
+  onChange?: () => void;
 }
 
 export const InputElement = ({
@@ -30,7 +30,8 @@ export const InputElement = ({
     <>
       {type === "password" && (
         <InputHolder>
-          <label>{label}</label>
+          {label && <label>{label}</label>}
+
           <TextInput
             {...otherProps}
             value={value}
@@ -79,7 +80,8 @@ const TextInput = styled.input`
   outline: none;
   font-size: 14px;
   font-weight: ${({ disabled }) => (disabled ? 700 : 500)};
-  border: ${({ disabled }) => (disabled ? "1px solid #EED7FF" : "1px solid #7b31b2")};
+  border: ${({ disabled }) =>
+    disabled ? "1px solid #EED7FF" : "1px solid #7b31b2"};
   border-radius: 5px;
   color: ${({ disabled }) => (disabled ? "gray" : "black")};
   background-color: ${({ disabled }) =>
@@ -112,8 +114,8 @@ const InputHolder = styled.div`
     color: red;
   }
   @media ${devices.tabletL} {
-      width:100%;
-    }
+    width: 100%;
+  }
 `;
 
 const Error = styled(ErrorIcon)`

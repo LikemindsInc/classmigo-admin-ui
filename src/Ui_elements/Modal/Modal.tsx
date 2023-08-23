@@ -6,11 +6,17 @@ import styled from "styled-components";
 
 interface ModalProps {
   children: any;
-  width?: string | number
-  cancel:()=>void
+  width?: string | number;
+  cancel: () => void;
+  okay?: () => void;
 }
 
-export const CenteredDialog = ({ children,width, cancel }: ModalProps) => {
+export const CenteredDialog = ({
+  children,
+  width,
+  cancel,
+  okay,
+}: ModalProps) => {
   const { openModal } = useContext(ModalContext);
   return (
     <StyledModal
@@ -18,6 +24,7 @@ export const CenteredDialog = ({ children,width, cancel }: ModalProps) => {
       open={openModal}
       width={width}
       onCancel={cancel}
+      onOk={okay}
     >
       {children}
     </StyledModal>
@@ -25,7 +32,7 @@ export const CenteredDialog = ({ children,width, cancel }: ModalProps) => {
 };
 
 const StyledModal = styled(Modal)`
-  .ant-modal-footer{
+  .ant-modal-footer {
     display: none !important;
   }
-`
+`;

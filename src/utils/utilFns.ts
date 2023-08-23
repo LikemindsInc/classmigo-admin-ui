@@ -1,3 +1,5 @@
+import axios, { AxiosResponse } from "axios";
+import Cookies from "js-cookie";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
@@ -66,3 +68,37 @@ export const formatDate = (date: Date): string => {
   };
   return date.toLocaleDateString(undefined, options);
 };
+
+
+
+
+//Custom Post Function
+
+type ApiResponse<T> = {
+  data: T | null;
+  error: Error | null;
+}
+
+var accessToken: any = Cookies.get("user");
+let token: any = ""
+if (accessToken) {
+  token  = JSON.parse(accessToken);
+}
+export async function customPost<T>(url: string, requestData: any): Promise<ApiResponse<T>> {
+  try {
+    const response: AxiosResponse<T> = await axios.post(url, requestData, {
+      headers: {
+        Authorization: `Bearer ${token?.token}`,
+      }
+    });
+    return {
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: error as Error,
+    };
+  }
+}

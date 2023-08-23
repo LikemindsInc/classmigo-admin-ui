@@ -61,18 +61,20 @@ const LiveSessions = () => {
                 />
               </CreateContainer>
 
-              <div>
-                <UpcomingCard
-                  topic={liveLessons?.data[0]?.title}
-                  item={liveLessons?.data[0]}
-                  // time={liveLessons?.data.time}
-                />
-                <UpcomingCard
-                  topic={liveLessons?.data[1]?.title}
-                  item={liveLessons?.data[1]}
-                  // time={liveLessons?.data.time}
-                />
-              </div>
+              <UpcomingSection>
+                {liveLessons?.data.map((item: any, index: number) => {
+                  if (item?.isActive) {
+                    return (
+                      <UpcomingCard
+                        topic={item?.title}
+                        item={item}
+                        time={item?.time}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </UpcomingSection>
             </Upcoming>
             <Utilities>
               <PastHeader>Past Live Lessons</PastHeader>
@@ -90,18 +92,35 @@ const LiveSessions = () => {
                     />
                   )}
                 />
+                <Controller
+                  name="subject"
+                  control={control}
+                  render={({ field }) => (
+                    <SelectInput
+                      {...field}
+                      options={allClasses}
+                      defaultValue="Select a subject"
+                      isLoading={isLoadingClasses}
+                      width={200}
+                    />
+                  )}
+                />
                 <ButtonElement label="View Videos" />
               </aside>
             </Utilities>
             <LiveSection>
-              {liveLessons?.data?.map((item: any, index: number) => (
-                <LiveSessionCard
-                  title={item?.title}
-                  item={item}
-                  key={index}
-                  link={item?.liveUrl}
-                />
-              ))}
+              {liveLessons?.data.map((item: any, index: number) => {
+                if (!item?.isActive) {
+                  return (
+                    <UpcomingCard
+                      topic={item?.title}
+                      item={item}
+                      time={item?.time}
+                    />
+                  );
+                }
+                return null;
+              })}
             </LiveSection>
           </>
         ) : (
@@ -187,6 +206,7 @@ const LiveSection = styled.section`
     font-size: 1.3rem;
   }
   margin-top: 2rem;
+  gap:1rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
 
@@ -195,6 +215,17 @@ const LiveSection = styled.section`
   }
 `;
 
+const UpcomingSection = styled.section`
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  margin: 3rem 0;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
 const PastHeader = styled.h4`
   text-align: left;
   font-size: 1.3rem;
