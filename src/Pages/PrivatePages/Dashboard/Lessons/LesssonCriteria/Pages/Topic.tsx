@@ -39,6 +39,7 @@ const SelectTopic = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(topicSchema),
@@ -51,7 +52,7 @@ const SelectTopic = () => {
     data: topics,
     isLoading: isLoadingTopics,
     refetch: getLessons,
-  } = useApiGet(["topic"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
+  } = useApiGet(["lessons"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
     refetchOnWindowFocus: true,
     enabled: false,
   });
@@ -66,6 +67,7 @@ const SelectTopic = () => {
       draggable: true,
       theme: "light",
     });
+    getLessons()
   };
   const handleError = (error: any) => {
     toast.error(error?.message, {
@@ -83,7 +85,7 @@ const SelectTopic = () => {
     addTopicUrl,
     handleSuccess,
     handleError,
-    ["topic"]
+    ["lessons"]
   );
 
   useEffect(() => {
@@ -106,6 +108,7 @@ const SelectTopic = () => {
       studentClass: classTitle,
     };
     addTopic(requestBody);
+    setValue("topic", "")
   };
   return (
     <Container onSubmit={handleSubmit(onSubmit)}>
@@ -120,6 +123,7 @@ const SelectTopic = () => {
         <ButtonElement
           label="Add Topic"
           icon={<AddIcon />}
+          type="submit"
           isLoading={isAddingTopic}
         />
       </Header>

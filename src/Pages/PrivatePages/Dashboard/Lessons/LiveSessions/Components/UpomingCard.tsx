@@ -9,6 +9,7 @@ import {
 } from "../../../../../../custom-hooks";
 import { ButtonElement, Options, Tag } from "../../../../../../Ui_elements";
 import { cancelLiveLesson } from "../../../../../../Urls/LiveSessions";
+import { toast } from "react-toastify";
 
 interface Props {
   topic: string;
@@ -27,12 +28,34 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
     setAnchorEl(event.currentTarget);
   };
 
-  console.log(item)
+  const handleSuccess = () => {
+    toast.success(`Successfully cancelled`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
 
+  const handleError = () => {
+    toast.error(`Something went wrong, could not cancel session`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  
   const { mutate: cancelSession } = useApiPost(
     cancelLiveLesson,
-    () => {},
-    () => {},
+    handleSuccess,
+    handleError,
     ["live-sessions"]
   );
   const handleClose = () => {

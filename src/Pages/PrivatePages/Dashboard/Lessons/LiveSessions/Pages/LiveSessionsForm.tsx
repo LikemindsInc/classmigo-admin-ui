@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import {
   ButtonElement,
@@ -12,10 +12,7 @@ import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { Controller, useForm } from "react-hook-form";
 import { getAllClassesUrl, getAllSubjectsUrl } from "../../../../../../Urls";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
-import {
-  convertToBase64,
-  formatOptions,
-} from "../../../../../../utils/utilFns";
+import { formatOptions } from "../../../../../../utils/utilFns";
 import {
   createLiveLessonUrl,
   updateLiveLesson,
@@ -24,31 +21,31 @@ import { toast } from "react-toastify";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { liveSessionSchema } from "../LiveSessionsSchema";
 import { useLocation, useNavigate } from "react-router-dom";
+import { DateTimePickerElement } from "../../../../../../Ui_elements/Input/dateTimePicker";
 const LiveSessionsForm = () => {
-  const currentDate = new Date();
-  const [timeLine, setTimeLine] = useState<any>(null);
   const navigate = useNavigate();
   const { state } = useLocation();
+  console.log(state);
   const {
     register,
     control,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(liveSessionSchema),
     defaultValues: {
-      class: state?.class.label || null,
-      subject: state?.subject?.label || null,
+      class: state?.class || null,
+      subject: state?.subject || null,
       title: state?.title || null,
       note: state?.note || null,
-      date: state?.date || null,
       liveUrl: state?.liveUrl || null,
     },
   });
 
-  const classValue: any = watch("class");
-  const subjectValue: any = watch("subject");
+  let classValue: any = watch("class");
+  // let subjectValue: any = watch("subject");
 
   const onSuccess = () => {
     toast.success("Successfully added topic", {
@@ -83,17 +80,51 @@ const LiveSessionsForm = () => {
       enabled: true,
     }
   );
-  const { data: subjects, isFetching: isLoadingSubjects } = useApiGet(
-    ["allSubjects"],
-    () => getAllSubjectsUrl(classValue?.value),
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!classValue,
-    }
-  );
+  const {
+    data: subjects,
+    isFetching: isLoadingSubjects,
+    refetch: fetchSubject,
+  } = useApiGet(["allSubjects"], () => getAllSubjectsUrl(classValue?.value), {
+    refetchOnWindowFocus: false,
+    enabled: !!classValue,
+  });
 
-  const { mutate: updateSession, isLoading: isUpdatingLiveLesson } =
-    useApiPost(updateLiveLesson);
+  useEffect(() => {
+    if (classValue) {
+      fetchSubject();
+    }
+  }, [classValue, fetchSubject]);
+
+  const handleSuccess = () => {
+    toast.success(`Successfully Updated Live Lessons`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+    navigate(-1)
+  };
+
+  const handleError = () => {
+    toast.error(`Something went wrong, could not update live lesson`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  const { mutate: updateSession, isLoading: isUpdatingLiveLesson } = useApiPost(
+    state ? (_: any) => updateLiveLesson(_, state?._id) : null,
+    handleSuccess,
+    handleError
+  );
 
   const { mutate: createLiveLesson, isLoading: isCreatingLiveLesson } =
     useApiPost(createLiveLessonUrl, onSuccess, onError, ["classes"]);
@@ -107,17 +138,14 @@ const LiveSessionsForm = () => {
     return formatOptions(subjects?.data?.subjects, "name", "name");
   }, [subjects?.data]);
 
-
   const handleUpdate = (data: any) => {
-    console.log(data);
     const requestBody: any = {
       subject: data?.subject?.value,
       class: data?.class?.value,
       note: data?.note,
-      date: data?.date,
+      date: data?.date?.$d,
       liveUrl: data?.liveUrl,
       title: data?.title,
-      // image: data?.thumbnail,
     };
     updateSession(requestBody);
   };
@@ -130,9 +158,9 @@ const LiveSessionsForm = () => {
       date: data?.date,
       liveUrl: data?.liveUrl,
       title: data?.title,
-      // image: data?.thumbnail,
     };
     createLiveLesson(requestBody);
+    navigate(-1);
   };
   return (
     <Container onSubmit={handleSubmit(state ? handleUpdate : onSubmit)}>
@@ -145,8 +173,8 @@ const LiveSessionsForm = () => {
               <SelectInput
                 {...field}
                 options={allClasses}
-                value={classValue}
-                defaultValue="Subject Class"
+                defaultValue={"Subject Class"}
+                // value={state ? state?.class : null}
                 width={200}
                 error={errors?.class}
                 isLoading={isLoadingClasses}
@@ -163,8 +191,7 @@ const LiveSessionsForm = () => {
               <SelectInput
                 {...field}
                 options={allSubjects}
-                value={subjectValue}
-                defaultValue="Select Subject"
+                defaultValue={"Select Subject"}
                 width={200}
                 error={errors?.subject}
                 isLoading={isLoadingSubjects}
@@ -190,35 +217,14 @@ const LiveSessionsForm = () => {
           error={errors}
         />
       </InputHolder>
-      <TimeSelect>
-        <Controller
-          name="date"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <DatePickerInput
-              label="Date"
-              iconHidden={false}
-              width={150}
-              value={value}
-              onChange={onChange}
-            />
-          )}
-        />
 
-        <TimeContainer>
-          <InputElement label="Hour" id="hour" register={register} />
-          <p>:</p>
-          <InputElement label="Minute" id="minute" register={register} />
-          <ButtonsContainer>
-            <ButtonInputAm active={timeLine} onClick={() => setTimeLine("AM")}>
-              AM
-            </ButtonInputAm>
-            <ButtonInputPm active={timeLine} onClick={() => setTimeLine("PM")}>
-              PM
-            </ButtonInputPm>
-          </ButtonsContainer>
-        </TimeContainer>
-      </TimeSelect>
+      <InputHolder>
+        <DateTimePickerElement
+          id="date"
+          setValue={setValue}
+          error={errors?.date}
+        />
+      </InputHolder>
 
       <ThumbnailSection>
         <h6>Thumbnail</h6>
@@ -245,7 +251,7 @@ const LiveSessionsForm = () => {
         <ButtonElement
           label={state ? "Update" : "Schedule"}
           width={150}
-          isLoading={isCreatingLiveLesson}
+          isLoading={isUpdatingLiveLesson || isCreatingLiveLesson}
         />
       </InputHolder>
     </Container>

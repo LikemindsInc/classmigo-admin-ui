@@ -12,16 +12,11 @@ import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { QuestionCard } from "../Components/QuestionCard";
 import { getQuizQuestions } from "../../../../../../Urls";
 import { Skeleton } from "@mui/material";
-import noData from "../../../../../../Assets/noData.png"
+import noData from "../../../../../../Assets/noData.png";
 
 const QuizDetails = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const [questions, setQuestions] = useState<any>([])
-
-  console.log(state)
-
-  const handleSearchFilter = (value: string) => {};
 
   const { data: quizQuestions, isLoading: isLoadingQuizQuestions } = useApiGet(
     [`quiz${state}`],
@@ -32,11 +27,7 @@ const QuizDetails = () => {
     }
   );
 
-  useEffect(() => {
-    if(quizQuestions) {
-      setQuestions(quizQuestions?.data?.questions)
-    }
-  },[quizQuestions])
+  // quizQuestions && console.log(quizQuestions?.data?.questions);
 
   return (
     <Container>
@@ -60,15 +51,7 @@ const QuizDetails = () => {
         </SearchContainer>
 
         <QuestionsContainer>
-          {quizQuestions?.length > 0 ? (
-            <div>
-              {quizQuestions.map((item: any, index: number) => (
-                <QuestionCard
-                  
-                />
-              ))}
-            </div>
-          ) : isLoadingQuizQuestions ? (
+          {isLoadingQuizQuestions ? (
             <div>
               {[...Array(4)].map((_, index) => (
                 <SkeletonContainer key={index}>
@@ -79,6 +62,21 @@ const QuizDetails = () => {
                     height={118}
                   />
                 </SkeletonContainer>
+              ))}
+            </div>
+          ) : quizQuestions?.data?.questions &&
+            quizQuestions.data.questions.length > 0 ? (
+            <div>
+              {quizQuestions.data.questions.map((item: any, index: number) => (
+                <QuestionCard
+                  key={index}
+                  id={index+1}
+                  question={item?.question}
+                  options={item?.options}
+                  imageUrl={item?.imageUrl}
+                  answer={item?.correctOption}
+                  detailId={item?._id}
+                />
               ))}
             </div>
           ) : (
@@ -144,7 +142,7 @@ const SearchContainer = styled.div`
 
 const Body = styled.section`
   width: 100%;
-  padding: 0 15%;
+  padding: 0 20%;
 `;
 
 const QuestionsContainer = styled.section``;

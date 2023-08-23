@@ -49,7 +49,6 @@ const QuizLibrary = () => {
     [classes?.data]
   );
 
-  const handleSearchFilter = (value: string) => {};
 
   const { data: quizes, isLoading: isLoadingQuizes, refetch:fetchQuiz } = useApiGet(
     ["quizes"],
@@ -159,24 +158,6 @@ const Container = styled.section`
   }
 `;
 
-const Header = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  > div {
-    display: flex;
-    gap: 1%;
-  }
-  button {
-    font-size: 0.8rem;
-    height: 38px !important;
-    width: 200px;
-  }
-  @media ${devices.tabletL} {
-    gap: 4%;
-  }
-`;
 
 const SearchContainer = styled.div`
   display: flex;

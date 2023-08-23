@@ -2,27 +2,63 @@ import { Checkbox } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
 import { SelectInput } from "../../../../../../Ui_elements";
+import { useApiPost } from "../../../../../../custom-hooks";
+import { updateWeek } from "../../../../../../Urls";
+import { WEEK_OPTIONS } from "../../../../../../utils/constants";
+import { toast } from "react-toastify";
 
-export const ScheduleCard = () => {
+interface Props {
+  item: any;
+}
+
+
+const handleSuccess = () => {
+  toast.success(`Successfully updated`, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    theme: "light",
+  });
+};
+
+const handleError = () => {
+  toast.error(`Something went wrong, could not update lesson week`, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    theme: "light",
+  });
+};
+export const ScheduleCard = ({ item }: Props) => {
+  const { mutate: update } = useApiPost(
+    (_: any) => updateWeek(_, item?._id),
+    handleSuccess,
+    handleError,
+    ["lessonTopic"]
+  );
+
   return (
     <Container>
       <div>
         <div>
-          {/* <Checkbox
-            sx={{
-              color: "var(--primary-color)",
-              "&.Mui-checked": {
-                color: "var(--primary-color)",
-              },
-            }}
-          /> */}
-          <h6>Trigonometry</h6>
+          <h6>{item.lessonName}</h6>
         </div>
-
         <SelectInput
-          options={[]}
-          onChange={() => {}}
-          defaultValue="Assign Week"
+          options={WEEK_OPTIONS}
+          value={item.lessonWeek}
+          onChange={(value) => {
+            const requestBody: any = {
+              week: value?.value,
+            };
+            update(requestBody);
+          }}
+          defaultValue={item.lessonWeek}
           width={150}
         />
       </div>

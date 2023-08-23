@@ -14,20 +14,19 @@ import {
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
 import { addQuestionUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
-import { convertToBase64 } from "../../../../../../utils/utilFns";
+import { convertToBase64, customPost } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { addQuestionSchema } from "../QuizLibrarySchema";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { uploadImageUrl } from "../../../../../../Urls/Utils";
-
+import { toast } from "react-toastify";
 
 const AddQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const { setOpenModal } = useContext(ModalContext);
-  const [image, setImage] = useState("")
   const { state } = useLocation();
-
+  const navigate = useNavigate();
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -41,49 +40,68 @@ const AddQuestion = () => {
     resolver: yupResolver(addQuestionSchema),
   });
 
-  // console.log(errors);
-
-  const { mutate: addQuestion } = useApiPost(
-    addQuestionUrl,
-    () => {},
-    () => {}
-  );
-
-  const onImageUpload = (data:any) => {
-    console.log(data,"op")
+  const onSuccess = () => {
+    toast.success("Successfully added question", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+    navigate(-1)
   }
-  const { mutate: addImage} = useApiPost(
-    uploadImageUrl,
-    onImageUpload,
-    undefined
+
+  const onError = () => {
+    toast.error("Something went wrong", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  }
+
+  const { mutate: addQuestion, isLoading:isAddingQuestion } = useApiPost(
+    addQuestionUrl,
+    onSuccess,
+    onError
   );
 
-  const onSubmit = async(data: any) => {
+  const onSubmit = async (data: any) => {
     const options = ["A", "B", "C", "D"];
+
+    const imageUploadUrl =
+      "https://classmigo.herokuapp.com/api/v1/admin/upload";
 
     if (data?.image) {
       const formData = new FormData();
       formData.append("file", data?.image);
-      console.log(addImage(formData as any));
-
-      
-      const requestBody: any = {
-        questions: [
-          {
-            question: data.question,
-            // imageUrl: newImageUrl?.data?.url,
-            explanation: "You go explain tire",
-            options: options.map((label) => ({
-              label,
-              value: data[`option${label}`],
-            })),
-            correctOption: selectedOption,
-            score: data.score,
-          },
-        ],
-        quizId: state,
-      };
-      // addQuestion(requestBody);
+      try {
+        const response: any = await customPost(imageUploadUrl, formData);
+        const requestBody: any = {
+          questions: [
+            {
+              question: data.question,
+              imageUrl: response?.data?.data?.url,
+              explanation: "You go explain tire",
+              options: options.map((label) => ({
+                label,
+                value: data[`option${label}`],
+              })),
+              correctOption: selectedOption,
+              score: data.score,
+            },
+          ],
+          quizId: state,
+        };
+        addQuestion(requestBody);
+      } catch (e) {
+        console.log(e);
+      }
     } else {
       const requestBody: any = {
         questions: [
@@ -145,7 +163,7 @@ const AddQuestion = () => {
             id="score"
             error={errors}
           />
-          <ButtonElement label="Add Question" width={140} type="submit" />
+          <ButtonElement label="Add Question" width={140} type="submit" isLoading={isAddingQuestion} />
         </ButtonHolder>
       </Container>
       <Modal cancel={handleCancel} width={"40%"}>

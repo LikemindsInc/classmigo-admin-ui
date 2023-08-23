@@ -37,3 +37,10 @@ export const deleteQuiz = (id: string | number) => {
     method: "DELETE",
   });
 };
+
+export const  deleteQuizQuestionUrl = (id: string | number) => {
+  return request({
+    url: `${ADMIN_BASE_URL}/quiz/question/${id}`,
+    method: "DELETE",
+  });
+};

@@ -8,10 +8,11 @@ export const createLiveLessonUrl = (data:any) =>
     data: data,
   });
 
-export const updateLiveLesson = (id:string | number) =>
+export const updateLiveLesson = (data:any, id:string | number) =>
   request({
     url: `${ADMIN_BASE_URL}/live-lesson/${id}/update`,
     method: "PATCH",
+    data:data
   });
 
 

@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { DeleteIcon, EditIcon } from "../../../../../../Assets/Svgs";
-
+import { DeleteOutlined } from "@ant-design/icons";
 import Placeholder from "../../../../../../Assets/placeholder.png";
 import { ButtonElement } from "../../../../../../Ui_elements";
+import { ModalContext } from "../../../../../../Contexts/Contexts";
+import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
+import caution from "../../../../../../Assets/caution.png";
+import { useApiPost } from "../../../../../../custom-hooks";
+import { deleteQuizQuestionUrl } from "../../../../../../Urls";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
@@ -11,6 +16,7 @@ interface QuestionCardProp {
   question?: string;
   options?: any;
   answer?: any;
+  detailId?: any;
 }
 
 export const QuestionCard = ({
@@ -19,7 +25,26 @@ export const QuestionCard = ({
   question,
   options,
   answer,
+  detailId,
 }: QuestionCardProp) => {
+  const { setOpenModal } = useContext(ModalContext);
+
+  
+  const handleCancel = () => {
+    setOpenModal(false);
+  };
+
+  const handleOk = () => {
+    setOpenModal(false);
+  };
+
+  const { mutate: deleteQuestion } = useApiPost(
+    deleteQuizQuestionUrl,
+    () => {},
+    () => {}
+  );
+
+
   return (
     <Container>
       <QuestionHolder>
@@ -31,11 +56,12 @@ export const QuestionCard = ({
           <OptionsContainer>
             {options.map((option: any, index: number) => (
               <div key={index}>
-                <h6>{option.id}</h6>
-                <p>{option.label}</p>
+                <h6>{option.label}</h6>
+                <p>{option.value}</p>{" "}
               </div>
             ))}
           </OptionsContainer>
+          <Correct>Correct Answer: {answer}</Correct>
         </QuestionContainer>
       </QuestionHolder>
 
@@ -43,9 +69,21 @@ export const QuestionCard = ({
         <img src={imageUrl || Placeholder} alt="" />
         <div>
           <ButtonElement outline icon={<EditIcon />} label="Edit" />
-          <Delete />
+          <Delete onClick={()=>deleteQuestion(detailId)} />
         </div>
       </ImageContainer>
+
+      {/* <Modal okay={handleOk} cancel={handleCancel} width={"40%"}>
+        <ModalContent>
+          <img src={caution} alt="" />
+          <p>Question Uploaded Successfully</p>
+          <ButtonElement
+            label="Done"
+            width={100}
+            onClick={() => setOpenModal(false)}
+          />
+        </ModalContent>
+      </Modal> */}
     </Container>
   );
 };
@@ -62,9 +100,9 @@ const Container = styled.div`
 `;
 const Number = styled.div`
   background-color: var(--primary-color);
-  height: 0.3rem;
-  width: 0.3rem;
-  padding: 1rem;
+  height: 0.2rem;
+  width: 0.2rem;
+  padding: 0.7rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -104,10 +142,10 @@ const OptionsContainer = styled.div`
       font-weight: 600;
       transition: all 0.3s ease;
       font-size: 1rem;
-      margin-right: 0.1rem;
-      height: 2rem;
-      width: 2rem;
-      padding: 0.3rem;
+      margin-right: 0.3rem;
+      height: 1.3rem;
+      width: 1.3rem;
+      padding: 0.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -138,6 +176,24 @@ const ImageContainer = styled.div`
   }
 `;
 
-const Delete = styled(DeleteIcon)`
+const Delete = styled(DeleteOutlined)`
   cursor: pointer;
+  color: red;
+`;
+
+const Correct = styled.h6`
+  color: var(--primary-color);
+  font-size: 1rem;
+`;
+
+const Modal = styled(CenteredDialog)``;
+const ModalContent = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  p {
+    font-weight: 600;
+  }
 `;

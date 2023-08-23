@@ -1,31 +1,126 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import {
   ButtonElement,
   InputElement,
+  Loader,
   SelectInput,
 } from "../../../../../Ui_elements";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { ScheduleCard } from "./Components/ScheduleCard";
+import { useApiGet } from "../../../../../custom-hooks";
+import {
+  getAllClassesUrl,
+  getAllLessonsUrl,
+  getAllSubjectsUrl,
+} from "../../../../../Urls";
+import { Controller, useForm } from "react-hook-form";
+import { formatOptions } from "../../../../../utils/utilFns";
+import noData from "../../../../../Assets/noData.png";
+import { Skeleton } from "@mui/material";
 
 const ScheduleLessons = () => {
+  const {
+    control,
+    watch,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+  const [topic, setTopic] = useState([]);
+  let classValue: any = watch("class");
+  let subjectValue: any = watch("subject");
+  const { data: classes, isFetching: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+  const {
+    data: subjects,
+    isFetching: isLoadingSubjects,
+    refetch: fetchSubject,
+  } = useApiGet(["allSubjects"], () => getAllSubjectsUrl(classValue?.value), {
+    refetchOnWindowFocus: false,
+    enabled: !!classValue,
+  });
+
+  const {
+    data: topics,
+    isFetching: isLoadingTopics,
+    refetch: fetchTopic,
+  } = useApiGet(["lessonTopic"], () => getAllLessonsUrl(subjectValue?.label), {
+    refetchOnWindowFocus: false,
+    enabled: !!subjectValue,
+    staleTime: 0,
+    onSuccess: (data: any) => {
+      setTopic(data?.content);
+    },
+  });
+
+  useEffect(() => {
+    if (classValue) {
+      fetchSubject();
+    }
+  }, [classValue, fetchSubject]);
+
+  const allClasses = useMemo(
+    () => formatOptions(classes?.data, "value", "name"),
+    [classes?.data]
+  );
+
+  const allSubjects = useMemo(() => {
+    return formatOptions(subjects?.data?.subjects, "name", "name");
+  }, [subjects?.data]);
+
+  useEffect(() => {
+    if (topics?.data?.content) {
+      setTopic(topics.data.content);
+    }
+  }, [topics]);
+  const onSubmit = () => {
+    fetchTopic();
+  };
+
   return (
     <Container>
       <Header>
         <div>
-          <SelectInput
-            options={[]}
-            onChange={() => {}}
-            defaultValue="Subject Class"
-            width={200}
+          <Controller
+            name="class"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={allClasses}
+                defaultValue={"Subject Class"}
+                width={200}
+                error={errors?.class}
+                isLoading={isLoadingClasses}
+              />
+            )}
           />
-          <SelectInput
-            options={[]}
-            onChange={() => {}}
-            defaultValue="Select Subject"
-            width={200}
+          <Controller
+            name="subject"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={allSubjects}
+                defaultValue={"Select Subject"}
+                width={200}
+                error={errors?.subject}
+                isLoading={isLoadingSubjects}
+              />
+            )}
           />
-          <ButtonElement label="View Video Lessons" />
+          <ButtonElement
+            label="View Lessons"
+            isLoading={isLoadingTopics}
+            onClick={onSubmit}
+          />
         </div>
         {/* <WeekContainer>
           <p>Set Week No</p>
@@ -39,15 +134,22 @@ const ScheduleLessons = () => {
           defaultValue="Assign Week"
           width={150}
         />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
-        <ScheduleCard />
+
+        {topic && topic.length > 0 ? (
+          isLoadingTopics ? (
+            <Loader />
+          ) : (
+            topic.map((item: any, index: number) => (
+              <ScheduleCard key={index} item={item} />
+            ))
+          )
+        ) : (
+          <NoData>
+            <img src={noData} alt="No data" />
+            <p>You haven’t added any classes yet.</p>
+            <p>Use the create class above to add classes.</p>
+          </NoData>
+        )}
       </Body>
     </Container>
   );
@@ -115,4 +217,20 @@ const Body = styled.section`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+`;
+
+const NoData = styled.div`
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  img {
+    margin-bottom: 1rem;
+  }
+  p {
+    text-align: center;
+    font-size: 0.8rem;
+  }
 `;

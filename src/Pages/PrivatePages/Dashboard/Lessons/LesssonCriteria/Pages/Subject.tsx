@@ -130,7 +130,7 @@ const SelectSubject = () => {
             error={errors}
           />
           <ButtonElement
-            label="Add Class"
+            label="Add Subject"
             icon={<AddIcon />}
             isLoading={isCreatingSubject}
           />

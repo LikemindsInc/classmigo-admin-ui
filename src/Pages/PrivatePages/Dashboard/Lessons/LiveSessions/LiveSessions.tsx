@@ -206,6 +206,7 @@ const LiveSection = styled.section`
     font-size: 1.3rem;
   }
   margin-top: 2rem;
+  gap:1rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
 
@@ -216,15 +217,15 @@ const LiveSection = styled.section`
 
 const UpcomingSection = styled.section`
   width: 100%;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
+  margin: 3rem 0;
 
   @media (min-width: 768px) {
-    flex-wrap: wrap;
+    grid-template-columns: repeat(3, 1fr);
   }
 `;
-
 const PastHeader = styled.h4`
   text-align: left;
   font-size: 1.3rem;

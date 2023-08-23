@@ -21,19 +21,21 @@ import noData from "../../../../../Assets/noData.png";
 
 const VideoLibrary = () => {
   const [videos, setVideos] = useState([]);
+  const [topic, setTopic] = useState([]);
 
-  const { handleSubmit, watch, control } = useForm({});
+  const { handleSubmit, watch, control, setValue } = useForm({});
 
-  const classValue = watch("class");
-  const subjectValue = watch("subject");
+  let classValue = watch("class");
+  let subjectValue = watch("subject");
+  let topicValue = watch("topic");
 
   const {
     data: allVideos,
     isFetching: isFetchingVideos,
     refetch: getAllVideos,
-  } = useApiGet(["videos"], () => getAllVideosUrl(classValue?.value), {
+  } = useApiGet(["videos"], () => getAllVideosUrl(topicValue?.value), {
     refetchOnWindowFocus: false,
-    enabled: true
+    enabled: true,
   });
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
@@ -44,22 +46,35 @@ const VideoLibrary = () => {
       enabled: true,
     }
   );
-  const { data: subjects, isLoading: isLoadingSubjects } = useApiGet(
-    ["allSubjects"],
-    () => getAllSubjectsUrl(classValue?.value),
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!classValue,
+  const {
+    data: subjects,
+    isLoading: isLoadingSubjects,
+    refetch: fetchSubject,
+  } = useApiGet(["allSubjects"], () => getAllSubjectsUrl(classValue?.value), {
+    refetchOnWindowFocus: false,
+    enabled: !!classValue,
+  });
+  const {
+    data: topics,
+    isLoading: isLoadingTopics,
+    refetch: fetchTopic,
+  } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.value), {
+    refetchOnWindowFocus: false,
+    enabled: !!subjectValue,
+  });
+
+  useEffect(() => {
+    if (classValue) {
+      fetchSubject();
     }
-  );
-  const { data: topics, isLoading: isLoadingTopics } = useApiGet(
-    ["allTopics"],
-    () => getAllLessonsUrl(subjectValue?.value),
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!subjectValue,
+  }, [classValue, fetchSubject]);
+
+  useEffect(() => {
+    if (subjectValue) {
+      setValue("topic", "");
+      fetchTopic();
     }
-  );
+  }, [fetchTopic, setValue, subjectValue]);
 
   const allClasses = useMemo(
     () => formatOptions(classes?.data, "value", "name"),
@@ -71,7 +86,7 @@ const VideoLibrary = () => {
   }, [subjects?.data]);
 
   const allTopics = useMemo(() => {
-    return formatOptions(topics?.data?.content, "lessonName", "lessonName");
+    return formatOptions(topics?.data?.content, "lessonName", "_id");
   }, [topics?.data]);
 
   useEffect(() => {
@@ -80,7 +95,8 @@ const VideoLibrary = () => {
     }
   }, [allVideos, videos]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = () => {
+    console.log(topicValue, "lakaka");
     getAllVideos();
   };
 
