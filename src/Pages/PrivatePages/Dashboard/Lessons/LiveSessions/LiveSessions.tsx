@@ -17,6 +17,7 @@ import { getLiveLessons } from "../../../../../Urls/LiveSessions";
 import { Controller, useForm } from "react-hook-form";
 import { getAllClassesUrl } from "../../../../../Urls";
 import { formatOptions } from "../../../../../utils/utilFns";
+import { Fab } from "@mui/material";
 const LiveSessions = () => {
   const navigate = useNavigate();
 
@@ -55,10 +56,35 @@ const LiveSessions = () => {
             <Upcoming>
               <CreateContainer>
                 <h4>Upcoming Live Lessons</h4>
-                <ButtonElement
-                  label="Create live session"
-                  onClick={() => navigate("/live_lessons/schedule_session")}
-                />
+                <aside>
+                  <Controller
+                    name="class"
+                    control={control}
+                    render={({ field }) => (
+                      <SelectInput
+                        {...field}
+                        options={allClasses}
+                        defaultValue="Select a class"
+                        isLoading={isLoadingClasses}
+                        width={200}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="subject"
+                    control={control}
+                    render={({ field }) => (
+                      <SelectInput
+                        {...field}
+                        options={allClasses}
+                        defaultValue="Select a subject"
+                        isLoading={isLoadingClasses}
+                        width={200}
+                      />
+                    )}
+                  />
+                  <ButtonElement label="View Videos" />
+                </aside>
               </CreateContainer>
 
               <UpcomingSection>
@@ -136,6 +162,10 @@ const LiveSessions = () => {
           </NoData>
         )}
       </Body>
+
+      <FabContainer
+        onClick={() => navigate("/live_lessons/schedule_session")}
+      >+</FabContainer>
     </Container>
   );
 };
@@ -164,6 +194,7 @@ const Body = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
+  margin-bottom:10rem;
 `;
 
 const NoData = styled.div`
@@ -199,6 +230,31 @@ const Upcoming = styled.div`
   }
 `;
 
+const FabContainer = styled.div`
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  &:hover{
+    background-color: var(--primary-color);
+    color: white;
+  }
+  font-size:2rem;
+  color: var(--primary-color);
+  font-weight:700;
+  bottom: 10%;
+  right: 5%;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  background-color: var(--hover-color);
+  box-shadow: 1px 2px 25px -10px rgba(0, 0, 0, 0.75);
+  -webkit-box-shadow: 1px 2px 25px -10px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 1px 2px 25px -10px rgba(0, 0, 0, 0.75);
+`;
+
 const LiveSection = styled.section`
   margin-top: 2rem;
   width: 100%;
@@ -206,7 +262,7 @@ const LiveSection = styled.section`
     font-size: 1.3rem;
   }
   margin-top: 2rem;
-  gap:1rem;
+  gap: 1rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
 
@@ -238,7 +294,7 @@ const Utilities = styled.section`
   margin: 2rem 0;
   > aside {
     display: flex;
-    gap: 20px;
+    gap: 10px;
   }
   button {
     font-size: 0.8rem;
@@ -255,5 +311,11 @@ const CreateContainer = styled.section`
     font-size: 0.8rem;
     height: 38px !important;
     width: 200px;
+  }
+
+  aside {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 `;

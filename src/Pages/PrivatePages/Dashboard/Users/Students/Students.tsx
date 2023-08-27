@@ -9,35 +9,100 @@ import {
 } from "../../../../../Ui_elements";
 import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
 import { Drawer, Empty, Switch, Tag } from "antd";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
-import { getStudentDataUrl } from "../../../../../Urls/Students";
-import { useApiGet } from "../../../../../custom-hooks";
+import {
+  getStudentDataUrl,
+  toggleStudentUrl,
+} from "../../../../../Urls/Students";
+import { useAPiPut, useApiGet, useApiPost } from "../../../../../custom-hooks";
 import { UserDetails } from "./Components/UserDetails";
 import { ColumnsType } from "antd/es/table";
 import { IParent, ISubscription } from "@appModel";
 import moment from "moment";
+import { Controller, useForm } from "react-hook-form";
+import {
+  activateSubjectUrl,
+  deactivateSubjectUrl,
+  getAllClassesUrl,
+} from "../../../../../Urls";
+import { formatOptions } from "../../../../../utils/utilFns";
+import { Avatar } from "@mui/material";
+import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
+import { toast } from "react-toastify";
 const Students = () => {
-  const handleSearchFilter = (value: string) => {};
   //drawer handler
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [student, setStudent] = useState<any>([]);
-
   const [user, setUser] = useState<DataType | null>(null);
+  const [userId, setUserId] = useState<any>(null);
+  const [isActive, setIsActive] = useState(user?.isActive);
+
+  const { control, watch } = useForm();
 
   useEffect(() => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
 
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  const allClasses = useMemo(
+    () => formatOptions(classes?.data, "value", "name"),
+    [classes?.data]
+  );
+
+  const handleSuccess = () => {
+    toast.success(isActive ? `Successfully deactivated` : `Successfully activated`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+    setIsActive(!isActive);
+  };
+
+  const handleError = () => {
+    toast.error(`Something went wrong, could not update`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+  const { mutate: toggleStudent, isLoading: isTogglingStudent } =
+    useAPiPut(
+      (_: any) => toggleStudentUrl(_, userId),
+      handleSuccess,
+      handleError,
+      ["Student-data"]
+    );
+
   const {
     data: studentData,
     isLoading: isLoadingStudentData,
     refetch: fetchStudent,
-  } = useApiGet(["Student data"], () => getStudentDataUrl(), {
+  } = useApiGet(["Student-data"], () => getStudentDataUrl(), {
     refetchOnWindowFocus: false,
     enabled: true,
   });
+
+  useEffect(() => {
+    setIsActive(user?.isActive || false);
+  }, [user]);
 
   useEffect(() => {
     if (studentData) {
@@ -50,20 +115,21 @@ const Students = () => {
           (item.class && item.class.length > 0
             ? item.class.map((classItem: any) => classItem.name)
             : "" || null) || "",
-        status: item.role,
+        status: item.isActive ? "Verified" : "Unverified",
         isActive: item.isActive,
         subscription: item.subcription,
         parent: item.parent,
-        image:
-          item.image ||
-          "https://img.freepik.com/free-photo/portrait-handsome-man-with-dark-hairstyle-bristle-toothy-smile-dressed-white-sweatshirt-feels-very-glad-poses-indoor-pleased-european-guy-being-good-mood-smiles-positively-emotions-concept_273609-61405.jpg?w=2000",
+        image: item.image,
       }));
       setStudent(newData);
     }
   }, [studentData]);
 
-  const onChange = (checked: boolean) => {
-    console.log(`switch to ${checked}`);
+  const onToggleActive = () => {
+    const requestBody = {
+      isActive: isActive ? false : true,
+    };
+    toggleStudent(requestBody);
   };
 
   const headerStyle = {
@@ -81,6 +147,7 @@ const Students = () => {
     status: string;
     subscription: ISubscription[];
     image: string;
+    _id: string;
     isActive: boolean;
     parent?: IParent | null;
   }
@@ -100,12 +167,6 @@ const Students = () => {
       key: "username",
       ellipsis: true,
     },
-    // {
-    //   title: "CLASS",
-    //   dataIndex: "class",
-    //   key: "class",
-    //   ellipsis: true,
-    // },
     {
       title: "PHONE NUMBER",
       dataIndex: "phoneNumber",
@@ -127,7 +188,7 @@ const Students = () => {
         return (
           <div style={{ maxWidth: 300 }}>
             {data.map((item) => (
-              <Tag>{item.className} </Tag>
+              <SubTag>{item.className} </SubTag>
             ))}
           </div>
         );
@@ -175,62 +236,9 @@ const Students = () => {
 
   const handleRowClick = (data: DataType) => {
     setUser(data);
+    setUserId(data?.key);
+    setIsActive(data?.isActive);
   };
-
-  const classOptions = [
-    {
-      value: 0,
-      label: "Primary 1",
-    },
-    {
-      value: 1,
-      label: "Primary 2",
-    },
-    {
-      value: 2,
-      label: "Primary 3",
-    },
-    {
-      value: 3,
-      label: "Primary 4",
-    },
-    {
-      value: 4,
-      label: "Primary 5",
-    },
-    {
-      value: 5,
-      label: "Primary 6",
-    },
-    {
-      value: 6,
-      label: "Primary 2",
-    },
-    {
-      value: 7,
-      label: "JSS1",
-    },
-    {
-      value: 8,
-      label: "JSS2",
-    },
-    {
-      value: 9,
-      label: "JSS3",
-    },
-    {
-      value: 10,
-      label: "SS1",
-    },
-    {
-      value: 11,
-      label: "SS2",
-    },
-    {
-      value: 12,
-      label: "SS3",
-    },
-  ];
 
   const statusOptions = [
     {
@@ -253,37 +261,60 @@ const Students = () => {
       label: "Unsubscribed",
     },
   ];
+
+  //   <UtilsHolder>
+  //   <div>
+  //     <SearchInput />
+  //     <Controller
+  //       name="className"
+  //       control={control}
+  //       render={({ field }) => (
+  //         <SelectInput
+  //           {...field}
+  //           options={allClasses}
+  //           onChange={handleSearchFilter}
+  //           defaultValue="Class"
+  //           width={300}
+  //         />
+  //       )}
+  //     />
+  //     <Controller
+  //       name="status"
+  //       control={control}
+  //       render={({ field }) => (
+  //         <SelectInput
+  //           {...field}
+  //           options={statusOptions}
+  //           onChange={handleSearchFilter}
+  //           defaultValue="Status"
+  //           width={300}
+  //         />
+  //       )}
+  //     />
+
+  //     <Controller
+  //       name="className"
+  //       control={control}
+  //       render={({ field }) => (
+  //         <SelectInput
+  //           {...field}
+  //           options={subscribeOptions}
+  //           onChange={handleSearchFilter}
+  //           defaultValue="Subscription"
+  //           width={300}
+  //         />
+  //       )}
+  //     />
+
+  //     {/* <h6>2,500 Results</h6> */}
+  //   </div>
+  //   <button>
+  //     Export
+  //     <ExportIcon />
+  //   </button>
+  // </UtilsHolder>
   return (
     <Container>
-      <UtilsHolder>
-        <div>
-          <SearchInput />
-          <SelectInput
-            options={classOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Class"
-            width={200}
-          />
-          <SelectInput
-            options={statusOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Status"
-            width={200}
-          />
-          <SelectInput
-            options={subscribeOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Subscription"
-            width={150}
-          />
-          <h6>2,500 Results</h6>
-        </div>
-        <button>
-          Export
-          <ExportIcon />
-        </button>
-      </UtilsHolder>
-
       <TableElement
         loading={isLoadingStudentData}
         columns={updatedColumns}
@@ -302,13 +333,16 @@ const Students = () => {
         width={"25%"}
       >
         <DrawerContentContainer>
-          <CancelContainer>
+          {/* <CancelContainer>
             <CancelIcon />
-          </CancelContainer>
+          </CancelContainer> */}
           <UserInfo>
-            <img
-              src="https://media.istockphoto.com/id/1168369629/photo/happy-smiling-african-american-child-girl-yellow-background.webp?b=1&s=170667a&w=0&k=20&c=E0vD2JewKSB11Kq-pJVaBmMBJRNQu1Fuwodffs1d87o="
-              alt=""
+            <Avatar
+              sx={{
+                backgroundColor: "var(--hover-color)",
+                color: "black",
+              }}
+              alt={`${user?.name}`}
             />
             <div>
               <p>{user?.name}</p>
@@ -321,7 +355,7 @@ const Students = () => {
               </p>
             </div>
           </UserInfo>
-          <UpdateDetails>
+          {/* <UpdateDetails>
             <div>
               <InputElement placeholder="John Chukwuemeka" label="Name" />
               <ButtonElement width={84} outline label={"Update"} />
@@ -330,7 +364,7 @@ const Students = () => {
               <InputElement placeholder="08000000000" label="Phone number" />
               <ButtonElement label={"Update"} outline width={84} />
             </div>
-          </UpdateDetails>
+          </UpdateDetails> */}
 
           <Details>
             <div>
@@ -356,8 +390,11 @@ const Students = () => {
             <div>
               <h4>Status</h4>
               <SwitchContainer>
-                <p>{user?.isActive ? "Active" : "InActive"}</p>
-                <Switch defaultChecked={user?.isActive} onChange={onChange} />
+                <p>{isActive ? "Deactivate User" : "Activate User"}</p>
+                <SwitchElement
+                  activeState={isActive}
+                  handleChange={onToggleActive}
+                />
               </SwitchContainer>
             </div>
 
@@ -366,7 +403,6 @@ const Students = () => {
               {user?.parent ? (
                 <>
                   <h5>{user?.parent?.fullName}</h5>
-
                   <p>{user?.parent?.email}</p>
                   <p>{user?.parent?.phoneNumber}</p>
                   <ButtonElement outline width={84} label={"Unlink"} />
@@ -451,10 +487,10 @@ const UtilsHolder = styled.div`
 `;
 
 const DrawerContentContainer = styled.aside``;
-const CancelContainer = styled.section`
-  display: flex;
-  justify-content: flex-end;
-`;
+// const CancelContainer = styled.section`
+//   display: flex;
+//   justify-content: flex-end;
+// `;
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
@@ -467,6 +503,10 @@ const UserInfo = styled.div`
     border-radius: 50%;
   }
   div {
+    margin-top: 1rem;
+    span {
+      font-size: 0.8rem;
+    }
     p {
       font-weight: 700;
       font-size: 1rem;
@@ -480,9 +520,6 @@ const UpdateDetails = styled.div`
     align-items: flex-end;
     gap: 10px;
     margin-bottom: 2rem;
-    button {
-      margin-bottom: 7px;
-    }
   }
 `;
 
@@ -525,4 +562,14 @@ const SwitchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+const SubTag = styled.div`
+  background-color: var(--hover-color);
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  display: inline;
+  margin: 0 5px;
 `;

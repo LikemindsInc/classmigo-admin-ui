@@ -25,6 +25,7 @@ import { DateTimePickerElement } from "../../../../../../Ui_elements/Input/dateT
 const LiveSessionsForm = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [parsedDate, setParsedDate] = useState<any>(null);
   console.log(state);
   const {
     register,
@@ -37,7 +38,7 @@ const LiveSessionsForm = () => {
     resolver: yupResolver(liveSessionSchema),
     defaultValues: {
       class: state?.class || null,
-      subject: state?.subject || null,
+      subject: state?.subject?.name || null,
       title: state?.title || null,
       note: state?.note || null,
       liveUrl: state?.liveUrl || null,
@@ -46,6 +47,12 @@ const LiveSessionsForm = () => {
 
   let classValue: any = watch("class");
   // let subjectValue: any = watch("subject");
+
+  useEffect(() => {
+    if (state) {
+      setParsedDate((state.date));
+    }
+  }, [state]);
 
   const onSuccess = () => {
     toast.success("Successfully added topic", {
@@ -80,6 +87,8 @@ const LiveSessionsForm = () => {
       enabled: true,
     }
   );
+
+  classes && console.log(classes);
   const {
     data: subjects,
     isFetching: isLoadingSubjects,
@@ -105,7 +114,7 @@ const LiveSessionsForm = () => {
       draggable: true,
       theme: "light",
     });
-    navigate(-1)
+    navigate(-1);
   };
 
   const handleError = () => {
@@ -160,7 +169,6 @@ const LiveSessionsForm = () => {
       title: data?.title,
     };
     createLiveLesson(requestBody);
-    navigate(-1);
   };
   return (
     <Container onSubmit={handleSubmit(state ? handleUpdate : onSubmit)}>
@@ -173,9 +181,9 @@ const LiveSessionsForm = () => {
               <SelectInput
                 {...field}
                 options={allClasses}
-                defaultValue={"Subject Class"}
-                // value={state ? state?.class : null}
+                defaultValue={"Select a class"}
                 width={200}
+                value={state ? field.value : null}
                 error={errors?.class}
                 isLoading={isLoadingClasses}
               />
@@ -192,6 +200,7 @@ const LiveSessionsForm = () => {
                 {...field}
                 options={allSubjects}
                 defaultValue={"Select Subject"}
+                value={state ? field.value : null}
                 width={200}
                 error={errors?.subject}
                 isLoading={isLoadingSubjects}
@@ -223,6 +232,7 @@ const LiveSessionsForm = () => {
           id="date"
           setValue={setValue}
           error={errors?.date}
+          defaultValue={state ? parsedDate : null}
         />
       </InputHolder>
 

@@ -1,9 +1,8 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import Select, { StylesConfig } from "react-select";
 import styled from "styled-components";
 import { ErrorIcon } from "../../Assets/Svgs";
 import { Spinner } from "../Spinner/Spinner";
-
 interface SelectProps {
   options: any;
   onChange?: (value: any) => void;
@@ -16,52 +15,58 @@ interface SelectProps {
   id?: string;
 }
 
-export const SelectInput = ({
-  options,
-  onChange,
-  defaultValue,
-  width,
-  value,
-  error,
-  disabled,
-  isLoading,
-  id,
-}: SelectProps) => {
-  return (
-    <>
-      <SelectContainer width={width}>
-        <SelectElement
-          placeholder={defaultValue}
-          isDisabled={disabled}
-          styles={customStyles(disabled)}
-          options={options}
-          onChange={onChange}
-          value={value}
-        />
-        {isLoading && <Spinner color="var(--primary-color)" />}
-      </SelectContainer>
-      {error ? (
-        <ErrorContainer>
-          {error?.message && <Error />}
-          <p>{error?.message}</p>
-        </ErrorContainer>
-      ) : null}
-    </>
-  );
-};
+export const SelectInput = forwardRef<HTMLDivElement, SelectProps>(
+  (
+    {
+      options,
+      onChange,
+      defaultValue,
+      width,
+      value,
+      error,
+      disabled,
+      isLoading,
+      id,
+    },
+    ref
+  ) => {
+    return (
+      <div ref={ref}>
+        <SelectContainer width={width}>
+          <SelectElement
+            placeholder={defaultValue}
+            isDisabled={disabled}
+            defaultInputValue={value}
+            styles={customStyles(disabled)}
+            options={options}
+            onChange={onChange}
+            value={value}
+          />
+          {isLoading && <Spinner color="var(--primary-color)" />}
+        </SelectContainer>
+        {error ? (
+          <ErrorContainer>
+            {error?.message && <Error />}
+            <p>{error?.message}</p>
+          </ErrorContainer>
+        ) : null}
+      </div>
+    );
+  }
+);
 
 const SelectElement = styled(Select)`
   width: 100%;
 `;
 const ErrorContainer = styled.div`
   display: flex;
-  gap:5px;
+  gap: 5px;
   align-items: center;
   justify-content: flex-start;
-  width:100%;
+  width: 100%;
   margin-top: 0px;
   p {
-    color:red;
+    color: red;
     font-size: 0.7rem !important;
   }
 `;
