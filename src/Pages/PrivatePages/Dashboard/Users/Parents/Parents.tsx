@@ -12,16 +12,20 @@ import {
   SearchInput,
 } from "../../../../../Ui_elements";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
-import { useApiGet } from "../../../../../custom-hooks";
-import { getParentDataUrl } from "../../../../../Urls";
+import { useAPiPut, useApiGet } from "../../../../../custom-hooks";
+import { getParentDataUrl, toggleParentUrl } from "../../../../../Urls";
 import { UserDetails } from "./Components/UserDetails";
 import { IStudent } from "@appModel";
+import { Avatar } from "@mui/material";
+import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
+import { toast } from "react-toastify";
 
 const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [parent, setParent] = useState<any>([]);
-
   const [user, setUser] = useState<DataType | null>(null);
+  const [userId, setUserId] = useState<any>(null);
+  const [isActive, setIsActive] = useState(user?.isActive);
 
   interface DataType {
     key: string;
@@ -29,6 +33,7 @@ const Parents = () => {
     email: string;
     phoneNumber: number;
     status: string;
+    isActive: boolean;
     dependents?: IStudent[];
   }
 
@@ -70,12 +75,43 @@ const Parents = () => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
 
-  const onChange = (checked: boolean) => {
-    console.log(`switch to ${checked}`);
-  };
-
   const handleRowItemClick = (data: DataType) => {
     setUser(data);
+    setUserId(data?.key);
+    setIsActive(data?.isActive);
+    console.log(data);
+  };
+
+  useEffect(() => {
+    setIsActive(user?.isActive || false);
+  }, [user]);
+
+  const handleSuccess = () => {
+    toast.success(
+      isActive ? `Successfully deactivated` : `Successfully activated`,
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      }
+    );
+    setIsActive(!isActive);
+  };
+
+  const handleError = () => {
+    toast.error(`Something went wrong, could not update`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
   };
 
   const {
@@ -87,6 +123,13 @@ const Parents = () => {
     enabled: true,
   });
 
+  const { mutate: toggleParent, isLoading: isTogglingParent } = useAPiPut(
+    (_: any) => toggleParentUrl(_, userId),
+    handleSuccess,
+    handleError,
+    ["parent-data"]
+  );
+
   useEffect(() => {
     if (parentData) {
       const newData = parentData?.data?.content.map((item: any) => ({
@@ -94,8 +137,9 @@ const Parents = () => {
         name: item.fullName,
         email: item.email,
         phoneNumber: item.phoneNumber,
-        status: item.role,
+        status: item.isActive ? "Verified" : "Unverified",
         dependents: item.dependents,
+        isActive: item.isActive,
       }));
       setParent(newData);
     }
@@ -130,9 +174,16 @@ const Parents = () => {
     return updatedColumn;
   });
 
+  const onToggleActive = (status: any) => {
+    const requestBody = {
+      isActive: status === "Verified" ? false : true,
+    };
+    toggleParent(requestBody);
+  };
+
   return (
     <Container>
-      <UtilsHolder>
+      {/* <UtilsHolder>
         <div>
           <SearchInput />
           <h6>2,500 Results</h6>
@@ -141,7 +192,7 @@ const Parents = () => {
           Export
           <ExportIcon />
         </button>
-      </UtilsHolder>
+      </UtilsHolder> */}
       <TableElement
         columns={updatedColumns}
         data={parent || null}
@@ -160,27 +211,37 @@ const Parents = () => {
         width={"25%"}
       >
         <DrawerContentContainer>
-          <CancelContainer>
+          {/* <CancelContainer>
             <CancelIcon />
-          </CancelContainer>
+          </CancelContainer> */}
           <UserInfo>
-            <img
-              src="https://media.istockphoto.com/id/1168369629/photo/happy-smiling-african-american-child-girl-yellow-background.webp?b=1&s=170667a&w=0&k=20&c=E0vD2JewKSB11Kq-pJVaBmMBJRNQu1Fuwodffs1d87o="
-              alt=""
+            <Avatar
+              sx={{
+                backgroundColor: "var(--hover-color)",
+                color: "black",
+              }}
+              alt={`${user?.name}`}
             />
             <div>
               <p>{user?.name}</p>
               <p>{user?.email}</p>
             </div>
           </UserInfo>
-          <UpdateDetails>
+          {/* <UpdateDetails>
             <div>
               <InputElement placeholder="John Chukwuemeka" label="Name" />
               <ButtonElement width={84} outline label={"Update"} />
             </div>
-          </UpdateDetails>
+          </UpdateDetails> */}
 
           <Details>
+            <VerificationContainer>
+              <h4>Verification</h4>
+              <SwitchElement
+                activeState={isActive}
+                handleChange={() => onToggleActive(user?.status)}
+              />
+            </VerificationContainer>
             <StudentContainer>
               <h4>Dependents</h4>
               {user && user.dependents && user.dependents.length > 0 ? (
@@ -217,7 +278,6 @@ const Container = styled.section`
   gap: 10%;
   overflow-y: scroll;
   position: relative !important;
-import { data } from '../../../../../utils/dummyDataStudents';
 
   @media ${devices.tablet} {
     padding: 0 1rem 1rem 1rem;
@@ -275,6 +335,8 @@ const UtilsHolder = styled.div`
     }
   }
 `;
+
+const VerificationContainer = styled.div``;
 
 const DrawerContentContainer = styled.aside``;
 const CancelContainer = styled.section`

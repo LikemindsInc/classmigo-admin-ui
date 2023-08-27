@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
@@ -27,7 +27,13 @@ export const SubtopicCard = ({
   parentItem,
   handleChange,
 }: Props) => {
-  console.log(active);
+  console.log(active, "sub");
+
+  const [localActive, setLocalActive] = useState(active)
+
+  useEffect(() => {
+    
+  })
   const handleActivateSuccess = () => {
     toast.success("Successfully Activated topic", {
       position: "top-right",
@@ -38,6 +44,8 @@ export const SubtopicCard = ({
       draggable: true,
       theme: "light",
     });
+    setLocalActive(!localActive)
+
   };
   const handleActivationError = (error: any) => {
     toast.error(error, {
@@ -60,6 +68,7 @@ export const SubtopicCard = ({
       draggable: true,
       theme: "light",
     });
+    setLocalActive(!localActive)
   };
   const handleDeactivationError = (error: any) => {
     toast.error(error, {
@@ -90,7 +99,7 @@ export const SubtopicCard = ({
     });
 
   const toggleSubtopicActive = () => {
-    if (active) {
+    if (localActive) {
       deactivateSubtopic();
       queryClient.invalidateQueries([`sub_topic${parentItem}`]);
     } else {
@@ -107,7 +116,7 @@ export const SubtopicCard = ({
         </div>
         <SwitchContainer>
           <SwitchElement
-            activeState={active}
+            activeState={localActive}
             handleChange={toggleSubtopicActive}
           />
         </SwitchContainer>

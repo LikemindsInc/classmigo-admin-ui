@@ -68,28 +68,39 @@ export const formatDate = (date: Date): string => {
   };
   return date.toLocaleDateString(undefined, options);
 };
+export const formatIncomingDate = (incomingDate: string): string => {
+  console.log("Incoming Date:", incomingDate);
 
+  const newDateTime = new Date(incomingDate);
+  console.log("New Date Object:", newDateTime);
 
+  const formattedDateTime = newDateTime.toISOString().slice(0, 16);
+  console.log("Formatted Date:", formattedDateTime);
 
+  return formattedDateTime;
+};
 
 //Custom Post Function
 
 type ApiResponse<T> = {
   data: T | null;
   error: Error | null;
-}
+};
 
 var accessToken: any = Cookies.get("user");
-let token: any = ""
+let token: any = "";
 if (accessToken) {
-  token  = JSON.parse(accessToken);
+  token = JSON.parse(accessToken);
 }
-export async function customPost<T>(url: string, requestData: any): Promise<ApiResponse<T>> {
+export async function customPost<T>(
+  url: string,
+  requestData: any
+): Promise<ApiResponse<T>> {
   try {
     const response: AxiosResponse<T> = await axios.post(url, requestData, {
       headers: {
         Authorization: `Bearer ${token?.token}`,
-      }
+      },
     });
     return {
       data: response.data,

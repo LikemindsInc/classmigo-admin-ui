@@ -1,3 +1,4 @@
+import { Avatar } from "@mui/material";
 import styled from "styled-components";
 
 export const UserDetails = ({
@@ -9,7 +10,13 @@ export const UserDetails = ({
 }) => {
   return (
     <Container>
-      <img src={image} alt="" />
+      <Avatar
+        sx={{
+          backgroundColor: "var(--hover-color)",
+          color: "black",
+        }}
+        alt={`${name}`}
+      />
       <h4>{name}</h4>
     </Container>
   );

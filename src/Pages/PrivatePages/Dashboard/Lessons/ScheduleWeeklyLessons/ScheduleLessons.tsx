@@ -128,12 +128,12 @@ const ScheduleLessons = () => {
         </WeekContainer> */}
       </Header>
       <Body>
-        <SelectInput
+        {/* <SelectInput
           options={[]}
           onChange={() => {}}
           defaultValue="Assign Week"
           width={150}
-        />
+        /> */}
 
         {topic && topic.length > 0 ? (
           isLoadingTopics ? (

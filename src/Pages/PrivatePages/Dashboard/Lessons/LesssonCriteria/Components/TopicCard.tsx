@@ -59,6 +59,7 @@ export const TopicCard = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+
   const handleActivateSuccess = () => {
     toast.success("Successfully Activated topic", {
       position: "top-right",
