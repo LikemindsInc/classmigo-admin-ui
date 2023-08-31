@@ -59,5 +59,6 @@ declare module "@appModel" {
     subcription: ISubscription[];
     updatedAt: string;
     userName: string;
+    _id:string
   }
 }

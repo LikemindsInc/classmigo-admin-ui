@@ -64,7 +64,8 @@ const StyledTextArea = styled.textarea`
   border-radius: 5px;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
 
   &:focus {
     border: none;

@@ -7,10 +7,13 @@ import { ButtonElement } from "../../../../../../Ui_elements";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
-  id: number;
-  question: string;
-  options: any;
+  id?: number;
+  question?: string;
+  options?: any;
   answer?: any;
+  detailId?: any;
+  item?: any;
+  queryId?:string
 }
 
 export const QuestionCard = ({
@@ -19,32 +22,46 @@ export const QuestionCard = ({
   question,
   options,
   answer,
+  detailId,
+  item,
+  queryId
 }: QuestionCardProp) => {
+
   return (
     <Container>
       <QuestionHolder>
-        <Number>
+        {/* <Number>
           <p>{id}</p>
-        </Number>
+        </Number> */}
         <QuestionContainer>
           <h5>{question}</h5>
           <OptionsContainer>
             {options.map((option: any, index: number) => (
               <div key={index}>
-                <h6>{option.id}</h6>
-                <p>{option.label}</p>
+                <h6>{option.label}</h6>
+                <p>{option.value}</p>{" "}
               </div>
             ))}
           </OptionsContainer>
+          <Correct>Correct Answer: {answer}</Correct>
         </QuestionContainer>
       </QuestionHolder>
 
       <ImageContainer>
         <img src={imageUrl || Placeholder} alt="" />
-        <div>
-          <ButtonElement outline icon={<EditIcon />} label="Edit" />
-          <Delete />
-        </div>
+        {/* <div>
+          <ButtonElement
+            outline
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() =>
+              navigate(`/quiz_library/edit_question/${id}`, {
+                state: { id: detailId, item: item },
+              })
+            }
+          />
+          <Delete onClick={() => setOpen(!open)} />
+        </div> */}
       </ImageContainer>
     </Container>
   );
@@ -86,6 +103,13 @@ const QuestionHolder = styled.div`
   display: flex;
   gap: 20px;
 `
+
+const Correct = styled.h6`
+  color: var(--primary-color);
+  font-size: 1rem;
+`;
+
+
 const OptionsContainer = styled.div`
   margin-top: 1rem;
   cursor: pointer;
@@ -121,7 +145,11 @@ const OptionsContainer = styled.div`
 `;
 
 const ImageContainer = styled.div`
-
+  img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+  }
   > div {
     display: flex;
     gap: 1rem;

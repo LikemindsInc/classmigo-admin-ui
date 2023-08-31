@@ -66,14 +66,19 @@ const ScheduleLessons = () => {
     }
   }, [classValue, fetchSubject]);
 
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const activeSubjects  =  subjects?.data?.subjects.filter((item: any) => item.isActive);
+  // const activeTopics = topics?.data?.content.filter((item: any) => item.isActive);
+  
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
   const allSubjects = useMemo(() => {
-    return formatOptions(subjects?.data?.subjects, "name", "name");
-  }, [subjects?.data]);
+    return formatOptions(activeSubjects, "name", "name");
+  }, [activeSubjects]);
 
   useEffect(() => {
     if (topics?.data?.content) {

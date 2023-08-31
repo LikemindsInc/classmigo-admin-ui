@@ -2,20 +2,29 @@ import styled from "styled-components";
 import { SearchOutlined } from "@ant-design/icons";
 
 interface SearchProps {
-  onSearch?: () => void;
+  onSearch?: (e:any) => void;
+  value?:string
   width?: number;
 }
 
-export const SearchInput = ({ onSearch, width }: SearchProps) => {
+
+
+export const SearchInput = ({ onSearch, width, value }: SearchProps) => {
   return (
     <SearchContainer width={width}>
-      <input placeholder="search" />
+      <input placeholder="search" onChange={onSearch} value={value} />
       <div>
         <SearchIcon />
       </div>
     </SearchContainer>
   );
 };
+
+
+
+
+
+
 
 const SearchContainer = styled.div<{ width?: number }>`
   width: ${({ width }) => (width ? width + "px" : "100%")};

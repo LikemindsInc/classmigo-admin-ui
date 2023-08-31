@@ -40,9 +40,11 @@ const LiveSessions = () => {
     }
   );
 
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
   if (isLoadingLiveLessons) {
@@ -104,7 +106,7 @@ const LiveSessions = () => {
             </Upcoming>
             <Utilities>
               <PastHeader>Past Live Lessons</PastHeader>
-              <aside>
+              {/* <aside>
                 <Controller
                   name="class"
                   control={control}
@@ -132,7 +134,7 @@ const LiveSessions = () => {
                   )}
                 />
                 <ButtonElement label="View Videos" />
-              </aside>
+              </aside> */}
             </Utilities>
             <LiveSection>
               {liveLessons?.data.map((item: any, index: number) => {
@@ -163,9 +165,9 @@ const LiveSessions = () => {
         )}
       </Body>
 
-      <FabContainer
-        onClick={() => navigate("/live_lessons/schedule_session")}
-      >+</FabContainer>
+      <FabContainer onClick={() => navigate("/live_lessons/schedule_session")}>
+        +
+      </FabContainer>
     </Container>
   );
 };
@@ -194,7 +196,7 @@ const Body = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin-bottom:10rem;
+  margin-bottom: 10rem;
 `;
 
 const NoData = styled.div`
@@ -237,13 +239,13 @@ const FabContainer = styled.div`
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  &:hover{
+  &:hover {
     background-color: var(--primary-color);
     color: white;
   }
-  font-size:2rem;
+  font-size: 2rem;
   color: var(--primary-color);
-  font-weight:700;
+  font-weight: 700;
   bottom: 10%;
   right: 5%;
   width: 5rem;

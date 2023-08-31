@@ -12,8 +12,12 @@ import {
   SearchInput,
 } from "../../../../../Ui_elements";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
-import { useAPiPut, useApiGet } from "../../../../../custom-hooks";
-import { getParentDataUrl, toggleParentUrl } from "../../../../../Urls";
+import { useAPiPut, useApiGet, useApiPost } from "../../../../../custom-hooks";
+import {
+  getParentDataUrl,
+  toggleParentUrl,
+  unlinkStudentUrl,
+} from "../../../../../Urls";
 import { UserDetails } from "./Components/UserDetails";
 import { IStudent } from "@appModel";
 import { Avatar } from "@mui/material";
@@ -26,6 +30,21 @@ const Parents = () => {
   const [user, setUser] = useState<DataType | null>(null);
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
+  const [searchFilter, setSearchFilter] = useState<any>({
+    page: "",
+    pageSize: "",
+    search: "",
+  });
+
+  const handleSearchFilter = (e: any) => {
+    setTimeout(() => {
+      setSearchFilter((prev: any) => ({
+        ...prev,
+        search: e.target.value,
+      }));
+      fetchParent();
+    }, 1500);
+  };
 
   interface DataType {
     key: string;
@@ -79,7 +98,6 @@ const Parents = () => {
     setUser(data);
     setUserId(data?.key);
     setIsActive(data?.isActive);
-    console.log(data);
   };
 
   useEffect(() => {
@@ -117,10 +135,12 @@ const Parents = () => {
   const {
     data: parentData,
     isLoading: isLoadingParentData,
+    isFetching: isFetchingParentData,
     refetch: fetchParent,
-  } = useApiGet(["Parent data"], () => getParentDataUrl(), {
+  } = useApiGet(["Parent data"], () => getParentDataUrl(searchFilter), {
     refetchOnWindowFocus: false,
     enabled: true,
+    cacheTime: 0,
   });
 
   const { mutate: toggleParent, isLoading: isTogglingParent } = useAPiPut(
@@ -128,6 +148,38 @@ const Parents = () => {
     handleSuccess,
     handleError,
     ["parent-data"]
+  );
+
+
+  const { mutate: unlink, isLoading: isUnlinkingParent } = useApiPost(
+    user?.dependents ?
+      ()=> unlinkStudentUrl(
+        user?.key,
+        user?.dependents?.map((item) => [item._id])
+      )
+      : null,
+    () => {
+      toast.success(`Successfully unlinked`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    },
+    () => {
+      toast.error(`Something went wrong, couldn't unlink`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    }
   );
 
   useEffect(() => {
@@ -183,24 +235,25 @@ const Parents = () => {
 
   return (
     <Container>
-      {/* <UtilsHolder>
+      <UtilsHolder>
         <div>
-          <SearchInput />
-          <h6>2,500 Results</h6>
+          <SearchInput onSearch={handleSearchFilter} />
         </div>
         <button>
           Export
           <ExportIcon />
         </button>
-      </UtilsHolder> */}
+      </UtilsHolder>
       <TableElement
         columns={updatedColumns}
         data={parent || null}
-        loading={isLoadingParentData}
+        loading={isLoadingParentData || isFetchingParentData}
         pagination
         paginationData={parentData?.data?.pagination}
         fetchFunction={getParentDataUrl}
         fetchAction={fetchParent}
+        searchFilter={searchFilter}
+        setSearchFilter={setSearchFilter}
       />
 
       <Drawer
@@ -211,9 +264,6 @@ const Parents = () => {
         width={"25%"}
       >
         <DrawerContentContainer>
-          {/* <CancelContainer>
-            <CancelIcon />
-          </CancelContainer> */}
           <UserInfo>
             <Avatar
               sx={{
@@ -233,7 +283,6 @@ const Parents = () => {
               <ButtonElement width={84} outline label={"Update"} />
             </div>
           </UpdateDetails> */}
-
           <Details>
             <VerificationContainer>
               <h4>Verification</h4>
@@ -251,7 +300,13 @@ const Parents = () => {
                       {item.firstName} {item.lastName}
                     </h5>
                     <p>{item.phoneNumber}</p>
-                    <ButtonElement outline width={84} label={"Unlink"} />
+                    <ButtonElement
+                      outline
+                      isLoading={isUnlinkingParent}
+                      width={84}
+                      label={"Unlink"}
+                      onClick={unlink}
+                    />
                   </div>
                 ))
               ) : (
@@ -299,7 +354,7 @@ const UtilsHolder = styled.div`
     display: flex;
     align-items: center;
     gap: 1rem;
-    width: 50%;
+    width: 30%;
 
     @media ${devices.tabletL} {
       flex-direction: column;

@@ -43,12 +43,12 @@ export const columns: ColumnsType<DataType> = [
     dataIndex: "amount",
     key: "amount",
   },
-  {
-    title: "DATE PURCHASED",
-    render: (record: DataType) => (
-      <ToolTipElement>{record.datePurchased}</ToolTipElement>
-    ),
-  },
+  // {
+  //   title: "DATE PURCHASED",
+  //   render: (record: DataType) => (
+  //     <ToolTipElement>{record.datePurchased}</ToolTipElement>
+  //   ),
+  // },
   {
     title: "",
     dataIndex: "options",

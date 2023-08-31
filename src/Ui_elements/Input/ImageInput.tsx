@@ -11,6 +11,7 @@ interface ImageInputProps {
   register?: any;
   id?: string;
   error?: any;
+  defaultImage?: string;
 }
 
 export const ImageInput = ({
@@ -19,9 +20,10 @@ export const ImageInput = ({
   register,
   id,
   error,
+  defaultImage
 }: ImageInputProps) => {
   const fileInputRef = useRef<any>(null);
-  const [preview, setPreview] = useState("");
+  const [preview, setPreview] = useState(defaultImage || "");
 
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>

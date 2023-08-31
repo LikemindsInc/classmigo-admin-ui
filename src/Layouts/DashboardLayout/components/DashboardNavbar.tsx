@@ -2,21 +2,26 @@ import { styled } from "styled-components";
 import { NotificationIcon } from "../../../Assets/Svgs";
 import Avatar from "antd/es/avatar/avatar";
 import { UserOutlined } from "@ant-design/icons";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { NavbarContext, UserContext } from "../../../Contexts/Contexts";
 import { Popover } from "antd";
 import { Breadcrumbs } from "../../../Ui_elements";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getFirstRouteName } from "../../../utils/utilFns";
 
 export const DashboardNavbar = () => {
-  const { title } = useContext(NavbarContext);
+  const { title, setTitle } = useContext(NavbarContext);
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate()
   const logout = () => {
     setUser(null);
     navigate("/")
   };
+
+  useEffect(() => {
+    setTitle(getFirstRouteName(window.location.href))
+  },[setTitle])
 
   const content = (
     <Logout onClick={logout}>

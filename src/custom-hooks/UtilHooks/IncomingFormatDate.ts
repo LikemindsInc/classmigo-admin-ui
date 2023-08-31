@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 
-const useFormattedDate = (incomingDate: string): string => {
-  const [formattedDate, setFormattedDate] = useState('');
+const useFormattedDateTime = (incomingDateTime: string): string => {
+  const [formattedDateTime, setFormattedDateTime] = useState('');
 
   useEffect(() => {
-    const newDateTime = dayjs(incomingDate);
-    const formattedDateTime = newDateTime.format('MM/DD/YYYY hh:mm');
-    setFormattedDate(formattedDateTime);
-  }, [incomingDate]);
+    const newDateTime = dayjs(incomingDateTime);
+    const formattedDateTime = newDateTime.format('YYYY-MM-DDTHH:mm');
+    setFormattedDateTime(formattedDateTime);
+  }, [incomingDateTime]);
 
-  return formattedDate;
+  return formattedDateTime;
 };
 
-export default useFormattedDate;
+export default useFormattedDateTime;

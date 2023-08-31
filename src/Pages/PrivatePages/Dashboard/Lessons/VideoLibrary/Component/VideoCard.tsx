@@ -9,9 +9,10 @@ type VideoProps = {
   title?: string;
   index?: number;
   source: string;
-  details?:any
+  details?: any
+  classValue?:string
 };
-export const VideoCard = ({ title, index, source, details }: VideoProps) => {
+export const VideoCard = ({ title, index, source, details, classValue }: VideoProps) => {
   const navigate = useNavigate();
   return (
     <Container>
@@ -24,6 +25,7 @@ export const VideoCard = ({ title, index, source, details }: VideoProps) => {
           navigate(`/video_library/${title}`, {
             state: {
               details,
+              classValue:classValue,
               index: index,
             },
           })

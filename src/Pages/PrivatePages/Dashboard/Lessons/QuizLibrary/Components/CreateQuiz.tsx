@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import styled from "styled-components";
@@ -17,6 +17,7 @@ import {
 import { formatOptions } from "../../../../../../utils/utilFns";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createQuizSchema } from "../QuizLibrarySchema";
+import { ModalContext } from "../../../../../../Contexts/Contexts";
 
 export const CreateQuiz = () => {
   const {
@@ -29,6 +30,9 @@ export const CreateQuiz = () => {
   } = useForm({
     resolver: yupResolver(createQuizSchema),
   });
+
+  const { setOpenModal } = useContext(ModalContext);
+
 
   let classValue: any = watch("class");
   let subjectValue: any = watch("subject");
@@ -62,6 +66,7 @@ export const CreateQuiz = () => {
     setValue("name", " ");
     setValue("topic", "");
     setValue("difficulty", null as any);
+    setOpenModal(false);
   };
 
   const onError = (error: any) => {
@@ -118,23 +123,30 @@ export const CreateQuiz = () => {
     }
   }, [fetchTopic, subjectValue]);
 
+
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const activeSubjects  =  subjects?.data?.subjects.filter((item: any) => item.isActive);
+  const activeTopics  =  topics?.data?.content.filter((item: any) => item.isActive);
+
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
   const allSubjects = useMemo(() => {
-    return formatOptions(subjects?.data?.subjects, "name", "_id");
-  }, [subjects?.data]);
+    return formatOptions(activeSubjects, "name", "_id");
+  }, [activeSubjects]);
 
   const allTopics = useMemo(() => {
-    return formatOptions(topics?.data?.content, "lessonName", "_id");
-  }, [topics?.data]);
+    return formatOptions(activeTopics, "lessonName", "_id");
+  }, [activeTopics]);
 
   const { mutate: addQuiz, isLoading: isCreatingQuiz } = useApiPost(
     createQuizUrl,
     onSuccess,
-    onError
+    onError,
+    ["quizes"]
   );
 
   const onSubmit = (data: any) => {
@@ -217,11 +229,14 @@ export const CreateQuiz = () => {
 };
 
 const Container = styled.form`
-  width: 100%;
+  width: inherit;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+  input{
+    width:inherit !important;
+  }
 `;
 
 const ButtonContainer = styled.div`

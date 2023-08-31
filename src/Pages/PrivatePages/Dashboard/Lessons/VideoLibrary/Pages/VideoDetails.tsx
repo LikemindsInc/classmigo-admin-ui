@@ -62,6 +62,7 @@ const VideoDetails = () => {
     // console.log(data);
     const requestBody: any = {
       title: data.lessonName,
+      class: state.classValue?.value,
       file: data.video,
     };
 
@@ -80,32 +81,32 @@ const VideoDetails = () => {
           />
         </InputHolders>
 
-        <InputHolders>
+        {/* <InputHolders>
           <TextAreaInput
             label="Description"
             placeholder="Give a little description of the lesson "
             register={register}
             id="lessonDescription"
           />
-        </InputHolders>
+        </InputHolders> */}
 
         <InputHolders>
-          <p>Upload Video</p>
+          <p>Update Video</p>
           <ImageInput
-            title="Upload Video"
+            title="Update Video"
             type="video"
             id="video"
             register={register}
           />
         </InputHolders>
-        <ThumbnailSection>
+        {/* <ThumbnailSection>
           <h6>Thumbnail</h6>
           <p>Choose or upload an image to show what the video is about</p>
           <ThumbnailList>
             <ImageInput title="Upload Thumbnail" type="image" />
           </ThumbnailList>
-        </ThumbnailSection>
-        <ButtonElement label="Save" width={150} type="submit" />
+        </ThumbnailSection> */}
+        <ButtonElement label="Update" width={150} type="submit" />
       </DetailsContainer>
       <PreviewContainer>
         <h6>Preview</h6>

@@ -55,6 +55,13 @@ const LazyAskTheTeacher = lazy(
       "../../Pages/PrivatePages/Dashboard/Lessons/AskTheTeacher/AskTheTeacher"
     )
 );
+
+const LazyErrorPage = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Error/Error"
+    )
+);
 const LazyScheduleLiveLessons = lazy(
   () =>
     import(
@@ -98,6 +105,13 @@ const LazyQuizLibraryAddQuestion = lazy(
   () =>
     import(
       "../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/AddQuestion"
+    )
+);
+
+const LazyQuizLibraryEditQuestion = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/EditQuestion"
     )
 );
 
@@ -198,6 +212,10 @@ export const PrivateRoutes = () => {
       element: <LazyQuizLibraryAddQuestion />,
     },
     {
+      path: "/quiz_library/edit_question/:id",
+      element: <LazyQuizLibraryEditQuestion/>,
+    },
+    {
       path: "/schedule_lessons",
       element: <LazyScheduleLessons />,
     },
@@ -267,6 +285,10 @@ export const PrivateRoutes = () => {
     {
       path: "/admin-access/:id",
       element: <AdminDetail />,
+    },
+    {
+      path: "/*",
+      element: <LazyErrorPage/>,
     },
     
   ];

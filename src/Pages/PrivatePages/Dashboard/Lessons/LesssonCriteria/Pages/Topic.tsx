@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../Assets/noData.png";
 import { useLocation } from "react-router-dom";
@@ -13,6 +13,9 @@ import { AddIcon } from "../../../../../../Assets/Svgs";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { topicSchema } from "../LessonCriteriaSchema";
+import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
+import { ModalContext } from "../../../../../../Contexts/Contexts";
+import { CreateTopic } from "../Components/CreateTopic";
 
 const SelectTopic = () => {
   const [selectTopic, setSelecttopic] = useState<any>([]);
@@ -24,15 +27,8 @@ const SelectTopic = () => {
   const { scope, classTitle } = state;
   const dragTopic = useRef<any>(null);
   const dragOverTopic = useRef<any>(null);
+  const { setOpenModal } = useContext(ModalContext);
 
-  const handleDragSort = () => {
-    let items = [...selectTopic];
-    const draggedItem = items.splice(dragTopic.current, 1)[0];
-    items.splice(dragOverTopic.current, 0, draggedItem);
-    dragTopic.current = null;
-    dragOverTopic.current = null;
-    setSelecttopic(items);
-  };
 
   const PAGE_SIZE = 6;
 
@@ -44,17 +40,31 @@ const SelectTopic = () => {
   } = useForm({
     resolver: yupResolver(topicSchema),
   });
+
+  const handleDragSort = () => {
+    let items = [...selectTopic];
+    const draggedItem = items.splice(dragTopic.current, 1)[0];
+    items.splice(dragOverTopic.current, 0, draggedItem);
+    dragTopic.current = null;
+    dragOverTopic.current = null;
+    setSelecttopic(items);
+  };
+
   const handlePageChange = (e: any, p: number) => {
     setPage(p);
+  };
+
+  const handleCancel = () => {
+    setOpenModal(false);
   };
 
   const {
     data: topics,
     isLoading: isLoadingTopics,
     refetch: getLessons,
-  } = useApiGet(["lessons"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
+  } = useApiGet(["lessons-get-all"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
     refetchOnWindowFocus: true,
-    enabled: false,
+    enabled: true,
   });
 
   const handleSuccess = () => {
@@ -67,7 +77,7 @@ const SelectTopic = () => {
       draggable: true,
       theme: "light",
     });
-    getLessons()
+    getLessons();
   };
   const handleError = (error: any) => {
     toast.error(error?.message, {
@@ -101,30 +111,13 @@ const SelectTopic = () => {
     }
   }, [topics]);
 
-  const onSubmit = (data: any) => {
-    const requestBody: any = {
-      lessonName: data?.topic,
-      schoolSubject: scope,
-      studentClass: classTitle,
-    };
-    addTopic(requestBody);
-    setValue("topic", "")
-  };
   return (
-    <Container onSubmit={handleSubmit(onSubmit)}>
+    <Container>
       <Header>
-        <InputElement
-          label="Create Topic"
-          placeholder="Enter Topic"
-          register={register}
-          id="topic"
-          error={errors}
-        />
         <ButtonElement
           label="Add Topic"
           icon={<AddIcon />}
-          type="submit"
-          isLoading={isAddingTopic}
+          onClick={()=>setOpenModal(true)}
         />
       </Header>
       <Body>
@@ -159,7 +152,7 @@ const SelectTopic = () => {
                 id={item?._id}
                 index={index}
                 track={index}
-                active={item?.schoolSubject?.isActive}
+                active={item?.isActive}
                 onDragStart={() => (dragTopic.current = index)}
                 onDragEnter={() => (dragOverTopic.current = index)}
                 onDragEnd={handleDragSort}
@@ -181,13 +174,19 @@ const SelectTopic = () => {
           </CardContainer>
         )}
       </Body>
+      <Modal cancel={handleCancel} width={"35%"} title="Add Topic">
+        <CreateTopic
+          scope={scope}
+          classTitle={classTitle}
+        />
+      </Modal>
     </Container>
   );
 };
 
 export default SelectTopic;
 
-const Container = styled.form`
+const Container = styled.div`
   width: 100%;
   max-height: 85vh;
   height: 100%;
@@ -208,6 +207,7 @@ const Header = styled.div`
   display: flex;
   width: 100%;
   align-items: flex-end;
+  justify-content:flex-end;
   margin-bottom: 2rem;
   @media ${devices.tabletL} {
     flex-direction: column;
@@ -287,3 +287,4 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
+const Modal = styled(CenteredDialog)``;

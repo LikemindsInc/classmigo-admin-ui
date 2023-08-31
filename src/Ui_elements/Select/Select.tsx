@@ -31,7 +31,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectProps>(
     ref
   ) => {
     return (
-      <div ref={ref}>
+      <OuterContainer ref={ref}>
         <SelectContainer width={width}>
           <SelectElement
             placeholder={defaultValue}
@@ -50,13 +50,17 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectProps>(
             <p>{error?.message}</p>
           </ErrorContainer>
         ) : null}
-      </div>
+      </OuterContainer>
     );
   }
 );
 
 const SelectElement = styled(Select)`
   width: 100%;
+`;
+
+const OuterContainer = styled.div`
+  /* width: 100% !important; */
 `;
 const ErrorContainer = styled.div`
   display: flex;
@@ -72,7 +76,7 @@ const ErrorContainer = styled.div`
 `;
 
 const SelectContainer = styled.div<{ width: any }>`
-  width: ${({ width }) => (width ? width + "px" : "100%")};
+  width: ${({ width }) => (width ? width + "px" : "100% !important")};
   display: flex;
   gap: 5px;
   align-items: center;

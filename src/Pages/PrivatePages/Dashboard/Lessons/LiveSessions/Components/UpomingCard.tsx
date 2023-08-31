@@ -10,6 +10,7 @@ import {
 import { ButtonElement, Options, Tag } from "../../../../../../Ui_elements";
 import { cancelLiveLesson } from "../../../../../../Urls/LiveSessions";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 interface Props {
   topic: string;
@@ -23,6 +24,9 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const newTimeFormat = useFormattedDateTime(item?.date);
+  const currentTime = dayjs();
+  const targetTime = dayjs(item?.date);
+  const daysRemaining = targetTime.diff(currentTime, "day");
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -51,7 +55,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
       theme: "light",
     });
   };
-  
+
   const { mutate: cancelSession } = useApiPost(
     cancelLiveLesson,
     handleSuccess,
@@ -76,7 +80,13 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
             <p>{newTimeFormat?.formattedTime}</p>
           </Time>
           <Start>
-            <p>Starts in 5 Days</p>
+            {daysRemaining > 0 ? (
+              <p>
+                Starts in {daysRemaining} {daysRemaining === 1 ? "day" : "days"}
+              </p>
+            ) : (
+              <p>Event has already started</p>
+            )}
             <button id="basic-button" onClick={handleClick}>
               <MoreIcon />
             </button>
@@ -90,9 +100,11 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
               }}
             >
               <Item
-                onClick={()=>navigate("/live_lessons/schedule_session", {
-                  state: item
-                })}
+                onClick={() =>
+                  navigate("/live_lessons/schedule_session", {
+                    state: item,
+                  })
+                }
               >
                 Edit
               </Item>

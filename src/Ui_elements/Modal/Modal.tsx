@@ -9,6 +9,10 @@ interface ModalProps {
   width?: string | number;
   cancel: () => void;
   okay?: () => void;
+  cancelText?: string;
+  okText?: string
+  title?: string
+  openState?: boolean
 }
 
 export const CenteredDialog = ({
@@ -16,15 +20,22 @@ export const CenteredDialog = ({
   width,
   cancel,
   okay,
+  cancelText,
+  okText,
+  title,
+  openState
 }: ModalProps) => {
   const { openModal } = useContext(ModalContext);
   return (
     <StyledModal
       centered
-      open={openModal}
+      open={openModal || openState}
       width={width}
       onCancel={cancel}
       onOk={okay}
+      cancelText={cancelText}
+      okText={okText}
+      title={title}
     >
       {children}
     </StyledModal>
