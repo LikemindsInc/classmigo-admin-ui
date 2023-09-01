@@ -1,9 +1,10 @@
 import { Divider, Timeline } from "antd";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { ExportIcon } from "../../../../../Assets/Svgs";
 import {
   DatePickerInput,
+  ModalOptions,
   SearchInput,
   SelectInput,
 } from "../../../../../Ui_elements";
@@ -12,14 +13,81 @@ import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { columns, data } from "../../../../../utils/dummyDataPayments";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { ModalContext } from "../../../../../Contexts/Contexts";
+import { getPaymentDataUrl } from "../../../../../Urls/Payments";
+import { useApiGet } from "../../../../../custom-hooks";
+import { ColumnsType } from "antd/es/table";
+import { UserDetails } from "./Components/UserDetails";
+import { ToolTipElement } from "./Components/ToolTip";
+import { formatDate } from "../../../../../utils/utilFns";
+import moment from "moment";
 
 const Payments = () => {
   const { setOpenModal } = useContext(ModalContext);
+  const [payment, setPayment] = useState<DataType[]>([]);
+
+
   const headerStyle = {
     color: "gray",
     fontSize: "12px",
     fontWeight: 700,
   };
+
+
+  interface DataType {
+    key: string;
+    name: string;
+    image: string;
+    username: string;
+    class: string;
+    plan: string;
+    amount: number;
+    datePurchased: string;
+  }
+
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "NAME",
+      dataIndex: "name",
+      key: "name",
+      render: (name: string, record: DataType) => (
+        <UserDetails image={record.image} name={name} />
+      ),
+    },
+    {
+      title: "USERNAME",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "CLASS",
+      dataIndex: "class",
+      key: "class",
+    },
+    {
+      title: "PLAN",
+      dataIndex: "plan",
+      key: "plan",
+    },
+    {
+      title: "AMOUNT (NGN)",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
+      title: "DATE PURCHASED",
+      render: (record: DataType) => (
+        <ToolTipElement paymentDetails={record}>{record.datePurchased}</ToolTipElement>
+      ),
+    },
+    {
+      title: "",
+      dataIndex: "options",
+      key: "options",
+      render: () => <ModalOptions />,
+    },
+  ];
+  
   const updatedColumns = columns.map((column: any) => {
     let updatedColumn = { ...column };
 
@@ -45,7 +113,6 @@ const Payments = () => {
       default:
         break;
     }
-
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
@@ -129,6 +196,35 @@ const Payments = () => {
     setOpenModal(false);
   };
 
+  const {
+    data: paymentData,
+    isLoading: isLoadingPaymentData,
+    refetch: fetchPayment,
+  } = useApiGet(["Payment-data"], () => getPaymentDataUrl(), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
+
+
+  useEffect(() => {
+    if (paymentData) {
+      const newData = paymentData?.data?.map((item: any) => ({
+        key: item?._id,
+        name: `${item?.student?.firstName} ${item?.student?.lastName}`,
+        username: item?.student?.userName,
+        class: item?.className,
+        datePurchased: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
+        plan: item?.subscription?.friendlyName,
+        amount: item?.amount,
+        image: item?.student?.profileImageUrl,
+        subStart: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
+        subStop: moment(item?.nextDueDate).format("DD, MMM, YYYY"),
+      }))
+      setPayment(newData)
+    }
+  },[paymentData])
+
+
   return (
     <Container>
       <UtilsHolder>
@@ -154,7 +250,12 @@ const Payments = () => {
           <ExportIcon />
         </Button>
       </UtilsHolder>
-      <TableElement columns={updatedColumns} data={data} />
+      <TableElement
+        columns={updatedColumns}
+        data={payment}
+        loading={isLoadingPaymentData}
+        
+      />
       <Modal cancel={handleCancel} width={"80%"}>
         <TransactionHeader>
           <p>

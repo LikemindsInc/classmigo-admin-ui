@@ -76,6 +76,8 @@ const QuizDetails = () => {
                   imageUrl={item?.imageUrl}
                   answer={item?.correctOption}
                   detailId={item?._id}
+                  item={item}
+                  queryId={state}
                 />
               ))}
             </div>

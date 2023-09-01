@@ -12,7 +12,7 @@ import {
   TextAreaInput,
 } from "../../../../../../Ui_elements";
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
-import { addQuestionUrl } from "../../../../../../Urls";
+import { addQuestionUrl, updateQuizQuestionUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { convertToBase64, customPost } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
@@ -21,12 +21,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { uploadImageUrl } from "../../../../../../Urls/Utils";
 import { toast } from "react-toastify";
 
-const AddQuestion = () => {
-  const [selectedOption, setSelectedOption] = useState<any>(null);
+const EditQuestion = () => {
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const { setOpenModal } = useContext(ModalContext);
   const { state } = useLocation();
+  const { item } = state;
+  const [selectedOption, setSelectedOption] = useState<any>(item.correctOption);
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+
+  useEffect(() => {
+    const initialOption = ["A", "B", "C", "D"].indexOf(item.correctOption);
+    setSelectionOptionId(initialOption);
+  }, [item.correctOption]);
+
   const navigate = useNavigate();
   const handleCancel = () => {
     setOpenModal(false);
@@ -39,13 +46,20 @@ const AddQuestion = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(addQuestionSchema),
+    defaultValues: {
+      question: item?.question,
+      explanation: item?.explanation,
+      optionA: item?.options[0]?.value,
+      optionB: item?.options[1]?.value,
+      optionC: item?.options[2]?.value,
+      optionD: item?.options[3]?.value,
+      score: item?.score,
+    },
   });
-
-  console.log(errors, "error")
 
 
   const onSuccess = () => {
-    toast.success("Successfully added question", {
+    toast.success("Successfully edited question", {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -54,8 +68,8 @@ const AddQuestion = () => {
       draggable: true,
       theme: "light",
     });
-    navigate(-1)
-  }
+    navigate(-1);
+  };
 
   const onError = () => {
     toast.error("Something went wrong", {
@@ -67,19 +81,20 @@ const AddQuestion = () => {
       draggable: true,
       theme: "light",
     });
-  }
+  };
 
-  const { mutate: addQuestion, isLoading:isAddingQuestion } = useApiPost(
-    addQuestionUrl,
+  const { mutate: updateQuestion, isLoading: isUpdatingQuestion } = useApiPost(
+    (_: any) => updateQuizQuestionUrl(_, item?._id),
     onSuccess,
     onError
   );
 
   const onSubmit = async (data: any) => {
     const options = ["A", "B", "C", "D"];
-    console.log("I rean")
+
     const imageUploadUrl =
       "https://classmigo.herokuapp.com/api/v1/admin/upload";
+
     if (data?.image) {
       const formData = new FormData();
       formData.append("file", data?.image);
@@ -90,42 +105,32 @@ const AddQuestion = () => {
           setIsUploadingImage(false)
         }
         const requestBody: any = {
-          questions: [
-            {
-              question: data.question,
-              imageUrl: response?.data?.data?.url,
-              explanation: "You go explain tire",
-              options: options.map((label) => ({
-                label,
-                value: data[`option${label}`],
-              })),
-              correctOption: selectedOption,
-              score: data.score,
-            },
-          ],
-          quizId: state,
+          question: data.question,
+          imageUrl: response?.data?.data?.url,
+          options: options.map((label) => ({
+            label,
+            value: data[`option${label}`],
+          })),
+          correctOption: selectedOption,
+          explanation: data?.explanation,
+          score: data.score,
         };
-        addQuestion(requestBody);
+        updateQuestion(requestBody);
       } catch (e) {
         console.log(e);
       }
     } else {
       const requestBody: any = {
-        questions: [
-          {
-            question: data.question,
-            explanation: "You go explain tire",
-            options: options.map((label) => ({
-              label,
-              value: data[`option${label}`],
-            })),
-            correctOption: selectedOption,
-            score: data.score,
-          },
-        ],
-        quizId: state,
+        question: data.question,
+        options: options.map((label) => ({
+          label,
+          value: data[`option${label}`],
+        })),
+        correctOption: selectedOption,
+        explanation: data?.explanation,
+        score: data.score,
       };
-      addQuestion(requestBody);
+      updateQuestion(requestBody);
     }
   };
 
@@ -151,7 +156,12 @@ const AddQuestion = () => {
           />
         </InputHolder>
         <InputHolder>
-          <ImageInput type="image" register={register} id="image" />
+          <ImageInput
+            type="image"
+            register={register}
+            id="image"
+            defaultImage={item?.imageUrl}
+          />
         </InputHolder>
         <OptionsContainer>
           <h3>Select an Option:</h3>
@@ -180,17 +190,17 @@ const AddQuestion = () => {
             error={errors}
           />
           <ButtonElement
-            label="Add Question"
+            label="Edit Question"
             width={140}
             type="submit"
-            isLoading={isAddingQuestion || isUploadingImage}
+            isLoading={isUpdatingQuestion || isUploadingImage }
           />
         </ButtonHolder>
       </Container>
       <Modal cancel={handleCancel} width={"40%"}>
         <ModalContent>
           <UploadTick />
-          <p>Question Uploaded Successfully</p>
+          <p>Question Edited Successfully</p>
           <ButtonElement
             label="Done"
             width={100}
@@ -203,7 +213,7 @@ const AddQuestion = () => {
   );
 };
 
-export default AddQuestion;
+export default EditQuestion;
 
 const Container = styled.form`
   width: 100%;

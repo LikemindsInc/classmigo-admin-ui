@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import {
@@ -11,112 +11,95 @@ import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 import { QuestionCard } from "./Components/QuestionCard";
 import { useNavigate} from "react-router-dom";
+import { getAllClassesUrl, getAllQuizUrl } from "../../../../../Urls";
+import { useApiGet } from "../../../../../custom-hooks";
+import { formatOptions } from "../../../../../utils/utilFns";
+import { Controller, useForm } from "react-hook-form";
+import { debounce } from "lodash";
+
+
+type Filter = {
+  search: string
+  className: string
+}
 
 const GeneralKnowledge = () => {
   const { setOpenModal } = useContext(ModalContext);
-  const [questions, setQuestions] = useState <any>([
-    {
-      question:
-        "Two immiscible liquids with different boiling points can be separated by",
-      options: [
-        {
-          id: "A",
-          label: "The use of Separation Funnel",
-        },
-        {
-          id: "B",
-          label: "Evaporation",
-        },
-        {
-          id: "C",
-          label: "Distillation",
-        },
-        {
-          id: "D",
-          label: "Decantation",
-        },
-      ],
-      answer: {
-        id: "A",
-        label: "The use of Separation Funnel",
-      },
-      imageUrl: null,
-    },
+  const [questions, setQuestions] = useState<any>();
 
-    {
-      question:
-        "Two immiscible liquids with different boiling points can be separated by",
-      options: [
-        {
-          id: "A",
-          label: "The use of Separation Funnel",
-        },
-        {
-          id: "B",
-          label: "Evaporation",
-        },
-        {
-          id: "C",
-          label: "Distillation",
-        },
-        {
-          id: "D",
-          label: "Decantation",
-        },
-      ],
-      answer: {
-        id: "A",
-        label: "The use of Separation Funnel",
-      },
-      imageUrl: null,
-    },
 
-    {
-      question:
-        "Two immiscible liquids with different boiling points can be separated by",
-      options: [
-        {
-          id: "A",
-          label: "The use of Separation Funnel",
-        },
-        {
-          id: "B",
-          label: "Evaporation",
-        },
-        {
-          id: "C",
-          label: "Distillation",
-        },
-        {
-          id: "D",
-          label: "Decantation",
-        },
-      ],
-      answer: {
-        id: "A",
-        label: "The use of Separation Funnel",
-      },
-      imageUrl: null,
-    },
-  ]);
+  const { control, watch } = useForm();
+  const [searchFilter, setSearchFilter] = useState<Filter>({
+    search: "",
+    className:""
+  })
+  
 
-  const levelOptions = [
-    {
-      id: 0,
-      label: "Beginner",
-    },
-    {
-      id: 1,
-      label: "Intermediate",
-    },
-    {
-      id: 2,
-      label: "Advanced",
-    },
-  ];
+  const debouncedSearchFilterUpdate = debounce((value) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: value
+    }));
+  }, 1500);
 
-  const handleSearchFilter = (value: string) => {};
 
+
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  const {
+    data: generalQuiz,
+    isLoading: isLoadingQuizes,
+    refetch: fetchQuiz
+  } = useApiGet(
+    ["quizes"],
+    () => getAllQuizUrl(searchFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const allClasses = useMemo(
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
+  );
+
+
+  useEffect(() => {
+    if (generalQuiz) {
+      setQuestions(generalQuiz?.data?.content)
+    }
+  },[generalQuiz])
+
+
+
+  const handleSearchFilter = (e: any) => {
+    const searchValue = e.target.value
+    debouncedSearchFilterUpdate(searchValue);
+  };
+
+  const onClassSelect = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: value?.value,
+    }));
+    fetchQuiz()
+  };
+
+  useEffect(() => {
+    fetchQuiz()
+  }, [fetchQuiz, searchFilter])
+  
+
+  
   const navigate = useNavigate()
   // const handleOk = () => {
   //   setOpenModal(false);
@@ -133,12 +116,20 @@ const GeneralKnowledge = () => {
     <Container>
       <UtilsHolder>
         <div>
-          <SelectInput
-            options={levelOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Select Level"
-            width={160}
+          <Controller
+            name="className"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+              options={allClasses}
+              onChange={onClassSelect}
+              defaultValue="Select Level"
+              width={160}
+            />
+            )}
           />
+
           <ButtonElement
             icon={<CsvIcon />}
             label="Upload CSV"
@@ -157,23 +148,26 @@ const GeneralKnowledge = () => {
 
       <QuestionsContainer>
         <SearchContainer>
-          <SearchInput />
-          <p>250 Results</p>
+          <SearchInput
+            onSearch={handleSearchFilter}
+          />
+          {/* <p>250 Results</p> */}
         </SearchContainer>
         <Questions>
-          {questions.map((item:any, index:number) => (
-            <QuestionCard
-              id={index+1}
-              imageUrl={item?.imageUrl}
-              key={index}
-              question={item?.question}
-              options={item?.options}
-              answer={item?.answer}
-            />
-          ))}
-        </Questions>
+  { questions && questions.map((question: any, index: number) =>
+    question.questions.map((item: any, itemIndex: number) => (
+      <QuestionCard
+        id={index + 1}
+        imageUrl={item?.imageUrl}
+        key={itemIndex}
+        question={item?.question}
+        options={item?.options}
+        answer={item?.answer}
+      />
+    ))
+  )}
+</Questions>
       </QuestionsContainer>
-
       <Modal cancel={handleCancel} width={"40%"}>
         <ModalContent>
           <UploadTick />
@@ -239,7 +233,7 @@ const ModalContent = styled.div`
 `;
 
 const QuestionsContainer = styled.div`
-  padding: 0 10%;
+  padding: 0 20%;
 `;
 
 const SearchContainer = styled.div`

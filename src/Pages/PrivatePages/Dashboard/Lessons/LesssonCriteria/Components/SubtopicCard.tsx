@@ -27,7 +27,6 @@ export const SubtopicCard = ({
   parentItem,
   handleChange,
 }: Props) => {
-  console.log(active, "sub");
 
   const [localActive, setLocalActive] = useState(active)
 
@@ -35,7 +34,7 @@ export const SubtopicCard = ({
     
   })
   const handleActivateSuccess = () => {
-    toast.success("Successfully Activated topic", {
+    toast.success("Successfully Activated subtopic", {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -59,7 +58,7 @@ export const SubtopicCard = ({
     });
   };
   const handleDeactivateSuccess = () => {
-    toast.success("Successfully Deactivated topic", {
+    toast.success("Successfully Deactivated subtopic", {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -82,7 +81,7 @@ export const SubtopicCard = ({
     });
   };
   const queryClient = useQueryClient();
-  const { refetch: activateSubtopic, isFetching: isLoadingActivate } =
+  const { refetch: activateSubtopic } =
     useApiGet([`subject${indexCount}`], () => activateSubtopicUrl(id), {
       refetchOnWindowFocus: false,
       enabled: false,
@@ -90,7 +89,7 @@ export const SubtopicCard = ({
       onError: handleActivationError,
     });
 
-  const { refetch: deactivateSubtopic, isFetching: isLoadingDeactivate } =
+  const { refetch: deactivateSubtopic } =
     useApiGet([`subject${id}`], () => deactivateSubtopicUrl(id), {
       refetchOnWindowFocus: false,
       enabled: false,

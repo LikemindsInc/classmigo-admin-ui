@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import { DeleteIcon, EditIcon } from "../../../../../../Assets/Svgs";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -9,6 +9,8 @@ import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
 import caution from "../../../../../../Assets/caution.png";
 import { useApiPost } from "../../../../../../custom-hooks";
 import { deleteQuizQuestionUrl } from "../../../../../../Urls";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
@@ -17,6 +19,8 @@ interface QuestionCardProp {
   options?: any;
   answer?: any;
   detailId?: any;
+  item?: any;
+  queryId?:string
 }
 
 export const QuestionCard = ({
@@ -26,24 +30,43 @@ export const QuestionCard = ({
   options,
   answer,
   detailId,
+  item,
+  queryId
 }: QuestionCardProp) => {
-  const { setOpenModal } = useContext(ModalContext);
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
-  
-  const handleCancel = () => {
-    setOpenModal(false);
-  };
-
-  const handleOk = () => {
-    setOpenModal(false);
-  };
-
-  const { mutate: deleteQuestion } = useApiPost(
+  const { mutate: deleteQuestion, isLoading: isDeletingQuestion } = useApiPost(
     deleteQuizQuestionUrl,
-    () => {},
-    () => {}
+    () => {
+      toast.success(`Successfully deleted question`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      setOpen(!open)
+    },
+    () => {
+      toast.error(`Successfully deleted question`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    },
+    [`quiz${queryId}`]
   );
 
+  const handleDelete = (quizId: any) => {
+    deleteQuestion(quizId);
+  };
 
   return (
     <Container>
@@ -68,22 +91,40 @@ export const QuestionCard = ({
       <ImageContainer>
         <img src={imageUrl || Placeholder} alt="" />
         <div>
-          <ButtonElement outline icon={<EditIcon />} label="Edit" />
-          <Delete onClick={()=>deleteQuestion(detailId)} />
+          <ButtonElement
+            outline
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() =>
+              navigate(`/quiz_library/edit_question/${id}`, {
+                state: { id: detailId, item: item },
+              })
+            }
+          />
+          <Delete onClick={() => setOpen(!open)} />
         </div>
       </ImageContainer>
 
-      {/* <Modal okay={handleOk} cancel={handleCancel} width={"40%"}>
+      <Modal
+        title="Delete Quiz?"
+        okText="Delete"
+        cancelText="Cancel"
+        // okay={() => handleDelete(quizId)}
+        cancel={() => setOpen(false)}
+        openState={open}
+      >
         <ModalContent>
-          <img src={caution} alt="" />
-          <p>Question Uploaded Successfully</p>
-          <ButtonElement
-            label="Done"
-            width={100}
-            onClick={() => setOpenModal(false)}
-          />
+          <p>Are you sure you want to delete this quiz?</p>
+          <div>
+            <ButtonElement outline label="No" onClick={() => setOpen(false)} />
+            <ButtonElement
+              label="Delete"
+              onClick={() => handleDelete(detailId)}
+              isLoading={isDeletingQuestion}
+            />
+          </div>
         </ModalContent>
-      </Modal> */}
+      </Modal>
     </Container>
   );
 };
@@ -159,8 +200,9 @@ const OptionsContainer = styled.div`
 
 const ImageContainer = styled.div`
   img {
-    width: inherit;
+    width: 200px;
     height: 100px;
+    object-fit: cover;
   }
   > div {
     display: flex;
@@ -188,12 +230,14 @@ const Correct = styled.h6`
 
 const Modal = styled(CenteredDialog)``;
 const ModalContent = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 1.5rem;
-
+  text-align: center;
   p {
-    font-weight: 600;
+    margin: 10% 0;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 `;

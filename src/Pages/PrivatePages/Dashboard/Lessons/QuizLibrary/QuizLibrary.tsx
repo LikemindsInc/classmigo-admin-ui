@@ -14,7 +14,6 @@ import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { getAllClassesUrl, getAllQuizUrl } from "../../../../../Urls";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { CreateQuiz } from "./Components/CreateQuiz";
-import { QuestionCard } from "./Components/QuestionCard";
 import { Card } from "./Components/QuizCard";
 import { Skeleton } from "@mui/material";
 import noData from "../../../../../Assets/noData.png";
@@ -24,6 +23,7 @@ import { Controller, useForm } from "react-hook-form";
 const QuizLibrary = () => {
   const navigate = useNavigate();
   const { setOpenModal } = useContext(ModalContext);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [quiz, setQuiz] = useState<any>([]);
   const handleCancel = () => {
     setOpenModal(false);
@@ -44,20 +44,24 @@ const QuizLibrary = () => {
     }
   );
 
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
 
   const { data: quizes, isLoading: isLoadingQuizes, refetch:fetchQuiz } = useApiGet(
     ["quizes"],
-    () => getAllQuizUrl(classValue && classValue?.value),
+    () => getAllQuizUrl(),
     {
       refetchOnWindowFocus: false,
       enabled: true,
     }
   );
+
 
   useEffect(() => {
     if (classValue) {
@@ -70,6 +74,7 @@ const QuizLibrary = () => {
       setQuiz(quizes?.data?.content);
     }
   }, [quizes]);
+
 
   return (
     <>
@@ -131,6 +136,10 @@ const QuizLibrary = () => {
           </QuestionsContainer>
         </Body>
       </Container>
+{/* 
+      <Modal cancel={handleCancel} width={"35%"}>
+        <CreateQuiz />
+      </Modal> */}
 
       <Modal cancel={handleCancel} width={"35%"}>
         <CreateQuiz />

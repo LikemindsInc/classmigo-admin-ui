@@ -2,35 +2,33 @@ import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import {
   ButtonElement,
-  InputElement,
   Options,
   SearchInput,
   SelectInput,
 } from "../../../../../Ui_elements";
-import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
-import { Drawer, Empty, Switch, Tag } from "antd";
+import { ExportIcon } from "../../../../../Assets/Svgs";
+import { Drawer, Empty } from "antd";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
 import { DrawerContext } from "../../../../../Contexts/Contexts";
 import {
   getStudentDataUrl,
   toggleStudentUrl,
+  unlinkParentUrl,
 } from "../../../../../Urls/Students";
-import { useAPiPut, useApiGet, useApiPost } from "../../../../../custom-hooks";
+import { useAPiPut, useApiGet } from "../../../../../custom-hooks";
 import { UserDetails } from "./Components/UserDetails";
 import { ColumnsType } from "antd/es/table";
 import { IParent, ISubscription } from "@appModel";
 import moment from "moment";
 import { Controller, useForm } from "react-hook-form";
-import {
-  activateSubjectUrl,
-  deactivateSubjectUrl,
-  getAllClassesUrl,
-} from "../../../../../Urls";
+import { getAllClassesUrl } from "../../../../../Urls";
 import { formatOptions } from "../../../../../utils/utilFns";
 import { Avatar } from "@mui/material";
 import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
 import { toast } from "react-toastify";
+import { debounce } from "lodash";
+
 const Students = () => {
   //drawer handler
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
@@ -38,12 +36,60 @@ const Students = () => {
   const [user, setUser] = useState<DataType | null>(null);
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
+  const [searchFilter, setSearchFilter] = useState<any>({
+    page: "",
+    pageSize: "",
+    search: "",
+    className: "",
+    isSubscribed: null,
+    isActive:null
+  });
+  const { control } = useForm();
 
-  const { control, watch } = useForm();
 
+  const debouncedSearchFilterUpdate = debounce((value) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: value
+    }));
+  }, 1500);
+
+
+  const handleSearchFilter = (e:any) => {
+    const searchValue = e.target.value
+    debouncedSearchFilterUpdate(searchValue);
+  }
+
+  const onSelectVerified = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      isActive: value?.value,
+    }));
+    fetchStudent()
+  };
+
+  const onSelectSubscription = (value:any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      isSubscribed: value?.value,
+    }));
+    fetchStudent()
+  }
+
+  const onSelectClassname = (value:any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: value?.value,
+    }));
+    fetchStudent()
+  }
+
+  
+  
   useEffect(() => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
+
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -54,21 +100,26 @@ const Students = () => {
     }
   );
 
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
   const handleSuccess = () => {
-    toast.success(isActive ? `Successfully deactivated` : `Successfully activated`, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
+    toast.success(
+      isActive ? `Successfully deactivated` : `Successfully activated`,
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      }
+    );
     setIsActive(!isActive);
   };
 
@@ -83,22 +134,58 @@ const Students = () => {
       theme: "light",
     });
   };
-  const { mutate: toggleStudent, isLoading: isTogglingStudent } =
-    useAPiPut(
-      (_: any) => toggleStudentUrl(_, userId),
-      handleSuccess,
-      handleError,
-      ["Student-data"]
-    );
+
+  const { mutate: toggleStudent } = useAPiPut(
+    (_: any) => toggleStudentUrl(_, userId),
+    handleSuccess,
+    handleError,
+    ["Student-data"]
+  );
+
 
   const {
     data: studentData,
     isLoading: isLoadingStudentData,
+    isFetching:isFetchingStudentData,
     refetch: fetchStudent,
-  } = useApiGet(["Student-data"], () => getStudentDataUrl(), {
+  } = useApiGet(["Student-data"], () => getStudentDataUrl(searchFilter), {
     refetchOnWindowFocus: false,
     enabled: true,
+    cacheTime:0
   });
+
+  const { refetch: link } = useApiGet(
+    ["unlink-parent"],
+    ()=>  unlinkParentUrl(user?.key, user?.parent?._id),
+    {
+      enabled: false,
+      refetchOnWindowFocus: false,
+      onSuccess: () => { 
+        toast.success(`Successfully unlinked Parent`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+        setOpenDrawer(false)
+        fetchStudent()
+      },
+      onError: () => { 
+        toast.error(`Something went wrong, could not unlink parent`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+      },
+    },
+  )
 
   useEffect(() => {
     setIsActive(user?.isActive || false);
@@ -172,6 +259,7 @@ const Students = () => {
       dataIndex: "phoneNumber",
       key: "phoneNumber",
       ellipsis: true,
+      
     },
     {
       title: "STATUS",
@@ -235,96 +323,104 @@ const Students = () => {
   });
 
   const handleRowClick = (data: DataType) => {
+    console.log(data, "jjjj")
     setUser(data);
     setUserId(data?.key);
     setIsActive(data?.isActive);
   };
 
+
   const statusOptions = [
     {
-      value: 0,
+      value: true,
       label: "Verified",
     },
     {
-      value: 1,
+      value: false,
       label: "Unverified",
     },
   ];
 
   const subscribeOptions = [
     {
-      value: 0,
+      value: true,
       label: "Subscribed",
     },
     {
-      value: 1,
+      value: false,
       label: "Unsubscribed",
     },
   ];
 
-  //   <UtilsHolder>
-  //   <div>
-  //     <SearchInput />
-  //     <Controller
-  //       name="className"
-  //       control={control}
-  //       render={({ field }) => (
-  //         <SelectInput
-  //           {...field}
-  //           options={allClasses}
-  //           onChange={handleSearchFilter}
-  //           defaultValue="Class"
-  //           width={300}
-  //         />
-  //       )}
-  //     />
-  //     <Controller
-  //       name="status"
-  //       control={control}
-  //       render={({ field }) => (
-  //         <SelectInput
-  //           {...field}
-  //           options={statusOptions}
-  //           onChange={handleSearchFilter}
-  //           defaultValue="Status"
-  //           width={300}
-  //         />
-  //       )}
-  //     />
-
-  //     <Controller
-  //       name="className"
-  //       control={control}
-  //       render={({ field }) => (
-  //         <SelectInput
-  //           {...field}
-  //           options={subscribeOptions}
-  //           onChange={handleSearchFilter}
-  //           defaultValue="Subscription"
-  //           width={300}
-  //         />
-  //       )}
-  //     />
-
-  //     {/* <h6>2,500 Results</h6> */}
-  //   </div>
-  //   <button>
-  //     Export
-  //     <ExportIcon />
-  //   </button>
-  // </UtilsHolder>
   return (
     <Container>
+      <UtilsHolder>
+        <div>
+          <SearchInput
+            // value={searchValue}
+            onSearch={handleSearchFilter}
+          />
+          <Controller
+            name="className"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={allClasses}
+                onChange={onSelectClassname}
+                defaultValue="Class"
+                width={200}
+                isLoading={isLoadingClasses}
+              />
+            )}
+          />
+          <Controller
+            name="status"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={statusOptions}
+                onChange={onSelectVerified}
+                defaultValue="Status"
+                width={200}
+              />
+            )}
+          />
+
+          <Controller
+            name="subscription"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                {...field}
+                options={subscribeOptions}
+                onChange={onSelectSubscription}
+                defaultValue="Subscription"
+                width={200}
+              />
+            )}
+          />
+
+          {/* <h6>2,500 Results</h6> */}
+        </div>
+        <button>
+          Export
+          <ExportIcon />
+        </button>
+      </UtilsHolder>
+
       <TableElement
-        loading={isLoadingStudentData}
+        loading={isLoadingStudentData || isFetchingStudentData}
         columns={updatedColumns}
         data={student || null}
         pagination
         paginationData={studentData?.data?.pagination}
         fetchFunction={getStudentDataUrl}
         fetchAction={fetchStudent}
+        setSearchFilter={setSearchFilter}
+        searchFilter={searchFilter}
       />
-
       <Drawer
         placement="right"
         onClose={() => setOpenDrawer(false)}
@@ -405,7 +501,12 @@ const Students = () => {
                   <h5>{user?.parent?.fullName}</h5>
                   <p>{user?.parent?.email}</p>
                   <p>{user?.parent?.phoneNumber}</p>
-                  <ButtonElement outline width={84} label={"Unlink"} />
+                  <ButtonElement
+                    outline
+                    width={84}
+                    label={"Unlink"}
+                    onClick={()=>link()}
+                  />
                 </>
               ) : (
                 <Empty />
@@ -453,7 +554,7 @@ const UtilsHolder = styled.div`
     display: flex;
     align-items: center;
     gap: 1rem;
-    width: 65%;
+    width: 80%;
 
     @media ${devices.tabletL} {
       flex-direction: column;

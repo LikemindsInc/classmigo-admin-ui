@@ -6,6 +6,8 @@ interface TableProps {
   data: any;
   paginationData: any;
   loading: boolean;
+  searchFilter: any
+  setSearchFilter:any
   fetchFunction?: () => void;
   fetchAction?:()=>void
 }
@@ -16,44 +18,46 @@ export const TableElement = ({
   paginationData,
   loading,
   fetchFunction,
+  searchFilter,
+  setSearchFilter,
   fetchAction
 }: TableProps | any) => {
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total:paginationData?.numberOfPages
-  });
+  const [pagination, setPagination] = useState<any>();
 
   useEffect(() => {
     if (paginationData) {
-      setPagination((prevPagination: any) => ({
-        ...prevPagination,
-        pageSize: paginationData.totalDocs,
-      }));
+      setPagination({
+        current: paginationData?.page,
+        pageSize: paginationData?.perPage,
+        total: paginationData?.totalDocs
+      });
     }
   }, [paginationData]);
 
   const handlePagination = (page: number) => {
-    console.log(page,"page")
-    setPagination((prevPagination) => ({
-      ...prevPagination,
-      current: page,
-    }));
-
-    if (fetchFunction) {
-      fetchAction()
-      fetchFunction(page, pagination.pageSize);
-    }
+    setSearchFilter((prev: any) => (
+      {
+        ...prev,
+        page: page,
+        pageSize: pagination?.pageSize
+      }));
   };
+
+  useEffect(() => {
+    if (fetchFunction) {
+      fetchAction();
+      fetchFunction(searchFilter);
+    }
+  },[fetchAction, fetchFunction, searchFilter])
 
   return (
     <Table
       sortDirections={["ascend"]}
-      pagination={{
+      pagination={pagination && {
         total: pagination.total,
-        pageSize: 10,
+        pageSize: pagination.pageSize,
         current: pagination.current,
-        onChange: (page) => {handlePagination(page)},
+        onChange: (page) => { handlePagination(page); },
       }}
       size="large"
       loading={loading}

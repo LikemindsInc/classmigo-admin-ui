@@ -36,7 +36,9 @@ import { ReactComponent as MicIcon } from '../Svgs/VideoCallIcons/mic.svg';
 import { ReactComponent as VideosIcon} from '../Svgs/VideoCallIcons/video.svg';
 import { ReactComponent as ShareIcon} from '../Svgs/VideoCallIcons/sharedScreen.svg';
 import { ReactComponent as ArtBoardIcon} from '../Svgs/VideoCallIcons/artBoard.svg';
-import { ReactComponent as EndIcon} from '../Svgs/VideoCallIcons/endCall.svg';
+import { ReactComponent as EndIcon } from '../Svgs/VideoCallIcons/endCall.svg';
+import { ReactComponent as Disconnected} from '../Error_404.svg';
+
 
 
 
@@ -84,5 +86,6 @@ export {
     VideosIcon,
     ShareIcon,
     ArtBoardIcon,
-    EndIcon
+    EndIcon,
+    Disconnected
 }

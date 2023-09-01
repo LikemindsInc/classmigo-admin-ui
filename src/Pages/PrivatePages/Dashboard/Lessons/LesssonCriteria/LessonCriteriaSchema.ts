@@ -6,7 +6,7 @@ export const classSchema = yup.object().shape({
     .string()
     .test(
       "text name",
-      "Class must be a string not a number",
+      `Subject must be a string, not contain "/", or not a number`,
       checkforValidString
     )
     .nullable()
@@ -18,7 +18,7 @@ export const subjectSchema = yup.object().shape({
     .string()
     .test(
       "text name",
-      "Subject must be a string not a number",
+      `Subject must be a string, not contain "/", or not a number`,
       checkforValidString
     )
     .nullable()
@@ -30,10 +30,16 @@ export const topicSchema = yup.object().shape({
     .string()
     .test(
       "text name",
-      "Subject must be a string not a number",
+      `Subject must be a string, not contain "/", or not a number`,
       checkforValidString
     )
     .nullable()
+    .required("Please enter a subject"),
+    description: yup
+    .string()
+    .required("Please enter a description"),
+    video: yup
+    .mixed()
     .required("Please enter a subject"),
 });
 
@@ -42,7 +48,7 @@ export const subTopicSchema = yup.object().shape({
     .string()
     .test(
       "text name",
-      "Subject must be a string not a number",
+      `Subject must be a string, not contain "/", or not a number`,
       checkforValidString
     )
     .nullable()

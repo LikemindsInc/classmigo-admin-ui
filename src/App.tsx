@@ -12,9 +12,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useContext } from "react";
 import { UserContext } from "./Contexts/Contexts";
 import { ToastContainer } from "react-toastify";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useIsOnline } from "./custom-hooks";
+import Error from "./Pages/PrivatePages/Dashboard/Error/Error";
 
 function App() {
   const { user } = useContext(UserContext);
+  const isOnline = useIsOnline();
   const queryClient = new QueryClient();
 
   const customTheme = createTheme({
@@ -40,13 +44,23 @@ function App() {
           <NavbarContextProvider>
             <DrawerContextProvider>
               <ModalContextProvider>
-                {user ? <PrivateRoutes /> : <SharedRoutes />}
+                {isOnline ? (
+                  user ? (
+                    <PrivateRoutes />
+                  ) : (
+                    <SharedRoutes />
+                  )
+                ) : (
+                  <Error />
+                )}
+
                 <ToastContainer />
               </ModalContextProvider>
             </DrawerContextProvider>
           </NavbarContextProvider>
         </ThemeProvider>
       </LocalizationProvider>
+      <ReactQueryDevtools initialIsOpen={true} position="bottom-right" />
     </QueryClientProvider>
   );
 }

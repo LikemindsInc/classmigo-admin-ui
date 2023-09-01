@@ -5,7 +5,10 @@ import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { useApiPost } from "../../../../../../custom-hooks";
 import { deleteQuiz } from "../../../../../../Urls";
 import { toast } from "react-toastify";
-import { Spinner } from "../../../../../../Ui_elements";
+import { ButtonElement, Spinner } from "../../../../../../Ui_elements";
+import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
+import { useContext, useState } from "react";
+import { ModalContext } from "../../../../../../Contexts/Contexts";
 
 interface Props {
   quizId?: number | string;
@@ -13,6 +16,7 @@ interface Props {
 }
 export const Card = ({ quizId, details }: Props) => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const onSuccess = () => {
     toast.success("Successfully Deleted Quiz", {
@@ -24,10 +28,11 @@ export const Card = ({ quizId, details }: Props) => {
       draggable: true,
       theme: "light",
     });
+    setOpen(false);
   };
 
   const onError = (error: any) => {
-    toast.error(`Something went wrong, coudln't delete quiz: ${error}`, {
+    toast.error(`Something went wrong, couldn't delete quiz: ${error}`, {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -68,9 +73,29 @@ export const Card = ({ quizId, details }: Props) => {
         {isDeletingQuiz ? (
           <Spinner color="var(--primary-color)" />
         ) : (
-          <Delete onClick={() => handleDelete(quizId)} />
+          <Delete onClick={() => setOpen(true)} />
         )}
       </>
+      <Modal
+        title="Delete Quiz?"
+        okText="Delete"
+        cancelText="Cancel"
+        // okay={() => handleDelete(quizId)}
+        cancel={() => setOpen(false)}
+        openState={open}
+      >
+        <ModalContent>
+          <p>Are you sure you want to delete this quiz?</p>
+          <div>
+            <ButtonElement outline label="No" onClick={() => setOpen(false)} />
+            <ButtonElement
+              label="Delete"
+              onClick={() => handleDelete(quizId)}
+              isLoading={isDeletingQuiz}
+            />
+          </div>
+        </ModalContent>
+      </Modal>
     </OuterContainer>
   );
 };
@@ -143,4 +168,19 @@ const OuterContainer = styled.div`
 const Delete = styled(DeleteOutlined)`
   cursor: pointer;
   color: red;
+`;
+
+const Modal = styled(CenteredDialog)``;
+
+const ModalContent = styled.div`
+  text-align: center;
+  p {
+    margin: 10% 0;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 `;

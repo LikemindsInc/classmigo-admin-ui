@@ -2,13 +2,15 @@ import React from 'react'
 import { styled } from 'styled-components';
 import { Tooltip } from 'antd';
 
-export const ToolTipElement = ({ children }) => {
+
+export const ToolTipElement = ({ children, paymentDetails }) => {
+    console.log(paymentDetails, "mkmm");
     const Details = () => (
         <Container>
             <h6>Subscription Details</h6>
-            <h6>SS1 <span>3 Months</span></h6>
-            <p>Subscription Started: 01/08/2023</p>
-            <p>Subscription End: 32/10/2023</p>
+            <h6>{paymentDetails?.class} <span>{paymentDetails?.plan}</span></h6>
+            <p>Subscription Started: {paymentDetails?.subStart}</p>
+            <p>Subscription End: {paymentDetails?.subStop}</p>
         </Container>
     );
 
@@ -16,7 +18,7 @@ export const ToolTipElement = ({ children }) => {
         <ToolContainer>
             <Tooltip
                 placement="bottom"
-                title={<Details/>}
+                title={<Details />}
                 autoAdjustOverflow={true}
                 destroyTooltipOnHide={true}
                 overlayStyle={{
@@ -24,10 +26,10 @@ export const ToolTipElement = ({ children }) => {
                     background: '#7B31B2',
 
                     borderRadius: '14px',
-                    padding: 0, 
+                    padding: 0,
                     color: 'white',
                     borderColor: "#7B31B2",
-                    outline:"none"
+                    outline: "none"
                 }}
             >
                 <DataInfo>{children}</DataInfo>
@@ -56,6 +58,7 @@ const Container = styled.div`
 `
 const DataInfo = styled.p`
     cursor: pointer;
+    font-size: 0.8rem;
 `
 const ToolContainer = styled.div`
   .ant-tooltip-inner {

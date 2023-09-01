@@ -17,11 +17,11 @@ export const createQuizUrl = (data: any) => {
   });
 };
 
-export const getAllQuizUrl = (classParam: string) => {
+export const getAllQuizUrl = (filter?:any) => {
   return request({
     url: `${ADMIN_BASE_URL}/quiz/get-all`,
     method: "GET",
-    params: { className: classParam },
+    params: { ...filter },
   });
 };
 export const getQuizQuestions = (id: string | number) => {
@@ -42,5 +42,13 @@ export const  deleteQuizQuestionUrl = (id: string | number) => {
   return request({
     url: `${ADMIN_BASE_URL}/quiz/question/${id}`,
     method: "DELETE",
+  });
+};
+
+export const  updateQuizQuestionUrl = (data:any, id: string | number) => {
+  return request({
+    url: `${ADMIN_BASE_URL}/quiz/question/${id}/update`,
+    method: "PATCH",
+    data: data
   });
 };

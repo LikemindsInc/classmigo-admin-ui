@@ -20,17 +20,21 @@ export const DateTimePickerElement = ({
   defaultValue,
 }: Props) => {
   console.log(defaultValue, "llopp")
-  const incomingDateFormat = useFormattedDate(defaultValue)
-  console.log(incomingDateFormat, "Incoming")
+  const [incomingDateFormat, setIncomingDateFormat] = useState<any>(dayjs(defaultValue));
+  const usefulDate = useFormattedDate(defaultValue);
+  // console.log(incomingDateFormat, "Incoming")
+
 
   return (
     <Container>
-      <Input
+      <Picker
         label="Enter time and date"
         onChange={(newValue) => {
           setValue(id, newValue);
         }}
+        minDate={dayjs(new Date())}
         defaultValue={incomingDateFormat}
+        
       />
       {error ? (
         <ErrorContainer>
@@ -44,7 +48,7 @@ export const DateTimePickerElement = ({
 
 const Container = styled.div``;
 
-const Input = styled(DateTimePicker)`
+const Picker = styled(DateTimePicker)`
   &:focus {
     label {
       color: var(--primary-color);

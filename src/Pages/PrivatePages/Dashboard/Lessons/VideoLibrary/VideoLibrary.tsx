@@ -76,18 +76,23 @@ const VideoLibrary = () => {
     }
   }, [fetchTopic, setValue, subjectValue]);
 
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const activeSubjects  =  subjects?.data?.subjects.filter((item: any) => item.isActive);
+  const activeTopics  =  topics?.data?.content.filter((item: any) => item.isActive);
+
+
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
   const allSubjects = useMemo(() => {
-    return formatOptions(subjects?.data?.subjects, "name", "name");
-  }, [subjects?.data]);
+    return formatOptions(activeSubjects, "name", "name");
+  }, [activeSubjects]);
 
   const allTopics = useMemo(() => {
-    return formatOptions(topics?.data?.content, "lessonName", "_id");
-  }, [topics?.data]);
+    return formatOptions(activeTopics, "lessonName", "_id");
+  }, [activeTopics]);
 
   useEffect(() => {
     if (allVideos) {
@@ -173,6 +178,7 @@ const VideoLibrary = () => {
                 key={index}
                 source={item?.videoUrl}
                 details={item}
+                classValue={classValue}
               />
             ))
           ) : (

@@ -2,6 +2,7 @@ import * as yup from "yup";
 
 export const addQuestionSchema = yup.object().shape({
   question: yup.string().required("Please enter a question"),
+  explanation: yup.string().required("Please enter an explanation"),
   optionA: yup.string().required("Please enter an option"),
   optionB: yup.string().required("Please enter an option"),
   optionC: yup.string().required("Please enter an option"),

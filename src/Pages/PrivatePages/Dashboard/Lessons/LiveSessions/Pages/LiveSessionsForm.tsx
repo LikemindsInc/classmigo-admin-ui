@@ -22,6 +22,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { liveSessionSchema } from "../LiveSessionsSchema";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DateTimePickerElement } from "../../../../../../Ui_elements/Input/dateTimePicker";
+import dayjs from 'dayjs';
 const LiveSessionsForm = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -50,7 +51,7 @@ const LiveSessionsForm = () => {
 
   useEffect(() => {
     if (state) {
-      setParsedDate((state.date));
+      setParsedDate(state.date);
     }
   }, [state]);
 
@@ -138,14 +139,18 @@ const LiveSessionsForm = () => {
   const { mutate: createLiveLesson, isLoading: isCreatingLiveLesson } =
     useApiPost(createLiveLessonUrl, onSuccess, onError, ["classes"]);
 
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const activeSubjects =
+    subjects && subjects?.data?.subjects.filter((item: any) => item.isActive);
+
   const allClasses = useMemo(
-    () => formatOptions(classes?.data, "value", "name"),
-    [classes?.data]
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
   );
 
   const allSubjects = useMemo(() => {
-    return formatOptions(subjects?.data?.subjects, "name", "name");
-  }, [subjects?.data]);
+    return formatOptions(subjects?.data, "name", "name");
+  }, [activeSubjects]);
 
   const handleUpdate = (data: any) => {
     const requestBody: any = {

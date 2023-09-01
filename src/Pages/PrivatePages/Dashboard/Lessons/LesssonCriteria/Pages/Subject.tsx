@@ -31,17 +31,17 @@ const SelectSubject = () => {
     resolver: yupResolver(subjectSchema),
   });
 
-  const handleSuccess = () => {
-    toast.success("Successfully Updated", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-  };
+  // const handleSuccess = () => {
+  //   toast.success("Successfully Updated", {
+  //     position: "top-right",
+  //     autoClose: 3000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: false,
+  //     draggable: true,
+  //     theme: "light",
+  //   });
+  // };
 
   const handleError = (error: any) => {
     toast.error(error?.message, {
@@ -61,7 +61,7 @@ const SelectSubject = () => {
     {
       refetchOnWindowFocus: false,
       enabled: true,
-      onSuccess: handleSuccess,
+      // onSuccess: handleSuccess,
       onError: handleError,
     }
   );

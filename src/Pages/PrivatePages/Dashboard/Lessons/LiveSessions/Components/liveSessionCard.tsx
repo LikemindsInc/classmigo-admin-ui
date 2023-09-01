@@ -5,6 +5,7 @@ import { PlayVideoIcon } from "../../../../../../Assets/Svgs";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { Tag, VideoPlayerElement } from "../../../../../../Ui_elements";
 import { useFormattedDateTime } from "../../../../../../custom-hooks";
+import dayjs from "dayjs";
 
 type VideoProps = {
   title?: string;
@@ -14,6 +15,7 @@ type VideoProps = {
 };
 export const LiveSessionCard = ({ title, index, link, item }: VideoProps) => {
   const newTimeFormat = useFormattedDateTime(item?.date);
+
 
   return (
     <Container>

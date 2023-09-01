@@ -55,21 +55,13 @@ export const TopicCard = ({
 }: CardProps) => {
   const [subtopic, setSubtopic] = useState<any>([]);
   const [showSubtopic, setShowSubtopic] = useState(false);
-  let isActive = active;
+  const [isActive, setIsActive] = useState(active);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-
-  const handleActivateSuccess = () => {
-    toast.success("Successfully Activated topic", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
+  const handleActivateSuccess = (data: any) => {
+    queryClient.invalidateQueries(["lessons-get-all"]);
+    setIsActive(!isActive);
   };
   const handleActivationError = (error: any) => {
     toast.error(error, {
@@ -82,16 +74,11 @@ export const TopicCard = ({
       theme: "light",
     });
   };
-  const handleDeactivateSuccess = () => {
-    toast.success("Successfully Activated topic", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
+  const handleDeactivateSuccess = (data: any) => {
+    if (data) {
+      queryClient.invalidateQueries(["lessons-get-all"]);
+      setIsActive(false);
+    }
   };
   const handleDeactivationError = (error: any) => {
     toast.error(error, {
@@ -105,24 +92,25 @@ export const TopicCard = ({
     });
   };
   const toggleActive = () => {
-    if (active) {
+    if (isActive) {
       deactivateTopic();
-      queryClient.invalidateQueries(["topic"]);
     } else {
       activateTopic();
-      queryClient.invalidateQueries(["topic"]);
     }
   };
 
-  const { refetch: deactivateTopic, isFetching: isLoadingDeactivate } =
-    useApiGet([`subject${id}`], () => deactivateTopicUrl(id), {
+  const { refetch: deactivateTopic } = useApiGet(
+    [`subject${id}`],
+    () => deactivateTopicUrl(id),
+    {
       refetchOnWindowFocus: false,
       enabled: false,
       onSuccess: handleDeactivateSuccess,
       onError: handleDeactivationError,
-    });
+    }
+  );
 
-  const { refetch: activateTopic, isFetching: isLoadingActivate } = useApiGet(
+  const { refetch: activateTopic } = useApiGet(
     [`subject${id}`],
     () => activateTopicUrl(id),
     {
@@ -185,15 +173,7 @@ export const TopicCard = ({
             </Details>
           </DetailsContainer>
           <SwitchContainer>
-            {index === track &&
-              (isLoadingActivate || isLoadingDeactivate ? (
-                <Spinner color="var(--primary-color)" />
-              ) : (
-                <SwitchElement
-                  activeState={isActive}
-                  handleChange={toggleActive}
-                />
-              ))}
+            <SwitchElement activeState={isActive} handleChange={()=>toggleActive()} />
           </SwitchContainer>
         </Container>
         <MoveIcon style={{ cursor: "move" }} />

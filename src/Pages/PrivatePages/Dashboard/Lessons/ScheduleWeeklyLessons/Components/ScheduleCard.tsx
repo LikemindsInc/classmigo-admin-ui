@@ -51,14 +51,13 @@ export const ScheduleCard = ({ item }: Props) => {
         </div>
         <SelectInput
           options={WEEK_OPTIONS}
-          value={item.lessonWeek}
-          onChange={(value) => {
+          onChange={(value:any) => {
             const requestBody: any = {
               week: value?.value,
             };
             update(requestBody);
           }}
-          defaultValue={item.lessonWeek}
+          defaultValue={item.lessonWeek || ""}
           width={150}
         />
       </div>
