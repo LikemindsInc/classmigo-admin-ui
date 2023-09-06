@@ -30,3 +30,52 @@ export const WEEK_OPTIONS = [
     value: 6,
   },
 ];
+
+
+export const SUBSCRIPTION_TYPES = [
+  {
+    label: "Free",
+    value: "FREE"
+  },
+  {
+    label: "Free For 7 Days",
+    value: "FREE_7DAYS"
+  },
+  {
+    label: "1 Month",
+    value: "1_MONTH_PER_CLASS"
+  },
+  {
+    label: "3 Months",
+    value: "3_MONTH_PER_CLASS"
+  },
+  {
+    label: "6 Months",
+    value: "6_MONTH_PER_CLASS"
+  },
+]
+
+
+
+export const PAYMENT_DATES = [
+  {
+    label: "Today",
+    value: "TODAY"
+  },
+  {
+    label: "This Week",
+    value: "THIS_WEEK"
+  },
+  {
+    label: "This Month",
+    value: "THIS_MONTH"
+  },
+  {
+    label: "This Year",
+    value: "THIS_YEAR"
+  },
+  {
+    label: "All Time",
+    value: "ALL_TIME"
+  },
+]

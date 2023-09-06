@@ -57,11 +57,19 @@ const LazyAskTheTeacher = lazy(
 );
 
 const LazyErrorPage = lazy(
-  () =>
-    import(
-      "../../Pages/PrivatePages/Dashboard/Error/Error"
-    )
+  () => import("../../Pages/PrivatePages/Dashboard/Error/Error")
 );
+
+const LazySubscription = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Subscription/Subscription")
+);
+
+const LazySubscriptionCreatePlan = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Subscription/Pages/CreatePlan")
+);
+
+
+
 const LazyScheduleLiveLessons = lazy(
   () =>
     import(
@@ -97,7 +105,7 @@ const LazyChat = lazy(
 const LazyAddQuestionGeneralKnowledge = lazy(
   () =>
     import(
-      "../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion/AddQuestion"
+      "../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion"
     )
 );
 
@@ -134,8 +142,11 @@ const AdminAccess = lazy(
 );
 
 const LazyQuizDetails = lazy(
-  ()=>import("../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/QuizDetails")
-)
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Lessons/QuizLibrary/Pages/QuizDetails"
+    )
+);
 
 const CreateAdmin = lazy(
   () =>
@@ -159,7 +170,6 @@ const LazyAddSubtopic = lazy(
       "../../Pages/PrivatePages/Dashboard/Lessons/LesssonCriteria/Pages/Subtopic"
     )
 );
-
 
 export const PrivateRoutes = () => {
   interface RouteConfig {
@@ -213,7 +223,7 @@ export const PrivateRoutes = () => {
     },
     {
       path: "/quiz_library/edit_question/:id",
-      element: <LazyQuizLibraryEditQuestion/>,
+      element: <LazyQuizLibraryEditQuestion />,
     },
     {
       path: "/schedule_lessons",
@@ -272,6 +282,14 @@ export const PrivateRoutes = () => {
       path: "/live_lessons/:id",
       element: <LazyLiveCall />,
     },
+    {
+      path: "/subscription",
+      element: <LazySubscription />,
+    },
+    {
+      path: "/subscription/create_plan",
+      element: <LazySubscriptionCreatePlan />,
+    },
 
     {
       path: "/admin-access/create-user",
@@ -288,9 +306,8 @@ export const PrivateRoutes = () => {
     },
     {
       path: "/*",
-      element: <LazyErrorPage/>,
+      element: <LazyErrorPage />,
     },
-    
   ];
 
   return (

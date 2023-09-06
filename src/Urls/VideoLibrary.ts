@@ -8,9 +8,11 @@ export const getAllVideosUrl = (className: string) =>
     params: { lessonId: className },
   });
 
-export const createVideoUrl = (data:any) =>
-  request({
+export const createVideoUrl = (data: any) => {
+  console.log(data, "hah");
+  return request({
     url: `${ADMIN_BASE_URL}/lesson/video/create`,
     method: "POST",
-    data: { data },
+    data: data,
   });
+};

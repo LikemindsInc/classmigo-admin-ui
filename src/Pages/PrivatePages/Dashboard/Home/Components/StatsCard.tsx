@@ -1,22 +1,27 @@
 import styled from "styled-components";
 import { GreenIcon, RedIcon } from "../../../../../Assets/Svgs";
+import { Skeleton } from "@mui/material";
 
 interface CardProps {
   value: string;
   description: string;
-  stat: boolean;
-  statValue: string;
+  // stat: boolean;
+  student: boolean;
+  isFetching: boolean;
+  // statValue: string;
 }
 export const StatsCard = ({
   value,
   description,
-  stat,
-  statValue,
-}: CardProps) => {
+  student,
+  isFetching,
+}: // stat,
+// statValue,
+CardProps) => {
   return (
     <Container>
       <StatHolder>
-        {stat ? (
+        {/* {stat ? (
           <IconHolder>
             <GreenIcon />
             <p>{statValue}</p>
@@ -26,12 +31,24 @@ export const StatsCard = ({
             <RedIcon />
             <p>{statValue}</p>
           </IconHolder>
-        )}
+        )} */}
       </StatHolder>
-      <DetailHolder>
-        <h3>{value}</h3>
-        <p>{description}</p>
-      </DetailHolder>
+      {isFetching ? (
+        <Skeleton
+          animation="wave"
+          variant="rectangular"
+          width={"100%"}
+          height={118}
+        />
+      ) : (
+        <DetailHolder>
+          <h3>
+            {!student && "₦"}
+            {value}
+          </h3>
+          <p>{description}</p>
+        </DetailHolder>
+      )}
     </Container>
   );
 };

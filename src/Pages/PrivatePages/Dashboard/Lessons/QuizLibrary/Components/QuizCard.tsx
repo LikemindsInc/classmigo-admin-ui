@@ -105,7 +105,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: 1.5rem 2rem;
   border-radius: 14px;
   width: 100%;
   transition: all 0.3s ease-in-out;
@@ -124,7 +124,7 @@ const Container = styled.div`
 `;
 
 const Tools = styled.p`
-  padding: 0.5rem 0.7rem;
+  padding: 0.3rem 0.5rem;
   font-size: 0.7rem;
   font-weight: 600;
   width: 114px;
@@ -141,12 +141,14 @@ const ToolsContainer = styled.div`
 
 const DetailsContainer = styled.div`
   width: 100%;
+
   h6 {
+
     font-size: 1.2rem;
     font-weight: 700;
-    margin-bottom: 1rem;
     @media ${devices.tablet} {
       background-colo: red !important;
+      font-size: 0.9rem;
     }
   }
 `;

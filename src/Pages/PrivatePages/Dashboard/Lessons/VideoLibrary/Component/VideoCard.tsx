@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { PlayVideoIcon } from "../../../../../../Assets/Svgs";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { VideoPlayerElement } from "../../../../../../Ui_elements";
 
@@ -17,7 +16,6 @@ export const VideoCard = ({ title, index, source, details, classValue }: VideoPr
   return (
     <Container>
       <MainContent>
-        {/* <PlayVideoIcon /> */}
         <VideoPlayerElement source={source} />
       </MainContent>
       <TopicContainer
@@ -58,7 +56,7 @@ const Container = styled.div`
   }
 
   @media ${devices.tabletL} {
-    width: 15rem;
+    width: 100%;
   }
 `;
 

@@ -13,15 +13,15 @@ import { getFirstRouteName } from "../../../utils/utilFns";
 export const DashboardNavbar = () => {
   const { title, setTitle } = useContext(NavbarContext);
   const { setUser } = useContext(UserContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const logout = () => {
     setUser(null);
-    navigate("/")
+    navigate("/");
   };
 
   useEffect(() => {
-    setTitle(getFirstRouteName(window.location.href))
-  },[setTitle])
+    setTitle(getFirstRouteName(window.location.href));
+  }, [setTitle]);
 
   const content = (
     <Logout onClick={logout}>
@@ -31,19 +31,20 @@ export const DashboardNavbar = () => {
 
   return (
     <Container>
-      <div>
+      <TitleContainer>
         <div>
           <h2>{title}</h2>
           <Breadcrumbs />
         </div>
-      </div>
+      </TitleContainer>
 
-      <div>
+      <NotificationContainer>
         <NotificationIcon />
+        
         <Popover content={content} trigger="click">
           <Avatar size={32} icon={<UserOutlined />} />
         </Popover>
-      </div>
+      </NotificationContainer>
     </Container>
   );
 };
@@ -60,29 +61,43 @@ const Container = styled.nav`
   top: 0;
   background-color: var(--dashboardBackground);
 
+  @media ${devices.tabletL} {
+    padding-left: 15%;
+  }
+
   h2 {
     font-size: 1.7rem;
     @media ${devices.tabletL} {
       font-size: 1.2rem;
     }
   }
-
+  /* 
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
-  }
+  } */
 
-  > div:first-child {
+  /* > div:first-child {
     align-items: flex-end;
-  }
+  } */
 `;
 
 const Logout = styled.div`
-  width: 100%;
+  width: fit-content;
   text-align: center;
   cursor: pointer;
-  &:hover {
+  /* &:hover {
     background-color: #f5e9ff;
-  }
+  } */
+`;
+
+const TitleContainer = styled.div`
+  align-items: flex-end;
+`;
+
+const NotificationContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;

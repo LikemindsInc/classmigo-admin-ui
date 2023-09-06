@@ -1,35 +1,27 @@
-import React, { useContext, useEffect, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React, { useContext} from "react";
+import {useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import styled from "styled-components";
-import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
+import {useApiPost } from "../../../../../../custom-hooks";
 import {
   ButtonElement,
   ImageInput,
   InputElement,
-  SelectInput,
   TextAreaInput,
 } from "../../../../../../Ui_elements";
 import {
   addTopicUrl,
-  createQuizUrl,
-  getAllClassesUrl,
-  getAllLessonsUrl,
-  getAllSubjectsUrl,
 } from "../../../../../../Urls";
-import { formatOptions } from "../../../../../../utils/utilFns";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ModalContext } from "../../../../../../Contexts/Contexts";
 import { topicSchema } from "../LessonCriteriaSchema";
-import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
-
 
 type Props = {
-  scope: string,
-  classTitle:string
-}
+  scope: string;
+  classTitle: string;
+};
 
-export const CreateTopic = ({scope, classTitle}: Props) => {
+export const CreateTopic = ({ scope, classTitle }: Props) => {
   const { setOpenModal } = useContext(ModalContext);
 
   const {
@@ -41,7 +33,6 @@ export const CreateTopic = ({scope, classTitle}: Props) => {
     resolver: yupResolver(topicSchema),
   });
 
-
   const handleSuccess = () => {
     toast.success("Successfully added topic", {
       position: "top-right",
@@ -52,7 +43,12 @@ export const CreateTopic = ({scope, classTitle}: Props) => {
       draggable: true,
       theme: "light",
     });
+    setValue("topic", "");
+    setValue("description", "");
+    setValue("video", null as any);
+    setOpenModal(false);
   };
+  
   const handleError = (error: any) => {
     toast.error(error?.message, {
       position: "top-right",
@@ -72,56 +68,65 @@ export const CreateTopic = ({scope, classTitle}: Props) => {
     ["lessons-get-all"]
   );
 
-
   const onSubmit = (data: any) => {
-    const requestBody: any = {
-      lessonName: data?.topic,
-      lessonDescription: data?.description,
-      // introVideo: data?.video,
-      schoolSubject: scope,
-      studentClass: classTitle,
-    };
-    addTopic(requestBody);
-    setValue("topic", "");
-    setValue("description", "");
-    setValue("video", "");
-    setOpenModal(false)
+    const formData = new FormData();
+    formData.append("lessonName", data?.topic);
+    formData.append("lessonDescription", data?.description);
+    formData.append("file", data?.video);
+    data?.introVideo && formData.append("introVideo", data?.introVideo);
+    formData.append("schoolSubject", scope);
+    formData.append("studentClass", classTitle);
+    addTopic(formData as any);
   };
-
 
   return (
     <Container onSubmit={handleSubmit(onSubmit)}>
-        <InputHolders>
-          <InputElement
-            label="Topic Title"
-            placeholder="Enter Lesson Title"
-            register={register}
-            id="topic"
-            error={errors}
-          />
-        </InputHolders>
+      <InputHolders>
+        <InputElement
+          label="Topic Title"
+          placeholder="Enter Lesson Title"
+          register={register}
+          id="topic"
+          error={errors}
+        />
+      </InputHolders>
 
-        <InputHolders>
-          <TextAreaInput
-            label="Description"
-            placeholder="Give a little description of the lesson "
-            register={register}
-            id="description"
-            error={errors}
-          />
-        </InputHolders>
+      <InputHolders>
+        <TextAreaInput
+          label="Description"
+          placeholder="Give a little description of the lesson "
+          register={register}
+          id="description"
+          error={errors}
+        />
+      </InputHolders>
 
-        <InputHolders>
-          <p>Upload Video</p>
-          <ImageInput
-            title="Upload Video"
-            type="video"
-            id="video"
-            register={register}
-            error={errors}
-          />
-        </InputHolders>
-        <ButtonElement label="Add Topic" width={150} type="submit" isLoading={isAddingTopic} />
+      <InputHolders>
+        <p>Upload Intro Video</p>
+        <ImageInput
+          title="Upload Video"
+          type="video"
+          id="video"
+          register={register}
+          error={errors}
+        />
+      </InputHolders>
+
+      <InputHolders>
+        <p>Or enter intro video URL</p>
+        <InputElement
+          // label="Video URL"
+          placeholder="Enter Video URL"
+          register={register}
+          id="introVideo"
+        />
+      </InputHolders>
+      <ButtonElement
+        label="Add Topic"
+        width={150}
+        type="submit"
+        isLoading={isAddingTopic}
+      />
     </Container>
   );
 };
@@ -129,14 +134,14 @@ export const CreateTopic = ({scope, classTitle}: Props) => {
 const Container = styled.form`
   width: 100%;
   padding: 2% 0;
-  input{
-    width:100% !important;
+  input {
+    width: 100% !important;
   }
 `;
 
 const InputHolders = styled.div`
   margin-bottom: 2rem;
-  >p {
+  > p {
     font-size: 0.8rem;
     font-weight: 600;
     margin-bottom: 0.5rem;

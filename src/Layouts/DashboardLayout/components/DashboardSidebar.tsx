@@ -11,6 +11,7 @@ import {
   PaymentIcon,
   QuizIcon,
   ScheduleIcon,
+  SubscriptionIcon,
   UserIcon,
   VideoIcon,
 } from "../../../Assets/Svgs";
@@ -84,6 +85,14 @@ export const DashboardSidebar = () => {
     },
   ];
 
+  const subscriptionMenu = [
+    {
+      path: "/subscription",
+      title: "Subscription",
+      icon: <SubscriptionIcon />,
+    },
+  ];
+
   const showMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -95,7 +104,12 @@ export const DashboardSidebar = () => {
         <div>
           <SideLogo />
           <section>
-            <SideBarMenuItem icon={<HomeIcon />} path="/" title="Home" />
+            <SideBarMenuItem
+              icon={<HomeIcon />}
+              path="/"
+              title="Home"
+              setMenuOpen={setMenuOpen}
+            />
           </section>
           <section>
             <h6>USERS</h6>
@@ -107,6 +121,8 @@ export const DashboardSidebar = () => {
                   icon={item.icon}
                   title={item.title}
                   path={item.path}
+                  menuOpen={menuOpen}
+                  setMenuOpen={setMenuOpen}
                 />
               );
             })}
@@ -121,6 +137,8 @@ export const DashboardSidebar = () => {
                   icon={item.icon}
                   title={item.title}
                   path={item.path}
+                  menuOpen={menuOpen}
+                  setMenuOpen={setMenuOpen}
                 />
               );
             })}
@@ -135,6 +153,24 @@ export const DashboardSidebar = () => {
                   icon={item.icon}
                   title={item.title}
                   path={item.path}
+                  menuOpen={menuOpen}
+                  setMenuOpen={setMenuOpen}
+                />
+              );
+            })}
+          </section>
+
+          <section>
+            <h6>SUBSCRIPTION</h6>
+            {subscriptionMenu.map((item, index) => {
+              return (
+                <SideBarMenuItem
+                  key={index}
+                  icon={item.icon}
+                  title={item.title}
+                  path={item.path}
+                  menuOpen={menuOpen}
+                  setMenuOpen={setMenuOpen}
                 />
               );
             })}
@@ -147,6 +183,8 @@ export const DashboardSidebar = () => {
             icon={<AdminIcon />}
             title="Admin Access"
             path={"/admin-access"}
+            menuOpen={menuOpen}
+            setMenuOpen={setMenuOpen}
           />
         </div>
       </Container>
@@ -160,7 +198,7 @@ export const DashboardSidebar = () => {
 };
 
 const Container = styled.aside<{ show: boolean }>`
-  min-height: 100vh;
+  max-height: 100vh;
   padding: 1.5rem 0 3.4rem 0;
   width: 19vw !important;
   background-color: white;
@@ -176,7 +214,7 @@ const Container = styled.aside<{ show: boolean }>`
 
   @media ${devices.tablet} {
     display: ${({ show }) => (show ? "block" : "none")};
-    width: 4rem !important;
+    width: 5rem !important;
     padding: 0 !important;
   }
 
@@ -221,7 +259,7 @@ const Touchable = styled.div<{ show: boolean }>`
 `;
 
 const SideLogo = styled(Logo)`
-  width: clamp(6rem, 50vw, 11rem);
+  width: clamp(3rem, 11vw, 11rem);
   height: clamp(1rem, 50vw, 1.5rem);
   margin-bottom: 2.8rem;
   margin-left: 3.4rem;

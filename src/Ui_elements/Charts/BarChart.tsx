@@ -28,7 +28,7 @@ export const BarChart = ({ data }: ChartProps) => {
     datasets: [
       {
         label: "Payments made",
-        data: data.map((data:any) => data.value),
+        data: data.map((data:any) => data.totalAmount),
         hoverBackgroundColor: "#7B31B2",
         borderRadius: 8,
       },

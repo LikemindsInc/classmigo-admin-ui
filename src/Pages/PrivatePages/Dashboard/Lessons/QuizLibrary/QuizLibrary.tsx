@@ -21,19 +21,16 @@ import { formatOptions } from "../../../../../utils/utilFns";
 import { Controller, useForm } from "react-hook-form";
 
 const QuizLibrary = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { setOpenModal } = useContext(ModalContext);
-  const [deleteModal, setDeleteModal] = useState(false);
+  // const [deleteModal, setDeleteModal] = useState(false);
   const [quiz, setQuiz] = useState<any>([]);
   const handleCancel = () => {
     setOpenModal(false);
   };
 
-
   const { control, watch } = useForm();
-
-
-  let classValue : any = watch("className")
+  let classValue: any = watch("className");
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -44,7 +41,6 @@ const QuizLibrary = () => {
     }
   );
 
-
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
 
   const allClasses = useMemo(
@@ -52,29 +48,26 @@ const QuizLibrary = () => {
     [activeClasses]
   );
 
-
-  const { data: quizes, isLoading: isLoadingQuizes, refetch:fetchQuiz } = useApiGet(
-    ["quizes"],
-    () => getAllQuizUrl(),
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
-
+  const {
+    data: quizes,
+    isLoading: isLoadingQuizes,
+    refetch: fetchQuiz,
+  } = useApiGet(["quizes"], () => getAllQuizUrl(), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
 
   useEffect(() => {
     if (classValue) {
-      fetchQuiz()
+      fetchQuiz();
     }
-  },[classValue, fetchQuiz])
+  }, [classValue, fetchQuiz]);
 
   useEffect(() => {
     if (quizes) {
       setQuiz(quizes?.data?.content);
     }
   }, [quizes]);
-
 
   return (
     <>
@@ -83,19 +76,20 @@ const QuizLibrary = () => {
           <ToolsContainer>
             <SearchContainer>
               <SearchInput width={300} />
-              <p>250 Results</p>
             </SearchContainer>
             <Utility>
               <Controller
                 name="className"
                 control={control}
                 render={({ field }) => (
-                  <SelectInput
-                    {...field}
-                    options={allClasses}
-                    defaultValue="Filter with class"
-                    isLoading={isLoadingClasses}
-                  />
+                  <SelectContainer>
+                    <SelectInput
+                      {...field}
+                      options={allClasses}
+                      defaultValue="Class Filter"
+                      isLoading={isLoadingClasses}
+                    />
+                  </SelectContainer>
                 )}
               />
               <ButtonElement
@@ -136,7 +130,7 @@ const QuizLibrary = () => {
           </QuestionsContainer>
         </Body>
       </Container>
-{/* 
+      {/* 
       <Modal cancel={handleCancel} width={"35%"}>
         <CreateQuiz />
       </Modal> */}
@@ -167,6 +161,13 @@ const Container = styled.section`
   }
 `;
 
+const SelectContainer = styled.div`
+  display: flex;
+  width: 200px;
+  @media ${devices.tabletL} {
+    width: 100%;
+  }
+`;
 
 const SearchContainer = styled.div`
   display: flex;
@@ -181,12 +182,18 @@ const SearchContainer = styled.div`
 const Body = styled.section`
   width: 100%;
   padding: 0 15%;
+  @media ${devices.tabletL} {
+    padding: 0;
+  }
 `;
 
 const ToolsContainer = styled.section`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+  }
 `;
 
 const Utility = styled.aside`
@@ -216,5 +223,7 @@ const NoData = styled.div`
 export const SkeletonContainer = styled.div`
   margin-bottom: 10px;
 `;
-const QuestionsContainer = styled.section``;
+const QuestionsContainer = styled.section`
+  margin-top: 2rem;
+`;
 const Modal = styled(CenteredDialog)``;

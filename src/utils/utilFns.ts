@@ -3,8 +3,6 @@ import Cookies from "js-cookie";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
-
-
 export const formatUrlName = (url: string): string => {
   const removePercentage = url.replace(/%20/g, " ");
   let removeUnderscoreHyphen = removePercentage.replace(/_/g, " ");
@@ -14,12 +12,6 @@ export const formatUrlName = (url: string): string => {
   );
   return _.capitalize(decoded);
 };
-
-
-
-
-
-
 
 export const getFirstRouteName = (url: string) => {
   const path = new URL(url).pathname;
@@ -35,21 +27,16 @@ export const getFirstRouteName = (url: string) => {
   return formattedRouteName;
 };
 
-
-
-
-
-
+export const checkValidNumber = (number: number | string) => {
+  if (typeof number === "number" && !isNaN(number) && number >= 0) {
+    return true;
+  }
+  return false;
+};
 
 export const checkFileSize = (file: any, maxSize: number): boolean => {
   return file.size <= maxSize;
 };
-
-
-
-
-
-
 
 export const convertToBase64 = (file: File): Promise<string> =>
   new Promise<string>((resolve, reject) => {
@@ -65,35 +52,18 @@ export const convertToBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
-
-
-
-
-
-
 export const checkforValidString = (value: any) =>
   value
     ? /^[^\s/]*[\w ]*[a-zA-Z]+(([', -][a-zA-Z])?[a-zA-Z]*)\s*$/.test(value)
     : true;
 
-    
-
 export const generateRandom = (length: number) => {
   return uuidv4().slice(0, length);
 };
 
-
-
-
-
 export const setMenuTitle = (url: string) => {
   const removePercentage = url.replace(/%20/g, " ");
 };
-
-
-
-
-
 
 export const formatOptions = (
   items: any[],
@@ -118,10 +88,6 @@ export const formatOptions = (
     : [];
 };
 
-
-
-
-
 export const formatDate = (date: Date): string => {
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -130,7 +96,6 @@ export const formatDate = (date: Date): string => {
   };
   return date.toLocaleDateString(undefined, options);
 };
-
 
 
 
@@ -148,10 +113,6 @@ export const formatIncomingDate = (incomingDate: string): string => {
   return formattedDateTime;
 };
 
-
-
-
-
 //Custom Post Function
 
 type ApiResponse<T> = {
@@ -164,6 +125,12 @@ let token: any = "";
 if (accessToken) {
   token = JSON.parse(accessToken);
 }
+
+
+
+
+
+
 export async function customPost<T>(
   url: string,
   requestData: any
@@ -185,3 +152,41 @@ export async function customPost<T>(
     };
   }
 }
+
+
+
+
+
+
+
+export const CalculateDiscount = (value: number, total: number) => {
+  if (total === 0) {
+    return 0;
+  }
+  return Math.floor((value / total) * 100);
+};
+
+
+
+
+
+
+
+
+export const generateUrlParams = (obj:any) => {
+	let generatedUrl = ``;
+	const arrayOfObjectKeys = Object.keys(obj);
+	arrayOfObjectKeys.forEach((key) => {
+		if (obj[key] || obj[key] === false) {
+			generatedUrl += `${key}=${obj[key]}&`;
+		}
+	});
+	return generatedUrl;
+};
+
+export const generateQueryKey = (baseKey: string, searchFilter: any) => {
+  const searchFilterString = JSON.stringify(searchFilter);
+  const queryKey = `${baseKey}-${searchFilterString}`;
+
+  return queryKey;
+};

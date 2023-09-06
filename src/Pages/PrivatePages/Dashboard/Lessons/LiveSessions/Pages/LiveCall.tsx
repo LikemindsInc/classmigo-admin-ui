@@ -81,6 +81,7 @@ const LiveCall = () => {
             />
           )} */}
           <VideoPlayerElement source={state.item.liveUrl} height="50vh" />
+          
           {/* <ToolBox>
             <ToolCircle onClick={toggleMute}>
               <i>
@@ -109,7 +110,7 @@ const LiveCall = () => {
             </ToolCircle>
           </ToolBox> */}
         </VideoSection>
-        <Participants>
+        {/* <Participants>
           <ParticipantCard />
           <ParticipantCard />
           <ParticipantCard />
@@ -121,16 +122,16 @@ const LiveCall = () => {
           <ParticipantCard />
           <ParticipantCard />
           <ParticipantCard />
-        </Participants>
+        </Participants> */}
       </VideoLayout>
-      <Messages>
+      {/* <Messages>
         <Navigator>
           <MenuItem onClick={() => setActive(0)}>Chat</MenuItem>
           <MenuItem onClick={() => setActive(1)}>Participants</MenuItem>
         </Navigator>
         {active === 0 && <LiveChat />}
         {active === 1 && <Participants />}
-      </Messages>
+      </Messages> */}
     </Container>
   );
 };
@@ -193,8 +194,8 @@ const Participants = styled.section`
 `;
 
 const VideoLayout = styled.main`
-  flex: 0.7;
-  max-width: 70%;
+  flex: 1;
+  max-width: 100%;
   background-color: white;
   padding: 0.5rem;
   position: relative;

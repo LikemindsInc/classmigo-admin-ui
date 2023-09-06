@@ -8,104 +8,38 @@ import { useState } from "react";
 // import { DatePickers } from "./DataPickers";
 import { StatsCard } from "./StatsCard";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
+import { PAYMENT_DATES } from "../../../../../utils/constants";
 
-export const PaymentData = () => {
-  const [dateRange, setDateRange] = useState<string>("This week");
-  const currentDate = new Date();
-  const date = currentDate.toDateString();
+interface PaymentDataProps {
+  data: any;
+  filter: any;
+  isFetching: boolean;
+  setFilter: any;
+  fetchAction: () => void;
+}
+export const PaymentData = ({
+  data,
+  filter,
+  setFilter,
+  isFetching,
+  fetchAction,
+}: PaymentDataProps) => {
 
-  const handleDateChange = (value: string) => {
-    setDateRange(value);
+  const handleDateChange = (value: { value: string; label: number }) => {
+    setFilter((item: any) => ({ ...item, period: value?.value }));
+    fetchAction();
   };
 
-  const dateSelectOptions = [
-    {
-      value: 0,
-      label: "Today",
-    },
-    {
-      value: 1,
-      label: "This Week",
-    },
-    {
-      value: 2,
-      label: "This Month",
-    },
-    {
-      value: 3,
-      label: "This Year",
-    },
-    {
-      value: 4,
-      label: "All Time",
-    },
-  ];
-
-  const chartData = [
-    {
-      month: "Jan",
-      value: 1000,
-    },
-    {
-      month: "Feb",
-      value: 1900,
-    },
-    {
-      month: "Mar",
-      value: 1200,
-    },
-    {
-      month: "May",
-      value: 2500,
-    },
-    {
-      month: "Jun",
-      value: 3000,
-    },
-    {
-      month: "Jul",
-      value: 4000,
-    },
-    {
-      month: "Aug",
-      value: 3200,
-    },
-    {
-      month: "Sep",
-      value: 2200,
-    },
-    {
-      month: "Oct",
-      value: 1200,
-    },
-
-    {
-      month: "Nov",
-      value: 3400,
-    },
-
-    {
-      month: "Dec",
-      value: 1000,
-    },
-  ];
   return (
     <Container>
       <Header>
         <h4>Payment Data</h4>
         <SelectContainer>
-          {/* <SelectInput
-            options={dateSelectOptions}
-            onChange={handleDateChange}
-            defaultValue={dateRange}
-          /> */}
-          <DatePickerInput defaultValue={date} label={"From Date"} width={130} />
-          <DatePickerInput defaultValue={date} label={"To Date"} width={130} />
           <SelectInput
-            options={dateSelectOptions}
+            options={PAYMENT_DATES}
             onChange={handleDateChange}
-            defaultValue={dateRange}
-            width={140}
+            defaultValue="Payment Date"
+            // width={200}
           />
         </SelectContainer>
       </Header>
@@ -113,20 +47,24 @@ export const PaymentData = () => {
       <ChartContainer>
         <StatContainer>
           <StatsCard
-            value="20,000"
+            value={data?.paymentData?.totalCountStudentSubscribed}
             description="Student Subscribed"
-            stat={true}
-            statValue="25%"
+            student={true}
+            isFetching={isFetching}
+            // stat={true}
+            // statValue="25%"
           />
           <StatsCard
-            value="₦250,000"
+            value={data?.paymentData?.totalPayment}
             description="Subscription Payment"
-            stat={false}
-            statValue="-8%"
+            student={false}
+            isFetching={isFetching}
+            // stat={false}
+            // statValue="-8%"
           />
         </StatContainer>
         <Chart>
-          <BarChart data={chartData} />
+          <BarChart data={data?.chart} />
         </Chart>
       </ChartContainer>
     </Container>
@@ -188,7 +126,7 @@ const SelectContainer = styled.div`
   display: flex;
   width: auto;
   gap: 3%;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
   @media ${devices.mobileL} {
     flex-direction: column;
     gap: 5%;

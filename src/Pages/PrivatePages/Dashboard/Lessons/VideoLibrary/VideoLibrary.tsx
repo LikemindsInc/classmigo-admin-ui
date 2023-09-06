@@ -21,7 +21,6 @@ import noData from "../../../../../Assets/noData.png";
 
 const VideoLibrary = () => {
   const [videos, setVideos] = useState([]);
-  const [topic, setTopic] = useState([]);
 
   const { handleSubmit, watch, control, setValue } = useForm({});
 
@@ -35,7 +34,7 @@ const VideoLibrary = () => {
     refetch: getAllVideos,
   } = useApiGet(["videos"], () => getAllVideosUrl(topicValue?.value), {
     refetchOnWindowFocus: false,
-    enabled: true,
+    enabled: false,
   });
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
@@ -77,9 +76,12 @@ const VideoLibrary = () => {
   }, [fetchTopic, setValue, subjectValue]);
 
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects  =  subjects?.data?.subjects.filter((item: any) => item.isActive);
-  const activeTopics  =  topics?.data?.content.filter((item: any) => item.isActive);
-
+  const activeSubjects = subjects?.data?.subjects.filter(
+    (item: any) => item.isActive
+  );
+  const activeTopics = topics?.data?.content.filter(
+    (item: any) => item.isActive
+  );
 
   const allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
@@ -117,13 +119,15 @@ const VideoLibrary = () => {
             name="class"
             control={control}
             render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={allClasses}
-                value={classValue}
-                defaultValue="Subject Class"
-                width={200}
-              />
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  options={allClasses}
+                  value={classValue}
+                  defaultValue="Subject Class"
+                  // width={200}
+                />
+              </SelectContainer>
             )}
           />
 
@@ -134,12 +138,14 @@ const VideoLibrary = () => {
               name="subject"
               control={control}
               render={({ field }) => (
-                <SelectInput
-                  {...field}
-                  options={allSubjects}
-                  defaultValue="Subject Subject"
-                  width={200}
-                />
+                <SelectContainer>
+                  <SelectInput
+                    {...field}
+                    options={allSubjects}
+                    defaultValue="Subject Subject"
+                    // width={200}
+                  />
+                </SelectContainer>
               )}
             />
           )}
@@ -151,12 +157,14 @@ const VideoLibrary = () => {
               name="topic"
               control={control}
               render={({ field }) => (
-                <SelectInput
-                  {...field}
-                  options={allTopics}
-                  defaultValue="Subject Topic"
-                  width={200}
-                />
+                <SelectContainer>
+                  <SelectInput
+                    {...field}
+                    options={allTopics}
+                    defaultValue="Subject Topic"
+                    // width={200}
+                  />
+                </SelectContainer>
               )}
             />
           )}
@@ -189,7 +197,7 @@ const VideoLibrary = () => {
         <NoData>
           <img src={noData} alt="No data" />
           <p>You haven’t selected any videos yet.</p>
-          <p>Use the view video lessons to view videos.</p>
+          <p>Select the class and subject categories, and use the view video lessons button to view videos.</p>
         </NoData>
       )}
     </Container>
@@ -218,15 +226,30 @@ const Container = styled.section`
 const Header = styled.div`
   display: flex;
   width: 100%;
-  flex-wrap: wrap;
   gap: 1%;
   button {
     font-size: 0.8rem;
     height: 38px !important;
-    width: 200px;
+    width: 200px !important;
   }
+
   @media ${devices.tabletL} {
     gap: 4%;
+    flex-wrap: wrap;
+    input {
+      width: 100%;
+    }
+  }
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 200px;
+  @media ${devices.tabletL} {
+    width: 100%;
+    margin-bottom: 20px;
   }
 `;
 

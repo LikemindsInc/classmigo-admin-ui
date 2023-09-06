@@ -23,13 +23,13 @@ const ScheduleLessons = () => {
   const {
     control,
     watch,
-    handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm();
   const [topic, setTopic] = useState([]);
   let classValue: any = watch("class");
   let subjectValue: any = watch("subject");
+
+  
   const { data: classes, isFetching: isLoadingClasses } = useApiGet(
     ["allClasses"],
     () => getAllClassesUrl(),
@@ -66,11 +66,12 @@ const ScheduleLessons = () => {
     }
   }, [classValue, fetchSubject]);
 
-
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects  =  subjects?.data?.subjects.filter((item: any) => item.isActive);
+  const activeSubjects = subjects?.data?.subjects.filter(
+    (item: any) => item.isActive
+  );
   // const activeTopics = topics?.data?.content.filter((item: any) => item.isActive);
-  
+
   const allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
     [activeClasses]
@@ -97,28 +98,30 @@ const ScheduleLessons = () => {
             name="class"
             control={control}
             render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={allClasses}
-                defaultValue={"Subject Class"}
-                width={200}
-                error={errors?.class}
-                isLoading={isLoadingClasses}
-              />
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  options={allClasses}
+                  defaultValue={"Select Class"}
+                  error={errors?.class}
+                  isLoading={isLoadingClasses}
+                />
+              </SelectContainer>
             )}
           />
           <Controller
             name="subject"
             control={control}
             render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={allSubjects}
-                defaultValue={"Select Subject"}
-                width={200}
-                error={errors?.subject}
-                isLoading={isLoadingSubjects}
-              />
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  options={allSubjects}
+                  defaultValue={"Select Subject"}
+                  error={errors?.subject}
+                  isLoading={isLoadingSubjects}
+                />
+              </SelectContainer>
             )}
           />
           <ButtonElement
@@ -190,29 +193,21 @@ const Header = styled.div`
     font-size: 0.8rem;
     height: 38px !important;
     width: 200px;
+    @media ${devices.tabletL} {
+      width: 100%;
+    }
   }
   > div {
     gap: 10px;
     display: flex;
     align-items: center;
+    @media ${devices.tabletL} {
+      flex-wrap: wrap;
+      width: 100%;
+    }
   }
   @media ${devices.tabletL} {
-    gap: 4%;
-  }
-`;
-
-const WeekContainer = styled.div`
-  align-items: center;
-  p {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-top: 5px;
-  }
-  input {
-    width: 40px;
-    padding: 5px;
-    text-align: center;
+    padding: 0;
   }
 `;
 
@@ -222,6 +217,17 @@ const Body = styled.section`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  @media ${devices.tabletL} {
+    padding: 0;
+  }
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  width: 200px;
+  @media ${devices.tabletL} {
+    width: 100%;
+  }
 `;
 
 const NoData = styled.div`
