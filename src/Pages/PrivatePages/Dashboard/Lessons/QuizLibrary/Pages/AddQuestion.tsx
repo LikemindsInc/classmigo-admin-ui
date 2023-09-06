@@ -94,7 +94,7 @@ const AddQuestion = () => {
             {
               question: data.question,
               imageUrl: response?.data?.data?.url,
-              explanation: "You go explain tire",
+              explanation: data?.explanation,
               options: options.map((label) => ({
                 label,
                 value: data[`option${label}`],
@@ -114,7 +114,7 @@ const AddQuestion = () => {
         questions: [
           {
             question: data.question,
-            explanation: "You go explain tire",
+            explanation: data?.explanation,
             options: options.map((label) => ({
               label,
               value: data[`option${label}`],
