@@ -82,10 +82,10 @@ const AdminDetail = () => {
             <p>Email Address</p>
             <p style={{ color: "var(--primary-color)" }}>{admin.email}</p>
             <Divider />
-            <p>Class</p>
+            <p style={{fontWeight: 700, fontSize:"20px"}}>Activate Class</p>
             <Section>{renderClassesSection()}</Section>
             <Divider />
-            <p>Reset Password</p>
+            <p style={{fontWeight: 700, fontSize:"20px"}}>Reset Password</p>
             <Section>{renderResetPasswordSection()}</Section>
             <Divider />
           </Col>
@@ -144,7 +144,6 @@ const AdminDetail = () => {
           <SwitchContainer key={index}>
             <p>{item.value}</p>
             <SwitchElement
-
               activeState={
                 admin.assignedClasses.findIndex(
                   (row) => row.studentClass?.name === item.name
@@ -323,16 +322,27 @@ const AdminDetail = () => {
     <Container style={{ padding: "40px 60px" }}>{renderContent()}</Container>
   );
 };
-
 const ClassSwitchWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
 `;
 
 const SwitchContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  p{
+    font-weight: 500;
+  }
 `;
 
 const Section = styled.section`

@@ -23,11 +23,26 @@ import { IParent, ISubscription } from "@appModel";
 import moment from "moment";
 import { Controller, useForm } from "react-hook-form";
 import { getAllClassesUrl } from "../../../../../Urls";
-import { formatOptions } from "../../../../../utils/utilFns";
+import { formatOptions, generateQueryKey } from "../../../../../utils/utilFns";
 import { Avatar } from "@mui/material";
 import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
 import { toast } from "react-toastify";
 import { debounce } from "lodash";
+import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
+
+interface DataType {
+  key: string;
+  name: string;
+  username: string;
+  class: string;
+  phoneNumber: number;
+  status: string;
+  subscription: ISubscription[];
+  image: string;
+  _id: string;
+  isActive: boolean;
+  parent?: IParent | null;
+}
 
 const Students = () => {
   //drawer handler
@@ -36,60 +51,92 @@ const Students = () => {
   const [user, setUser] = useState<DataType | null>(null);
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
+  const [openModal, setOpenModal] = useState(false);
   const [searchFilter, setSearchFilter] = useState<any>({
-    page: "",
-    pageSize: "",
-    search: "",
-    className: "",
+    page: 0,
+    pageSize: 10,
+    search: null,
+    className: null,
     isSubscribed: null,
-    isActive:null
+    isActive: null,
   });
-  const { control } = useForm();
+  const { control, setValue } = useForm();
 
+  //util functions
 
   const debouncedSearchFilterUpdate = debounce((value) => {
     setSearchFilter((prev: any) => ({
       ...prev,
-      search: value
+      search: value,
     }));
   }, 1500);
 
-
-  const handleSearchFilter = (e:any) => {
-    const searchValue = e.target.value
-    debouncedSearchFilterUpdate(searchValue);
-  }
+  const handleSearchFilter = (e: any) => {
+    const searchValue = e.target.value;
+    debouncedSearchFilterUpdate(searchValue.trim());
+  };
 
   const onSelectVerified = (value: any) => {
     setSearchFilter((prev: any) => ({
       ...prev,
       isActive: value?.value,
     }));
-    fetchStudent()
   };
 
-  const onSelectSubscription = (value:any) => {
+  const onSelectSubscription = (value: any) => {
     setSearchFilter((prev: any) => ({
       ...prev,
       isSubscribed: value?.value,
     }));
-    fetchStudent()
-  }
+  };
 
-  const onSelectClassname = (value:any) => {
+  const onSelectClassname = (value: any) => {
     setSearchFilter((prev: any) => ({
       ...prev,
       className: value?.value,
     }));
-    fetchStudent()
-  }
+  };
 
-  
-  
+  const handleClearClass = () => {
+    setValue("className", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: null,
+    }));
+  };
+
+  const handleClearStatus = () => {
+    setValue("status", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      isActive: null,
+    }));
+  };
+
+  const handleClearSubscription = () => {
+    setValue("subscription", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      isSubscribed: null,
+    }));
+  };
+
+  const onToggleActive = () => {
+    const requestBody = {
+      isActive: isActive ? false : true,
+    };
+    toggleStudent(requestBody);
+  };
+
+  // useEffect(() => {
+  //   console.log(searchFilter,"Search")
+  // },[searchFilter])
+
   useEffect(() => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
 
+  //Api Call
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -142,25 +189,27 @@ const Students = () => {
     ["Student-data"]
   );
 
-
   const {
     data: studentData,
     isLoading: isLoadingStudentData,
-    isFetching:isFetchingStudentData,
+    isFetching: isFetchingStudentData,
     refetch: fetchStudent,
-  } = useApiGet(["Student-data"], () => getStudentDataUrl(searchFilter), {
-    refetchOnWindowFocus: false,
-    enabled: true,
-    cacheTime:0
-  });
+  } = useApiGet(
+    [generateQueryKey("Student-data", searchFilter)],
+    () => getStudentDataUrl(searchFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
-  const { refetch: link } = useApiGet(
+  const { refetch: link, isLoading: isUnlinking } = useApiGet(
     ["unlink-parent"],
-    ()=>  unlinkParentUrl(user?.key, user?.parent?._id),
+    () => unlinkParentUrl(user?.key, user?.parent?._id),
     {
       enabled: false,
       refetchOnWindowFocus: false,
-      onSuccess: () => { 
+      onSuccess: () => {
         toast.success(`Successfully unlinked Parent`, {
           position: "top-right",
           autoClose: 3000,
@@ -170,10 +219,10 @@ const Students = () => {
           draggable: true,
           theme: "light",
         });
-        setOpenDrawer(false)
-        fetchStudent()
+        setOpenDrawer(false);
+        fetchStudent();
       },
-      onError: () => { 
+      onError: () => {
         toast.error(`Something went wrong, could not unlink parent`, {
           position: "top-right",
           autoClose: 3000,
@@ -184,8 +233,8 @@ const Students = () => {
           theme: "light",
         });
       },
-    },
-  )
+    }
+  );
 
   useEffect(() => {
     setIsActive(user?.isActive || false);
@@ -193,31 +242,25 @@ const Students = () => {
 
   useEffect(() => {
     if (studentData) {
-      const newData = studentData?.data?.content.map((item: any) => ({
-        key: item._id,
-        name: `${item.firstName} ${item.lastName}`,
-        username: item.userName,
-        phoneNumber: item.phoneNumber,
-        class:
-          (item.class && item.class.length > 0
-            ? item.class.map((classItem: any) => classItem.name)
-            : "" || null) || "",
-        status: item.isActive ? "Verified" : "Unverified",
-        isActive: item.isActive,
-        subscription: item.subcription,
-        parent: item.parent,
-        image: item.image,
-      }));
-      setStudent(newData);
+      setStudent(() =>
+        studentData?.data?.content.map((item: any) => ({
+          key: item._id,
+          name: `${item.firstName} ${item.lastName}`,
+          username: item.userName,
+          phoneNumber: item.phoneNumber,
+          class:
+            (item.class && item.class.length > 0
+              ? item.class.map((classItem: any) => classItem.name)
+              : "" || null) || "",
+          status: item.isActive ? "Active" : "Inactive",
+          isActive: item.isActive,
+          subscription: item.subcription,
+          parent: item.parent,
+          image: item.image,
+        }))
+      );
     }
-  }, [studentData]);
-
-  const onToggleActive = () => {
-    const requestBody = {
-      isActive: isActive ? false : true,
-    };
-    toggleStudent(requestBody);
-  };
+  }, [studentData, searchFilter]);
 
   const headerStyle = {
     color: "gray",
@@ -225,19 +268,6 @@ const Students = () => {
     fontWeight: 700,
   };
 
-  interface DataType {
-    key: string;
-    name: string;
-    username: string;
-    class: string;
-    phoneNumber: number;
-    status: string;
-    subscription: ISubscription[];
-    image: string;
-    _id: string;
-    isActive: boolean;
-    parent?: IParent | null;
-  }
   const columns: ColumnsType<DataType> = [
     {
       title: "NAME",
@@ -259,7 +289,6 @@ const Students = () => {
       dataIndex: "phoneNumber",
       key: "phoneNumber",
       ellipsis: true,
-      
     },
     {
       title: "STATUS",
@@ -287,7 +316,7 @@ const Students = () => {
       dataIndex: "options",
       key: "options",
       ellipsis: true,
-      render: (data, row) => (
+      render: (_, row) => (
         <div onClick={() => handleRowClick(row)}>
           <Options />
         </div>
@@ -323,21 +352,23 @@ const Students = () => {
   });
 
   const handleRowClick = (data: DataType) => {
-    console.log(data, "jjjj")
     setUser(data);
     setUserId(data?.key);
     setIsActive(data?.isActive);
   };
 
+  const confirmUnlink = () => {
+    setOpenModal(true);
+  };
 
   const statusOptions = [
     {
       value: true,
-      label: "Verified",
+      label: "Active",
     },
     {
       value: false,
-      label: "Unverified",
+      label: "Inactive",
     },
   ];
 
@@ -364,27 +395,39 @@ const Students = () => {
             name="className"
             control={control}
             render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={allClasses}
-                onChange={onSelectClassname}
-                defaultValue="Class"
-                width={200}
-                isLoading={isLoadingClasses}
-              />
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  id="className"
+                  options={allClasses}
+                  onChange={onSelectClassname}
+                  defaultValue="Class"
+                  // width={200}
+                  isLoading={isLoadingClasses}
+                />
+                {typeof searchFilter?.className === "string" && (
+                  <CancelIcon onClick={handleClearClass}>&#8855;</CancelIcon>
+                )}
+              </SelectContainer>
             )}
           />
           <Controller
             name="status"
             control={control}
             render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={statusOptions}
-                onChange={onSelectVerified}
-                defaultValue="Status"
-                width={200}
-              />
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  id="status"
+                  options={statusOptions}
+                  onChange={onSelectVerified}
+                  defaultValue="Status"
+                  // width={200}
+                />
+                {typeof searchFilter?.isActive === "boolean" && (
+                  <CancelIcon onClick={handleClearStatus}>&#8855;</CancelIcon>
+                )}
+              </SelectContainer>
             )}
           />
 
@@ -392,17 +435,29 @@ const Students = () => {
             name="subscription"
             control={control}
             render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={subscribeOptions}
-                onChange={onSelectSubscription}
-                defaultValue="Subscription"
-                width={200}
-              />
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  id="subscription"
+                  options={subscribeOptions}
+                  onChange={onSelectSubscription}
+                  defaultValue="Subscription"
+                  // width={200}
+                />
+                {typeof searchFilter?.isSubscribed === "boolean" && (
+                  <CancelIcon onClick={handleClearSubscription}>
+                    &#8855;
+                  </CancelIcon>
+                )}
+              </SelectContainer>
             )}
           />
 
-          {/* <h6>2,500 Results</h6> */}
+          {searchFilter?.search !== "" && student?.length > 0 && (
+            <h6>
+              {student?.length} {student?.length > 1 ? "Results" : "Result"}
+            </h6>
+          )}
         </div>
         <button>
           Export
@@ -420,13 +475,16 @@ const Students = () => {
         fetchAction={fetchStudent}
         setSearchFilter={setSearchFilter}
         searchFilter={searchFilter}
+        setUser={setUser}
+        setUserId={setUserId}
+        setIsActive={setIsActive}
       />
       <Drawer
         placement="right"
         onClose={() => setOpenDrawer(false)}
         open={openDrawer}
         closeIcon={false}
-        width={"25%"}
+        width={window.innerWidth < 768 ? "80%" : "25%"}
       >
         <DrawerContentContainer>
           {/* <CancelContainer>
@@ -451,16 +509,6 @@ const Students = () => {
               </p>
             </div>
           </UserInfo>
-          {/* <UpdateDetails>
-            <div>
-              <InputElement placeholder="John Chukwuemeka" label="Name" />
-              <ButtonElement width={84} outline label={"Update"} />
-            </div>
-            <div>
-              <InputElement placeholder="08000000000" label="Phone number" />
-              <ButtonElement label={"Update"} outline width={84} />
-            </div>
-          </UpdateDetails> */}
 
           <Details>
             <div>
@@ -505,7 +553,7 @@ const Students = () => {
                     outline
                     width={84}
                     label={"Unlink"}
-                    onClick={()=>link()}
+                    onClick={confirmUnlink}
                   />
                 </>
               ) : (
@@ -515,11 +563,37 @@ const Students = () => {
           </Details>
         </DrawerContentContainer>
       </Drawer>
+
+      <Modal
+        title="Delete Quiz?"
+        okText="Delete"
+        cancelText="Cancel"
+        cancel={() => setOpenModal(false)}
+        openState={openModal}
+      >
+        <ModalContent>
+          <p>Are you sure you want to unlink?</p>
+          <div>
+            <ButtonElement
+              outline
+              label="Cancel"
+              onClick={() => setOpenModal(false)}
+            />
+            <ButtonElement
+              label="Unlink"
+              onClick={() => link()}
+              isLoading={isUnlinking}
+            />
+          </div>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
 
 export default Students;
+
+
 
 export const Container = styled.section`
   width: 100%;
@@ -538,6 +612,21 @@ export const Container = styled.section`
   }
 `;
 
+const Modal = styled(CenteredDialog)``;
+
+const ModalContent = styled.div`
+  text-align: center;
+  p {
+    margin: 10% 0;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+`;
+
 const UtilsHolder = styled.div`
   display: flex;
   margin-top: 3rem;
@@ -549,6 +638,10 @@ const UtilsHolder = styled.div`
     flex-direction: column;
     align-items: flex-start;
     flex-wrap: wrap;
+
+    input {
+      width: fill !important;
+    }
   }
   > div {
     display: flex;
@@ -564,7 +657,7 @@ const UtilsHolder = styled.div`
     h6 {
       font-size: clamp(1rem, 1vw, 1rem);
       font-weight: 700;
-      width: fit-content;
+      width: 100%;
     }
   }
   button {
@@ -583,15 +676,13 @@ const UtilsHolder = styled.div`
 
     @media ${devices.tabletL} {
       margin-top: 5%;
+      width:100%;
     }
   }
 `;
 
 const DrawerContentContainer = styled.aside``;
-// const CancelContainer = styled.section`
-//   display: flex;
-//   justify-content: flex-end;
-// `;
+
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
@@ -612,15 +703,6 @@ const UserInfo = styled.div`
       font-weight: 700;
       font-size: 1rem;
     }
-  }
-`;
-const UpdateDetails = styled.div`
-  width: 100%;
-  > div {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    margin-bottom: 2rem;
   }
 `;
 
@@ -673,4 +755,18 @@ const SubTag = styled.div`
   font-size: 0.7rem;
   display: inline;
   margin: 0 5px;
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width:100%;
+`;
+
+const CancelIcon = styled.div`
+  color: red;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
 `;

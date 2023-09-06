@@ -8,14 +8,16 @@ interface ButtonProps {
   icon: any;
   title: string;
   path: string;
-  setShowMenu?: () => boolean;
+  setMenuOpen?: any;
+  menuOpen?: boolean;
 }
 
 export const SideBarMenuItem = ({
   icon,
   title,
   path,
-  setShowMenu,
+  setMenuOpen,
+  menuOpen,
 }: ButtonProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,7 +38,10 @@ export const SideBarMenuItem = ({
         (location.pathname.slice(1).includes(path.slice(1)) &&
           path.slice(1).trim() !== "")
       }
-      onClick={() => handleNavigate(path, title)}
+      onClick={() => {
+        handleNavigate(path, title);
+        setMenuOpen(!menuOpen);
+      }}
     >
       <div>{icon}</div>
       <p>{title}</p>

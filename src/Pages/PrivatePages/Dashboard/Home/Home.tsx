@@ -6,8 +6,14 @@ import { useApiGet } from "../../../../custom-hooks";
 import { getDashboardAnalytics } from "../../../../Urls/Home";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@mui/material";
+import { getSubscriptionAnalytics } from "../../../../Urls";
+import { generateQueryKey } from "../../../../utils/utilFns";
 const Home = () => {
   const [analyticsData, setAnalyticsData] = useState<any>("");
+  const [chartData, setChartData] = useState<any>(null);
+  const [filter, setFilter] = useState({
+    period:""
+  });
   const { data: analytics } = useApiGet(
     ["Analytics"],
     () => getDashboardAnalytics(),
@@ -16,9 +22,24 @@ const Home = () => {
       enabled: true,
     }
   );
+  const { data: chartAnalytics, refetch: fetchChart, isFetching } = useApiGet(
+    [generateQueryKey("Chart-data", filter)],
+    () => getSubscriptionAnalytics(filter),
+    {
+      refetchOnWindowFocus: true,
+      enabled: true,
+      cacheTime: 0,
+      staleTime: 0,
+    }
+  );
+
   useEffect(() => {
     analytics && setAnalyticsData(analytics?.data);
   }, [analytics, setAnalyticsData]);
+
+  useEffect(() => {
+    chartAnalytics && setChartData(chartAnalytics?.data);
+  }, [chartAnalytics]);
 
   return (
     <Container>
@@ -28,22 +49,80 @@ const Home = () => {
       {analyticsData ? (
         <CardGrid>
           {Object.keys(analyticsData).map((title, index) => (
-            <Card key={index} value={analyticsData[title]} description={title} />
+            <Card
+              key={index}
+              value={analyticsData[title]}
+              description={title}
+            />
           ))}
         </CardGrid>
       ) : (
         <CardGrid>
-            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
-            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
-            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
-            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
-            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
-            <Skeleton animation="wave" variant="rectangular" width={"100%"} height={118} />
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width={"100%"}
+            height={118}
+          />
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width={"100%"}
+            height={118}
+          />
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width={"100%"}
+            height={118}
+          />
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width={"100%"}
+            height={118}
+          />
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width={"100%"}
+            height={118}
+          />
+          <Skeleton
+            animation="wave"
+            variant="rectangular"
+            width={"100%"}
+            height={118}
+          />
         </CardGrid>
       )}
 
       <Details>
-        <PaymentData/>
+        {chartData ? (
+          <PaymentData
+            data={chartData}
+            filter={filter}
+            setFilter={setFilter}
+            fetchAction={fetchChart}
+            isFetching={isFetching}
+          />
+        ) : (
+          <>
+            {" "}
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width={"100%"}
+              height={118}
+            />
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width={"100%"}
+              height={118}
+            />
+          </>
+        )}
       </Details>
     </Container>
   );
@@ -95,7 +174,6 @@ const ScrollCap = styled.div`
     height: 0.8rem;
     margin-bottom: 0 !important;
   }
-
 `;
 
 const Details = styled.div`

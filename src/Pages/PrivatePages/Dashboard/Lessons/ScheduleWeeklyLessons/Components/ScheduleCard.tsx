@@ -6,11 +6,11 @@ import { useApiPost } from "../../../../../../custom-hooks";
 import { updateWeek } from "../../../../../../Urls";
 import { WEEK_OPTIONS } from "../../../../../../utils/constants";
 import { toast } from "react-toastify";
+import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 
 interface Props {
   item: any;
 }
-
 
 const handleSuccess = () => {
   toast.success(`Successfully updated`, {
@@ -49,17 +49,18 @@ export const ScheduleCard = ({ item }: Props) => {
         <div>
           <h6>{item.lessonName}</h6>
         </div>
-        <SelectInput
-          options={WEEK_OPTIONS}
-          onChange={(value:any) => {
-            const requestBody: any = {
-              week: value?.value,
-            };
-            update(requestBody);
-          }}
-          defaultValue={item.lessonWeek || ""}
-          width={150}
-        />
+        <SelectContainer>
+          <SelectInput
+            options={WEEK_OPTIONS}
+            onChange={(value: any) => {
+              const requestBody: any = {
+                week: value?.value,
+              };
+              update(requestBody);
+            }}
+            defaultValue={item.lessonWeek || ""}
+          />
+        </SelectContainer>
       </div>
     </Container>
   );
@@ -71,6 +72,10 @@ const Container = styled.div`
   border-radius: 12px;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
   padding: 2rem 4rem;
+
+  @media ${devices.tablet} {
+    padding: 1rem;
+  }
 
   > div {
     width: 100%;
@@ -87,4 +92,10 @@ const Container = styled.div`
       }
     }
   }
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  width: 100px;
+
 `;

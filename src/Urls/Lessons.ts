@@ -13,11 +13,13 @@ export const getAllLessonsUrl = (
   });
 };
 
-export const getAllSubjectsUrl = (className: string) =>
-  request({
+export const getAllSubjectsUrl = (className: string) => {
+  console.log(className, "url")
+  return request({
     url: `class/${className}/subjects`,
     method: "GET",
   });
+};
 
 export const getAllClassesUrl = () =>
   request({
@@ -113,4 +115,3 @@ export const activateSubtopicUrl = (id: string | number) =>
     url: `${ADMIN_BASE_URL}/class/sub-topic/${id}/activate`,
     method: "GET",
   });
-

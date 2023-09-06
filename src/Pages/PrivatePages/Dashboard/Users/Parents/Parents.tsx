@@ -3,11 +3,10 @@ import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Drawer, Empty, Switch } from "antd";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
-import { CancelIcon, ExportIcon } from "../../../../../Assets/Svgs";
+import { ExportIcon } from "../../../../../Assets/Svgs";
 import { ColumnsType } from "antd/es/table";
 import {
   ButtonElement,
-  InputElement,
   Options,
   SearchInput,
 } from "../../../../../Ui_elements";
@@ -23,6 +22,13 @@ import { IStudent } from "@appModel";
 import { Avatar } from "@mui/material";
 import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
 import { toast } from "react-toastify";
+import { debounce } from "lodash";
+import { generateQueryKey } from "../../../../../utils/utilFns";
+import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
+
+
+
+
 
 const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
@@ -30,21 +36,29 @@ const Parents = () => {
   const [user, setUser] = useState<DataType | null>(null);
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
+  const [openModal, setOpenModal] = useState(false);
   const [searchFilter, setSearchFilter] = useState<any>({
     page: "",
     pageSize: "",
     search: "",
   });
 
+  const debouncedSearchFilterUpdate = debounce((value) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: value,
+    }));
+  }, 1000);
+
   const handleSearchFilter = (e: any) => {
-    setTimeout(() => {
-      setSearchFilter((prev: any) => ({
-        ...prev,
-        search: e.target.value,
-      }));
-      fetchParent();
-    }, 1500);
+    const searchValue = e.target.value;
+    debouncedSearchFilterUpdate(searchValue.trim());
   };
+
+  const confirmUnlink = () => {
+    setOpenModal(true);
+  };
+
 
   interface DataType {
     key: string;
@@ -94,6 +108,10 @@ const Parents = () => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
 
+  useEffect(() => {
+    fetchParent();
+  }, [searchFilter]);
+
   const handleRowItemClick = (data: DataType) => {
     setUser(data);
     setUserId(data?.key);
@@ -137,26 +155,30 @@ const Parents = () => {
     isLoading: isLoadingParentData,
     isFetching: isFetchingParentData,
     refetch: fetchParent,
-  } = useApiGet(["Parent data"], () => getParentDataUrl(searchFilter), {
-    refetchOnWindowFocus: false,
-    enabled: true,
-    cacheTime: 0,
-  });
+  } = useApiGet(
+    [generateQueryKey("Parent-data", searchFilter)],
+    () => getParentDataUrl(searchFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: false,
+      cacheTime: 0,
+    }
+  );
 
-  const { mutate: toggleParent, isLoading: isTogglingParent } = useAPiPut(
+  const { mutate: toggleParent } = useAPiPut(
     (_: any) => toggleParentUrl(_, userId),
     handleSuccess,
     handleError,
     ["parent-data"]
   );
 
-
   const { mutate: unlink, isLoading: isUnlinkingParent } = useApiPost(
-    user?.dependents ?
-      ()=> unlinkStudentUrl(
-        user?.key,
-        user?.dependents?.map((item) => [item._id])
-      )
+    user?.dependents
+      ? () =>
+          unlinkStudentUrl(
+            user?.key,
+            user?.dependents?.map((item) => [item._id])
+          )
       : null,
     () => {
       toast.success(`Successfully unlinked`, {
@@ -189,7 +211,7 @@ const Parents = () => {
         name: item.fullName,
         email: item.email,
         phoneNumber: item.phoneNumber,
-        status: item.isActive ? "Verified" : "Unverified",
+        status: item.isActive ? "Active" : "Inactive",
         dependents: item.dependents,
         isActive: item.isActive,
       }));
@@ -261,7 +283,7 @@ const Parents = () => {
         onClose={() => setOpenDrawer(false)}
         open={openDrawer}
         closeIcon={false}
-        width={"25%"}
+        width={window.innerWidth < 768 ? "80%" : "25%"}
       >
         <DrawerContentContainer>
           <UserInfo>
@@ -305,7 +327,7 @@ const Parents = () => {
                       isLoading={isUnlinkingParent}
                       width={84}
                       label={"Unlink"}
-                      onClick={unlink}
+                      onClick={confirmUnlink}
                     />
                   </div>
                 ))
@@ -316,6 +338,29 @@ const Parents = () => {
           </Details>
         </DrawerContentContainer>
       </Drawer>
+      <Modal
+        title="Delete Quiz?"
+        okText="Delete"
+        cancelText="Cancel"
+        cancel={() => setOpenModal(false)}
+        openState={openModal}
+      >
+        <ModalContent>
+          <p>Are you sure you want to unlink?</p>
+          <div>
+            <ButtonElement
+              outline
+              label="Cancel"
+              onClick={() => setOpenModal(false)}
+            />
+            <ButtonElement
+              label="Unlink"
+              onClick={() => unlink()}
+              isLoading={isUnlinkingParent}
+            />
+          </div>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
@@ -336,6 +381,21 @@ const Container = styled.section`
 
   @media ${devices.tablet} {
     padding: 0 1rem 1rem 1rem;
+  }
+`;
+
+const Modal = styled(CenteredDialog)``;
+
+const ModalContent = styled.div`
+  text-align: center;
+  p {
+    margin: 10% 0;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 `;
 
@@ -394,10 +454,7 @@ const UtilsHolder = styled.div`
 const VerificationContainer = styled.div``;
 
 const DrawerContentContainer = styled.aside``;
-const CancelContainer = styled.section`
-  display: flex;
-  justify-content: flex-end;
-`;
+
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
@@ -416,18 +473,7 @@ const UserInfo = styled.div`
     }
   }
 `;
-const UpdateDetails = styled.div`
-  width: 100%;
-  > div {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    margin-bottom: 2rem;
-    button {
-      margin-bottom: 7px;
-    }
-  }
-`;
+
 
 const Details = styled.div`
   > div {

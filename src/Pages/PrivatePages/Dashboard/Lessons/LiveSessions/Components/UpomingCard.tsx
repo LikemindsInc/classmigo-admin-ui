@@ -11,6 +11,7 @@ import { ButtonElement, Options, Tag } from "../../../../../../Ui_elements";
 import { cancelLiveLesson } from "../../../../../../Urls/LiveSessions";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
+import live from "../../../../../../Assets/live.png"
 
 interface Props {
   topic: string;
@@ -70,7 +71,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
     <Container>
       <Details>
         <img
-          src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D&w=1000&q=80"
+          src={live}
           alt="hi"
         />
         <div>
@@ -85,7 +86,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
                 Starts in {daysRemaining} {daysRemaining === 1 ? "day" : "days"}
               </p>
             ) : (
-              <p>Event has already started</p>
+              <p>Event has ended</p>
             )}
             <button id="basic-button" onClick={handleClick}>
               <MoreIcon />

@@ -1,16 +1,14 @@
 import { Divider, Timeline } from "antd";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { ExportIcon } from "../../../../../Assets/Svgs";
 import {
-  DatePickerInput,
   ModalOptions,
   SearchInput,
   SelectInput,
 } from "../../../../../Ui_elements";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
-import { columns, data } from "../../../../../utils/dummyDataPayments";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 import { getPaymentDataUrl } from "../../../../../Urls/Payments";
@@ -18,20 +16,73 @@ import { useApiGet } from "../../../../../custom-hooks";
 import { ColumnsType } from "antd/es/table";
 import { UserDetails } from "./Components/UserDetails";
 import { ToolTipElement } from "./Components/ToolTip";
-import { formatDate } from "../../../../../utils/utilFns";
+import { formatOptions, generateQueryKey } from "../../../../../utils/utilFns";
 import moment from "moment";
+import { getAllClassesUrl } from "../../../../../Urls";
+import { debounce } from "lodash";
+import { Controller, useForm } from "react-hook-form";
+import { SUBSCRIPTION_TYPES } from "../../../../../utils/constants";
 
 const Payments = () => {
   const { setOpenModal } = useContext(ModalContext);
   const [payment, setPayment] = useState<DataType[]>([]);
+  const [searchFilter, setSearchFilter] = useState<any>({
+    page: 0,
+    search: null,
+    className: null,
+    planType: null,
+    sort: null,
+  });
 
+  const { control, setValue } = useForm();
+
+  const debouncedSearchFilterUpdate = debounce((value) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: value,
+    }));
+  }, 1500);
+
+  const handleSearchFilter = (e: any) => {
+    const searchValue = e.target.value;
+    debouncedSearchFilterUpdate(searchValue.trim());
+  };
+
+  const onSelectClassname = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: value?.value,
+    }));
+  };
+
+  const onSelectSubscription = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      planType: value?.value,
+    }));
+  };
+
+  const handleClearClass = () => {
+    setValue("className", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: null,
+    }));
+  };
+
+  const handleClearSubscription = () => {
+    setValue("subscription", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      planId: null,
+    }));
+  };
 
   const headerStyle = {
     color: "gray",
     fontSize: "12px",
     fontWeight: 700,
   };
-
 
   interface DataType {
     key: string;
@@ -43,7 +94,6 @@ const Payments = () => {
     amount: number;
     datePurchased: string;
   }
-
 
   const columns: ColumnsType<DataType> = [
     {
@@ -77,7 +127,9 @@ const Payments = () => {
     {
       title: "DATE PURCHASED",
       render: (record: DataType) => (
-        <ToolTipElement paymentDetails={record}>{record.datePurchased}</ToolTipElement>
+        <ToolTipElement paymentDetails={record}>
+          {record.datePurchased}
+        </ToolTipElement>
       ),
     },
     {
@@ -87,7 +139,7 @@ const Payments = () => {
       render: () => <ModalOptions />,
     },
   ];
-  
+
   const updatedColumns = columns.map((column: any) => {
     let updatedColumn = { ...column };
 
@@ -117,81 +169,21 @@ const Payments = () => {
     return updatedColumn;
   });
 
-  const classOptions = [
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
     {
-      value: 0,
-      label: "Primary 1",
-    },
-    {
-      value: 1,
-      label: "Primary 2",
-    },
-    {
-      value: 2,
-      label: "Primary 3",
-    },
-    {
-      value: 3,
-      label: "Primary 4",
-    },
-    {
-      value: 4,
-      label: "Primary 5",
-    },
-    {
-      value: 5,
-      label: "Primary 6",
-    },
-    {
-      value: 6,
-      label: "Primary 2",
-    },
-    {
-      value: 7,
-      label: "JSS1",
-    },
-    {
-      value: 8,
-      label: "JSS2",
-    },
-    {
-      value: 9,
-      label: "JSS3",
-    },
-    {
-      value: 10,
-      label: "SS1",
-    },
-    {
-      value: 11,
-      label: "SS2",
-    },
-    {
-      value: 12,
-      label: "SS3",
-    },
-  ];
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
-  const planOptions = [
-    {
-      value: 0,
-      label: "1 Month",
-    },
-    {
-      value: 1,
-      label: "2 Months",
-    },
-    {
-      value: 2,
-      label: "3 Months",
-    },
-  ];
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const allClasses = useMemo(
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
+  );
 
-  const handleSearchFilter = (value: string) => {};
-
-  // const handleOk = () => {
-  //   setOpenModal(false);
-  // };
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -199,16 +191,20 @@ const Payments = () => {
   const {
     data: paymentData,
     isLoading: isLoadingPaymentData,
+    isFetching: isFetchingPayments,
     refetch: fetchPayment,
-  } = useApiGet(["Payment-data"], () => getPaymentDataUrl(), {
-    refetchOnWindowFocus: false,
-    enabled: true,
-  });
-
+  } = useApiGet(
+    [generateQueryKey("Payment-data", searchFilter)],
+    () => getPaymentDataUrl(searchFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
   useEffect(() => {
     if (paymentData) {
-      const newData = paymentData?.data?.map((item: any) => ({
+      const newData = paymentData?.data?.content.map((item: any) => ({
         key: item?._id,
         name: `${item?.student?.firstName} ${item?.student?.lastName}`,
         username: item?.student?.userName,
@@ -219,31 +215,60 @@ const Payments = () => {
         image: item?.student?.profileImageUrl,
         subStart: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
         subStop: moment(item?.nextDueDate).format("DD, MMM, YYYY"),
-      }))
-      setPayment(newData)
+      }));
+      setPayment(newData);
     }
-  },[paymentData])
-
+  }, [paymentData]);
 
   return (
     <Container>
       <UtilsHolder>
         <div>
-          <SearchInput />
-          <SelectInput
-            options={classOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Class"
-            width={200}
+          <SearchInput onSearch={handleSearchFilter} />
+          <Controller
+            name="className"
+            control={control}
+            render={({ field }) => (
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  id="className"
+                  options={allClasses}
+                  onChange={onSelectClassname}
+                  defaultValue="Class"
+                  isLoading={isLoadingClasses}
+                />
+                {typeof searchFilter?.className === "string" && (
+                  <CancelIcon onClick={handleClearClass}>&#8855;</CancelIcon>
+                )}
+              </SelectContainer>
+            )}
           />
-          <SelectInput
-            options={planOptions}
-            onChange={handleSearchFilter}
-            defaultValue="Status"
-            width={200}
+
+          <Controller
+            name="subscription"
+            control={control}
+            render={({ field }) => (
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  id="planId"
+                  options={SUBSCRIPTION_TYPES}
+                  onChange={onSelectSubscription}
+                  defaultValue="Subscription"
+                  // width={200}
+                />
+                {typeof searchFilter?.isSubscribed === "boolean" && (
+                  <CancelIcon onClick={handleClearSubscription}>
+                    &#8855;
+                  </CancelIcon>
+                )}
+              </SelectContainer>
+            )}
           />
-          <DatePickerInput width={400} label={"Sort By Date"} />
-          <h6>2,500 Results</h6>
+
+          {/* <DatePickerInput width={400} label={"Sort By Date"} /> */}
+          {/* <h6>2,500 Results</h6> */}
         </div>
         <Button>
           Export
@@ -252,9 +277,14 @@ const Payments = () => {
       </UtilsHolder>
       <TableElement
         columns={updatedColumns}
-        data={payment}
-        loading={isLoadingPaymentData}
-        
+        data={payment || null}
+        loading={isLoadingPaymentData || isFetchingPayments}
+        pagination
+        paginationData={paymentData?.data?.pagination}
+        fetchFunction={getPaymentDataUrl}
+        fetchAction={fetchPayment}
+        setSearchFilter={setSearchFilter}
+        searchFilter={searchFilter}
       />
       <Modal cancel={handleCancel} width={"80%"}>
         <TransactionHeader>
@@ -362,16 +392,20 @@ const UtilsHolder = styled.div`
   width: auto;
   align-items: center;
   justify-content: space-between;
+
   @media ${devices.tabletL} {
     flex-direction: column;
     align-items: flex-start;
     flex-wrap: wrap;
+    input {
+      width: fill !important;
+    }
   }
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
-    width:80%;
+    width: 80%;
 
     @media ${devices.tabletL} {
       flex-direction: column;
@@ -459,4 +493,18 @@ const Button = styled.button`
   @media ${devices.tabletL} {
     margin-top: 5%;
   }
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+`;
+
+const CancelIcon = styled.div`
+  color: red;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
 `;

@@ -27,7 +27,6 @@ const LiveSessionsForm = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const [parsedDate, setParsedDate] = useState<any>(null);
-  console.log(state);
   const {
     register,
     control,
@@ -38,16 +37,16 @@ const LiveSessionsForm = () => {
   } = useForm({
     resolver: yupResolver(liveSessionSchema),
     defaultValues: {
-      class: state?.class || null,
-      subject: state?.subject?.name || null,
+      class: state?.class || undefined,
+      subject: state?.subject?.name || undefined,
       title: state?.title || null,
       note: state?.note || null,
       liveUrl: state?.liveUrl || null,
+      durationInMinutes: state?.durationInMinutes || null,
     },
   });
 
   let classValue: any = watch("class");
-  // let subjectValue: any = watch("subject");
 
   useEffect(() => {
     if (state) {
@@ -89,7 +88,6 @@ const LiveSessionsForm = () => {
     }
   );
 
-  classes && console.log(classes);
   const {
     data: subjects,
     isFetching: isLoadingSubjects,
@@ -140,8 +138,8 @@ const LiveSessionsForm = () => {
     useApiPost(createLiveLessonUrl, onSuccess, onError, ["classes"]);
 
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects =
-    subjects && subjects?.data?.subjects.filter((item: any) => item.isActive);
+  // const activeSubjects =
+  //   subjects && subjects?.data?.subjects.filter((item: any) => item.isActive);
 
   const allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
@@ -149,8 +147,8 @@ const LiveSessionsForm = () => {
   );
 
   const allSubjects = useMemo(() => {
-    return formatOptions(subjects?.data, "name", "name");
-  }, [activeSubjects]);
+    return formatOptions(subjects?.data?.subjects, "name", "name");
+  }, [subjects?.data?.subjects]);
 
   const handleUpdate = (data: any) => {
     const requestBody: any = {
@@ -160,6 +158,7 @@ const LiveSessionsForm = () => {
       date: data?.date?.$d,
       liveUrl: data?.liveUrl,
       title: data?.title,
+      durationInMinutes: data?.durationInMinutes
     };
     updateSession(requestBody);
   };
@@ -172,6 +171,7 @@ const LiveSessionsForm = () => {
       date: data?.date,
       liveUrl: data?.liveUrl,
       title: data?.title,
+      durationInMinutes: data?.durationInMinutes
     };
     createLiveLesson(requestBody);
   };
@@ -188,7 +188,6 @@ const LiveSessionsForm = () => {
                 options={allClasses}
                 defaultValue={"Select a class"}
                 width={200}
-                value={state ? field.value : null}
                 error={errors?.class}
                 isLoading={isLoadingClasses}
               />
@@ -205,7 +204,6 @@ const LiveSessionsForm = () => {
                 {...field}
                 options={allSubjects}
                 defaultValue={"Select Subject"}
-                value={state ? field.value : null}
                 width={200}
                 error={errors?.subject}
                 isLoading={isLoadingSubjects}
@@ -219,6 +217,7 @@ const LiveSessionsForm = () => {
         <InputElement
           label="Live Lesson Title"
           id="title"
+          placeholder={"Enter A Tile For Your Live Lesson"}
           register={register}
           error={errors}
         />
@@ -226,6 +225,7 @@ const LiveSessionsForm = () => {
       <InputHolder>
         <TextAreaInput
           label="Description"
+          placeholder={"Enter Your Live Lesson Description"}
           id="note"
           register={register}
           error={errors}
@@ -237,11 +237,21 @@ const LiveSessionsForm = () => {
           id="date"
           setValue={setValue}
           error={errors?.date}
-          defaultValue={state ? parsedDate : null}
+          defaultValue={state ? new Date() : null}
         />
       </InputHolder>
 
-      <ThumbnailSection>
+      <InputHolder>
+        <InputElement
+          label="Duration In Minutes"
+          id="durationInMinutes"
+          placeholder="Please Enter Duration In Minutes (1 Hour = 60 Minutes)"
+          register={register}
+          error={errors}
+        />
+      </InputHolder>
+
+      {/* <ThumbnailSection>
         <h6>Thumbnail</h6>
         <p>Choose or upload an image to show what the video is about</p>
         <ThumbnailList>
@@ -252,7 +262,7 @@ const LiveSessionsForm = () => {
             register={register}
           />
         </ThumbnailList>
-      </ThumbnailSection>
+      </ThumbnailSection> */}
       <InputHolder>
         <InputElement
           label="Live Lesson URL"
@@ -307,35 +317,13 @@ const Header = styled.div`
   }
 `;
 
-const TimeSelect = styled.div`
-  display: flex;
-  align-items: flex-end;
-  gap: 3rem;
-`;
-const TimeContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  p {
-    margin-top: 10%;
-    font-size: 2rem;
-    font-weight: 500;
-  }
-  input {
-    width: 50px;
-    padding: 10px;
-    text-align: center;
-  }
-`;
+
+
 
 const InputHolder = styled.div`
   width: 50%;
 `;
-const ButtonsContainer = styled.div`
-  display: flex;
-  align-self: flex-end;
-  gap: 5px;
-`;
+
 
 const ThumbnailSection = styled.section`
   margin-top: 2rem;
@@ -350,36 +338,4 @@ const ThumbnailSection = styled.section`
 
 const ThumbnailList = styled.div`
   margin-top: 2rem;
-`;
-
-const ButtonInputAm = styled.div<{ active: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${({ active }) =>
-    active === "AM" ? "var(--primary-color)" : "var(--dashboardBackground)"};
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  color: ${({ active }) => (active === "AM" ? "white" : "black")};
-  transition: all 0.3s ease;
-`;
-
-const ButtonInputPm = styled.div<{ active: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  color: ${({ active }) => (active === "PM" ? "white" : "black")};
-  justify-content: center;
-  background-color: ${({ active }) =>
-    active === "PM" ? "var(--primary-color)" : "var(--dashboardBackground)"};
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
 `;

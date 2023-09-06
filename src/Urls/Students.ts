@@ -1,18 +1,15 @@
 import { request } from "../utils/requestProcessor";
+import { generateUrlParams } from "../utils/utilFns";
 
 const ADMIN_BASE_URL = "admin";
 
-export const getStudentDataUrl = (
-  filter?:any
-) =>
-  
-  request({
-    url: `${ADMIN_BASE_URL}/students`,
+export const getStudentDataUrl = (filter?: any) => {
+  const generatedParam = generateUrlParams(filter);
+  return request({
+    url: `${ADMIN_BASE_URL}/students?${generatedParam}`,
     method: "GET",
-    params: {
-      ...filter
-    },
   });
+};
 
 export const toggleStudentUrl = (data: any, id: string) => {
   return request({
@@ -30,10 +27,9 @@ export const toggleParentUrl = (data: any, id: string) => {
   });
 };
 
-
-export const unlinkParentUrl = (studentId:any, parentId:any) => {
+export const unlinkParentUrl = (studentId: any, parentId: any) => {
   return request({
     url: `${ADMIN_BASE_URL}/student/${studentId}/parent/${parentId}/unlink`,
-    method: "GET"
-  })
-}
+    method: "GET",
+  });
+};

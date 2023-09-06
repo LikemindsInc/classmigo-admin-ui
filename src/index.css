@@ -99,12 +99,13 @@ h6 {
 
 .admin-card-wrapper {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
 .role-label {
   color: var(--primary-color);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: capitalize;
 }

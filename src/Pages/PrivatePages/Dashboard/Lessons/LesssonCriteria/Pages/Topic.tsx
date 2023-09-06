@@ -2,20 +2,17 @@ import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../Assets/noData.png";
 import { useLocation } from "react-router-dom";
-import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
+import { ButtonElement } from "../../../../../../Ui_elements";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { TopicCard } from "../Components/TopicCard";
-import { addTopicUrl, getAllLessonsUrl } from "../../../../../../Urls";
-import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
+import { getAllLessonsUrl } from "../../../../../../Urls";
+import { useApiGet } from "../../../../../../custom-hooks";
 import { Pagination, Skeleton } from "@mui/material";
-import { toast, ToastContainer } from "react-toastify";
 import { AddIcon } from "../../../../../../Assets/Svgs";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { topicSchema } from "../LessonCriteriaSchema";
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
 import { ModalContext } from "../../../../../../Contexts/Contexts";
 import { CreateTopic } from "../Components/CreateTopic";
+import { generateQueryKey } from "../../../../../../utils/utilFns";
 
 const SelectTopic = () => {
   const [selectTopic, setSelecttopic] = useState<any>([]);
@@ -29,17 +26,7 @@ const SelectTopic = () => {
   const dragOverTopic = useRef<any>(null);
   const { setOpenModal } = useContext(ModalContext);
 
-
   const PAGE_SIZE = 6;
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(topicSchema),
-  });
 
   const handleDragSort = () => {
     let items = [...selectTopic];
@@ -51,7 +38,7 @@ const SelectTopic = () => {
   };
 
   const handlePageChange = (e: any, p: number) => {
-    setPage(p);
+    setPage(p-1);
   };
 
   const handleCancel = () => {
@@ -61,41 +48,15 @@ const SelectTopic = () => {
   const {
     data: topics,
     isLoading: isLoadingTopics,
+    isFetching: isFetchingTopics,
     refetch: getLessons,
-  } = useApiGet(["lessons-get-all"], () => getAllLessonsUrl(scope, page, PAGE_SIZE), {
-    refetchOnWindowFocus: true,
-    enabled: true,
-  });
-
-  const handleSuccess = () => {
-    toast.success("Successfully added topic", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-    getLessons();
-  };
-  const handleError = (error: any) => {
-    toast.error(error?.message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-  };
-
-  const { mutate: addTopic, isLoading: isAddingTopic } = useApiPost(
-    addTopicUrl,
-    handleSuccess,
-    handleError,
-    ["lessons"]
+  } = useApiGet(
+    [generateQueryKey("lessons-get-all", page)],
+    () => getAllLessonsUrl(scope, page, PAGE_SIZE),
+    {
+      refetchOnWindowFocus: true,
+      enabled: true,
+    }
   );
 
   useEffect(() => {
@@ -107,6 +68,7 @@ const SelectTopic = () => {
   useEffect(() => {
     if (topics) {
       setSelecttopic(topics?.data?.content);
+      setPage(topics?.data?.pagination?.page);
       setTotalPages(topics?.data?.pagination?.numberOfPages);
     }
   }, [topics]);
@@ -117,11 +79,11 @@ const SelectTopic = () => {
         <ButtonElement
           label="Add Topic"
           icon={<AddIcon />}
-          onClick={()=>setOpenModal(true)}
+          onClick={() => setOpenModal(true)}
         />
       </Header>
       <Body>
-        {isLoadingTopics ? (
+        {isLoadingTopics || isFetchingTopics ? (
           <div>
             {[...Array(4)].map((_, index) => (
               <SkeletonContainer key={index}>
@@ -134,7 +96,7 @@ const SelectTopic = () => {
               </SkeletonContainer>
             ))}
           </div>
-        ) : selectTopic.length === 0 ? (
+        ) : !selectTopic ? (
           <NoData>
             <img src={noData} alt="No data" />
             <p>You haven’t added any classes yet.</p>
@@ -166,6 +128,7 @@ const SelectTopic = () => {
             <PaginationContainer>
               <Pagination
                 count={totalPages}
+                page={page + 1}
                 variant="outlined"
                 shape="rounded"
                 onChange={handlePageChange}
@@ -174,11 +137,12 @@ const SelectTopic = () => {
           </CardContainer>
         )}
       </Body>
-      <Modal cancel={handleCancel} width={"35%"} title="Add Topic">
-        <CreateTopic
-          scope={scope}
-          classTitle={classTitle}
-        />
+      <Modal
+        cancel={handleCancel}
+        width={window.innerWidth < 768 ? "90%" : "35%"}
+        title="Add Topic"
+      >
+        <CreateTopic scope={scope} classTitle={classTitle} />
       </Modal>
     </Container>
   );
@@ -207,7 +171,7 @@ const Header = styled.div`
   display: flex;
   width: 100%;
   align-items: flex-end;
-  justify-content:flex-end;
+  justify-content: flex-end;
   margin-bottom: 2rem;
   @media ${devices.tabletL} {
     flex-direction: column;

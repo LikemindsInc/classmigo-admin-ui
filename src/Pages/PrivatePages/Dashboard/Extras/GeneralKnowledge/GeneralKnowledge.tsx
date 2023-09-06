@@ -10,39 +10,37 @@ import { AddIcon, CsvIcon, UploadTick } from "../../../../../Assets/Svgs";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 import { QuestionCard } from "./Components/QuestionCard";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAllClassesUrl, getAllQuizUrl } from "../../../../../Urls";
 import { useApiGet } from "../../../../../custom-hooks";
-import { formatOptions } from "../../../../../utils/utilFns";
+import { formatOptions, generateQueryKey } from "../../../../../utils/utilFns";
 import { Controller, useForm } from "react-hook-form";
 import { debounce } from "lodash";
-
+import { getGeneralQuestions } from "../../../../../Urls/GeneralKnowledge";
+import noData from "../../../../../Assets/noData.png";
+import { Skeleton } from "@mui/material";
 
 type Filter = {
-  search: string
-  className: string
-}
+  search: string;
+  className: string;
+};
 
 const GeneralKnowledge = () => {
   const { setOpenModal } = useContext(ModalContext);
   const [questions, setQuestions] = useState<any>();
 
-
   const { control, watch } = useForm();
   const [searchFilter, setSearchFilter] = useState<Filter>({
     search: "",
-    className:""
-  })
-  
+    className: "",
+  });
 
   const debouncedSearchFilterUpdate = debounce((value) => {
     setSearchFilter((prev: any) => ({
       ...prev,
-      search: value
+      search: value,
     }));
   }, 1500);
-
-
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -56,10 +54,10 @@ const GeneralKnowledge = () => {
   const {
     data: generalQuiz,
     isLoading: isLoadingQuizes,
-    refetch: fetchQuiz
+    refetch: fetchQuiz,
   } = useApiGet(
-    ["quizes"],
-    () => getAllQuizUrl(searchFilter),
+    [generateQueryKey("general-questions", searchFilter)],
+    () => getGeneralQuestions(searchFilter),
     {
       refetchOnWindowFocus: false,
       enabled: true,
@@ -72,17 +70,14 @@ const GeneralKnowledge = () => {
     [activeClasses]
   );
 
-
   useEffect(() => {
     if (generalQuiz) {
-      setQuestions(generalQuiz?.data?.content)
+      setQuestions(generalQuiz?.data?.content);
     }
-  },[generalQuiz])
-
-
+  }, [generalQuiz]);
 
   const handleSearchFilter = (e: any) => {
-    const searchValue = e.target.value
+    const searchValue = e.target.value;
     debouncedSearchFilterUpdate(searchValue);
   };
 
@@ -91,23 +86,21 @@ const GeneralKnowledge = () => {
       ...prev,
       className: value?.value,
     }));
-    fetchQuiz()
+    fetchQuiz();
   };
 
   useEffect(() => {
-    fetchQuiz()
-  }, [fetchQuiz, searchFilter])
-  
+    fetchQuiz();
+  }, [fetchQuiz, searchFilter]);
 
-  
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   // const handleOk = () => {
   //   setOpenModal(false);
   // };
 
   const handleSetQuestions = () => {
-    setQuestions(null)
-  }
+    setQuestions(null);
+  };
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -116,19 +109,21 @@ const GeneralKnowledge = () => {
     <Container>
       <UtilsHolder>
         <div>
-          <Controller
-            name="className"
-            control={control}
-            render={({ field }) => (
-              <SelectInput
-                {...field}
-              options={allClasses}
-              onChange={onClassSelect}
-              defaultValue="Select Level"
-              width={160}
+          <SelectContainer>
+            <Controller
+              name="className"
+              control={control}
+              render={({ field }) => (
+                <SelectInput
+                  {...field}
+                  options={allClasses}
+                  onChange={onClassSelect}
+                  defaultValue="Select Class"
+                  // width={160}
+                />
+              )}
             />
-            )}
-          />
+          </SelectContainer>
 
           <ButtonElement
             icon={<CsvIcon />}
@@ -140,39 +135,57 @@ const GeneralKnowledge = () => {
             icon={<AddIcon />}
             label="Add New Question"
             width={200}
-            onClick={()=>navigate("/general_knowledge/add_question")}
+            onClick={() => navigate("/general_knowledge/add_question")}
           />
         </div>
         <ButtonElement outline={true} label="Download CSV Format" width={250} />
       </UtilsHolder>
 
       <QuestionsContainer>
-        <SearchContainer>
-          <SearchInput
-            onSearch={handleSearchFilter}
-          />
-          {/* <p>250 Results</p> */}
-        </SearchContainer>
-        <Questions>
-  { questions && questions.map((question: any, index: number) =>
-    question.questions.map((item: any, itemIndex: number) => (
-      <QuestionCard
-        id={index + 1}
-        imageUrl={item?.imageUrl}
-        key={itemIndex}
-        question={item?.question}
-        options={item?.options}
-        answer={item?.answer}
-      />
-    ))
-  )}
-</Questions>
+        {isLoadingQuizes ? (
+          <div>
+            {[...Array(4)].map((_, index) => (
+              <SkeletonContainer key={index}>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+            ))}
+          </div>
+        ) : questions && generalQuiz.data.content.length > 0 ? (
+          <div>
+            {questions.map((question: any, index: number) => (
+              <QuestionCard
+                id={index + 1}
+                imageUrl={question?.imageUrl}
+                key={question?._id}
+                question={question?.question}
+                options={question?.options}
+                answer={question?.answer}
+              />
+            ))}
+          </div>
+        ) : (
+          <NoData>
+            <img src={noData} alt="No data" />
+            <p>You haven’t added any question yet.</p>
+            <p>Use the add question above to add a question.</p>
+          </NoData>
+        )}
       </QuestionsContainer>
+
       <Modal cancel={handleCancel} width={"40%"}>
         <ModalContent>
           <UploadTick />
           <p>Question Uploaded Successfully</p>
-          <ButtonElement label="Done" width={100} onClick={handleSetQuestions} />
+          <ButtonElement
+            label="Done"
+            width={100}
+            onClick={handleSetQuestions}
+          />
         </ModalContent>
       </Modal>
     </Container>
@@ -204,13 +217,18 @@ const UtilsHolder = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  button {
-    font-size: 0.8rem;
-  }
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
+
+    button {
+      font-size: 0.8rem;
+      width: 300px;
+      @media ${devices.tablet} {
+        width: 100%;
+      }
+    }
 
     h6 {
       font-size: 1rem;
@@ -247,3 +265,33 @@ const SearchContainer = styled.div`
 `;
 
 const Questions = styled.div``;
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 300px;
+  @media ${devices.tablet} {
+    width: 100%;
+  }
+`;
+
+const NoData = styled.div`
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  img {
+    margin-bottom: 1rem;
+  }
+  p {
+    text-align: center;
+    font-size: 0.8rem;
+  }
+`;
+
+export const SkeletonContainer = styled.div`
+  margin-bottom: 10px;
+`;

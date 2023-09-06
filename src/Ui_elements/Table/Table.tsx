@@ -27,18 +27,23 @@ export const TableElement = ({
   useEffect(() => {
     if (paginationData) {
       setPagination({
-        current: paginationData?.page,
+        current: paginationData?.page + 1 ,
         pageSize: paginationData?.perPage,
         total: paginationData?.totalDocs
       });
     }
   }, [paginationData]);
 
+
   const handlePagination = (page: number) => {
+    setPagination((prev: any) => ({
+      ...prev,
+      current: page
+    }))
     setSearchFilter((prev: any) => (
       {
         ...prev,
-        page: page,
+        page: page - 1 ,
         pageSize: pagination?.pageSize
       }));
   };
@@ -57,7 +62,10 @@ export const TableElement = ({
         total: pagination.total,
         pageSize: pagination.pageSize,
         current: pagination.current,
-        onChange: (page) => { handlePagination(page); },
+        onChange: (page) => {
+          console.log(page, "page")
+          handlePagination(page);
+        },
       }}
       size="large"
       loading={loading}

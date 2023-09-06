@@ -28,13 +28,14 @@ const EditQuestion = () => {
   const { item } = state;
   const [selectedOption, setSelectedOption] = useState<any>(item.correctOption);
   const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initialOption = ["A", "B", "C", "D"].indexOf(item.correctOption);
     setSelectionOptionId(initialOption);
   }, [item.correctOption]);
 
-  const navigate = useNavigate();
+
   const handleCancel = () => {
     setOpenModal(false);
   };

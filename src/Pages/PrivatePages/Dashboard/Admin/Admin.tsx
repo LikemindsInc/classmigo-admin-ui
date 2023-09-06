@@ -2,15 +2,21 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Container } from "../Users/Students/Students";
 import { devices } from "../../../../utils/mediaQueryBreakPoints";
-import { Loader, SearchInput, SelectInput } from "../../../../Ui_elements";
+import {
+  ButtonElement,
+  Loader,
+  SearchInput,
+  SelectInput,
+} from "../../../../Ui_elements";
 import { APP_ROLES } from "../../../../utils/constants";
 import { useApiGet } from "../../../../custom-hooks";
 import { getAllAdmins } from "../../../../Urls";
 import { Avatar, Empty } from "antd";
 import { IAdmin } from "@appModel";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Admin = () => {
+  const navigate = useNavigate();
   const { data, isLoading, refetch } = useApiGet(
     ["admins"],
     () => getAllAdmins(),
@@ -50,7 +56,7 @@ const Admin = () => {
                 <div className="">
                   <Avatar
                     style={{ backgroundColor: "#d9d9d9" }}
-                    size={{ xs: 24, sm: 32, md: 40, lg: 75, xl: 75, xxl: 75 }}
+                    size={{ xs: 24, sm: 32, md: 40, lg: 60, xl: 75, xxl: 75 }}
                   >
                     <span
                       style={{ color: "#fff", fontSize: 24, fontWeight: "700" }}
@@ -61,7 +67,7 @@ const Admin = () => {
                   </Avatar>
                 </div>
                 <div>
-                  <h2 style={{ fontSize: 24, marginBottom: 6 }}>
+                  <h2 style={{ fontSize: 20, marginBottom: 6 }}>
                     {item.firstName} {item.lastName}
                   </h2>
                   <span className="role-label">{item.role}</span>
@@ -96,9 +102,10 @@ const Admin = () => {
           />
           <SearchInput />
         </div>
-        <Link to={"/admin-access/create-user"}>
-          <button>Create Admin User </button>
-        </Link>
+        <ButtonElement
+          label="Create Admin User"
+          onClick={() => navigate("/admin-access/create-user")}
+        />
         {/* {renderData()} */}
       </UtilsHolder>
       <section>{renderData()}</section>
@@ -120,6 +127,13 @@ const UtilsHolder = styled.div`
   width: auto;
   align-items: center;
   justify-content: space-between;
+
+  button{
+    width:200px;
+    @media ${devices.tabletL} {
+      margin-top: 5%;
+    }
+  }
 
   @media ${devices.tabletL} {
     flex-direction: column;
@@ -143,24 +157,7 @@ const UtilsHolder = styled.div`
       width: fit-content;
     }
   }
-  button {
-    background-color: var(--primary-color);
-    padding: 0.6rem;
-    color: white;
-    display: flex;
-    font-size: 0.8rem;
-    outline: none;
-    border: none;
-    border-radius: 12px;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    cursor: pointer;
 
-    @media ${devices.tabletL} {
-      margin-top: 5%;
-    }
-  }
 `;
 
 export default Admin;

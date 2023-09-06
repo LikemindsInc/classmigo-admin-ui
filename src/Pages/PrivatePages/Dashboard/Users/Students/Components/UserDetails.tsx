@@ -1,4 +1,4 @@
-import { Avatar } from "@mui/material";
+ import { Avatar } from "@mui/material";
 import styled from "styled-components";
 
 export const UserDetails = ({

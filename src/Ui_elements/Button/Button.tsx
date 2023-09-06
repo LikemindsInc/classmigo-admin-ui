@@ -28,7 +28,7 @@ export const ButtonElement: React.FC<ButtonProp> = ({
   return (
     <Button width={width} outline={outline} {...otherProps} type={type}>
       {isLoading ? (
-        <Spinner />
+        <Spinner color={outline ? "var(--primary-color)" : "white"} />
       ) : (
         <>
           {label}
@@ -51,7 +51,7 @@ const Button = styled.button<StyledButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size:14px;
+  font-size: 14px;
   width: ${({ width }) => (width ? width + "px" : "100%")};
   border-radius: 6px;
   outline: none;

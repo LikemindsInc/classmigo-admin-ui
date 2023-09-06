@@ -1,35 +1,61 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import {
-  ButtonElement,
-  InputElement,
-  Loader,
-  SelectInput,
-} from "../../../../../Ui_elements";
+import { ButtonElement, Loader, SelectInput } from "../../../../../Ui_elements";
 import noData from "../../../../../Assets/noData.png";
 import { useNavigate } from "react-router-dom";
 import { UpcomingCard } from "./Components/UpomingCard";
-import { LiveSessionCard } from "./Components/liveSessionCard";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
-import zIndex from "@mui/material/styles/zIndex";
 import { useApiGet } from "../../../../../custom-hooks";
 import { getLiveLessons } from "../../../../../Urls/LiveSessions";
 import { Controller, useForm } from "react-hook-form";
-import { getAllClassesUrl } from "../../../../../Urls";
+import { getAllClassesUrl, getAllSubjectsUrl } from "../../../../../Urls";
 import { formatOptions } from "../../../../../utils/utilFns";
-import { Fab } from "@mui/material";
-const LiveSessions = () => {
-  const navigate = useNavigate();
+import { useQueryClient } from "@tanstack/react-query";
 
-  const { control, getValues } = useForm();
-  const { data: liveLessons, isFetching: isLoadingLiveLessons } = useApiGet(
-    ["live-sessions"],
-    () => getLiveLessons(),
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
+const LiveSessions = () => {
+  const { control, watch } = useForm();
+  const [filter, setFilter] = useState({
+    subjectId: null,
+    className: null,
+  });
+  const [classValue, setClassValue] = useState<any>("")
+  const queryClient = useQueryClient()
+
+  const navigate = useNavigate();
+  // let classValue: any = watch("class");
+
+  const changeClass = (value: any) => {
+    setFilter((prev: any) => ({
+      ...prev,
+      className: value?.value,
+    }));
+    setClassValue(value?.value)
+  };
+
+  
+
+  const changeSubject = (value: any) => {
+    setFilter((prev: any) => ({
+      ...prev,
+      subjectId: value?.value,
+    }));
+  };
+
+  const {
+    data: liveLessons,
+    isFetching: isLoadingLiveLessons,
+    refetch: getLiveSessions,
+  } = useApiGet(["live-sessions"],
+    () => getLiveLessons(filter), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
+
+  // useEffect(() => {
+  //   if (filter) {
+  //     getLiveSessions();
+  //   }
+  // }, [filter]);
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -40,12 +66,32 @@ const LiveSessions = () => {
     }
   );
 
+  const handleSearch = () => {
+    queryClient.invalidateQueries(["live-sessions"])
+  }
+
+  const {
+    data: subjects,
+    isFetching: isLoadingSubjects,
+    refetch: fetchSubject,
+  } = useApiGet(["subject"], () => getAllSubjectsUrl(classValue && classValue), {
+    refetchOnWindowFocus: false,
+    enabled: !!classValue,
+  });
+
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+  const activeSubjects =  subjects?.data?.subjects.filter(
+    (item: any) => item.isActive
+  );
 
   const allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
     [activeClasses]
   );
+
+  const allSubjects = useMemo(() => {
+    return formatOptions(activeSubjects, "name", "name");
+  }, [activeSubjects]);
 
   if (isLoadingLiveLessons) {
     return <Loader />;
@@ -63,29 +109,37 @@ const LiveSessions = () => {
                     name="class"
                     control={control}
                     render={({ field }) => (
-                      <SelectInput
-                        {...field}
-                        options={allClasses}
-                        defaultValue="Select a class"
-                        isLoading={isLoadingClasses}
-                        width={200}
-                      />
+                      <SelectContainer>
+                        <SelectInput
+                          {...field}
+                          options={allClasses}
+                          defaultValue="Select a class"
+                          isLoading={isLoadingClasses}
+                          onChange={changeClass}
+                        />
+                      </SelectContainer>
                     )}
                   />
                   <Controller
                     name="subject"
                     control={control}
                     render={({ field }) => (
-                      <SelectInput
-                        {...field}
-                        options={allClasses}
-                        defaultValue="Select a subject"
-                        isLoading={isLoadingClasses}
-                        width={200}
-                      />
+                      <SelectContainer>
+                        <SelectInput
+                          {...field}
+                          options={allSubjects}
+                          defaultValue="Select a subject"
+                          isLoading={isLoadingSubjects}
+                          onChange={changeSubject}
+                        />
+                      </SelectContainer>
                     )}
                   />
-                  <ButtonElement label="View Videos" />
+                  <ButtonElement
+                    label="View Videos"
+                    isLoading={isLoadingLiveLessons}
+                    onClick={handleSearch}
+                  />
                 </aside>
               </CreateContainer>
 
@@ -106,35 +160,6 @@ const LiveSessions = () => {
             </Upcoming>
             <Utilities>
               <PastHeader>Past Live Lessons</PastHeader>
-              {/* <aside>
-                <Controller
-                  name="class"
-                  control={control}
-                  render={({ field }) => (
-                    <SelectInput
-                      {...field}
-                      options={allClasses}
-                      defaultValue="Select a class"
-                      isLoading={isLoadingClasses}
-                      width={200}
-                    />
-                  )}
-                />
-                <Controller
-                  name="subject"
-                  control={control}
-                  render={({ field }) => (
-                    <SelectInput
-                      {...field}
-                      options={allClasses}
-                      defaultValue="Select a subject"
-                      isLoading={isLoadingClasses}
-                      width={200}
-                    />
-                  )}
-                />
-                <ButtonElement label="View Videos" />
-              </aside> */}
             </Utilities>
             <LiveSection>
               {liveLessons?.data.map((item: any, index: number) => {
@@ -144,6 +169,7 @@ const LiveSessions = () => {
                       topic={item?.title}
                       item={item}
                       time={item?.time}
+                      key={index}
                     />
                   );
                 }
@@ -199,6 +225,14 @@ const Body = styled.div`
   margin-bottom: 10rem;
 `;
 
+const SelectContainer = styled.div`
+  display: flex;
+  width: 200px;
+  @media ${devices.tabletL} {
+    width: 100%;
+  }
+`;
+
 const NoData = styled.div`
   width: fit-content;
   margin: 0 auto;
@@ -229,6 +263,10 @@ const Upcoming = styled.div`
     gap: 5%;
     width: 70%;
     margin-top: 2rem;
+  }
+
+  @media ${devices.tabletL} {
+    margin: 40px 0;
   }
 `;
 
@@ -266,7 +304,8 @@ const LiveSection = styled.section`
   margin-top: 2rem;
   gap: 1rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); */
+  grid-template-columns: repeat(1, 1fr);
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
@@ -309,15 +348,36 @@ const CreateContainer = styled.section`
   display: flex;
   width: 100%;
   justify-content: space-between;
+
+  /* h4 {
+    font-size: 1rem;
+
+  } */
+  @media ${devices.tabletL} {
+    h4 {
+      margin-bottom: 10px;
+    }
+    flex-direction: column;
+    align-items: center;
+  }
   button {
     font-size: 0.8rem;
     height: 38px !important;
     width: 200px;
+    @media ${devices.tabletL} {
+      button {
+        width: 100%;
+      }
+    }
   }
 
   aside {
     display: flex;
     align-items: center;
     gap: 10px;
+    @media ${devices.tabletL} {
+      flex-direction: column;
+      width: inherit;
+    }
   }
 `;

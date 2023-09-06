@@ -1,5 +1,6 @@
 import { ADMIN_BASE_URL } from "../utils/constants";
 import { request } from "../utils/requestProcessor";
+import { generateUrlParams } from "../utils/utilFns";
 
 export const createLiveLessonUrl = (data:any) =>
   request({
@@ -16,9 +17,9 @@ export const updateLiveLesson = (data:any, id:string | number) =>
   });
 
 
-export const getLiveLessons = () =>
+export const getLiveLessons = (filter?:any) =>
 request({
-  url: `${ADMIN_BASE_URL}/live-lessons`,
+  url: `${ADMIN_BASE_URL}/live-lessons?${generateUrlParams(filter)}`,
   method: "GET",
 });
 

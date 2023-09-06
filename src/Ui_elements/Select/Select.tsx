@@ -3,6 +3,7 @@ import Select, { StylesConfig } from "react-select";
 import styled from "styled-components";
 import { ErrorIcon } from "../../Assets/Svgs";
 import { Spinner } from "../Spinner/Spinner";
+import { devices } from "../../utils/mediaQueryBreakPoints";
 interface SelectProps {
   options: any;
   onChange?: (value: any) => void;
@@ -32,7 +33,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectProps>(
   ) => {
     return (
       <OuterContainer ref={ref}>
-        <SelectContainer width={width}>
+        <SelectContainer>
           <SelectElement
             placeholder={defaultValue}
             isDisabled={disabled}
@@ -41,6 +42,7 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectProps>(
             options={options}
             onChange={onChange}
             value={value}
+            width={width}
           />
           {isLoading && <Spinner color="var(--primary-color)" />}
         </SelectContainer>
@@ -55,12 +57,12 @@ export const SelectInput = forwardRef<HTMLDivElement, SelectProps>(
   }
 );
 
-const SelectElement = styled(Select)`
-  width: 100%;
+const SelectElement = styled(Select)<{ width: any }>`
+  width: ${({ width }) => (width ? width + "px" : "100%")};
 `;
 
 const OuterContainer = styled.div`
-  /* width: 100% !important; */
+  width: 100%;
 `;
 const ErrorContainer = styled.div`
   display: flex;
@@ -68,15 +70,14 @@ const ErrorContainer = styled.div`
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  margin-top: 0px;
+  margin-top: 5px;
   p {
     color: red;
     font-size: 0.7rem !important;
   }
 `;
 
-const SelectContainer = styled.div<{ width: any }>`
-  width: ${({ width }) => (width ? width + "px" : "100% !important")};
+const SelectContainer = styled.div`
   display: flex;
   gap: 5px;
   align-items: center;

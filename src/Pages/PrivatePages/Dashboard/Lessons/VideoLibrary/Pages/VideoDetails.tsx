@@ -18,6 +18,8 @@ const VideoDetails = () => {
   const location = useLocation();
   const { state } = location;
 
+  console.log(state)
+
   const {
     register,
     handleSubmit,
@@ -27,7 +29,6 @@ const VideoDetails = () => {
       lessonName: state?.details?.title,
     },
   });
-  console.log(state);
 
   const onSuccess = () => {
     toast.success("Successfully added Video", {
@@ -60,13 +61,11 @@ const VideoDetails = () => {
   );
   const onSubmit = (data: any) => {
     // console.log(data);
-    const requestBody: any = {
-      title: data.lessonName,
-      class: state.classValue?.value,
-      file: data.video,
-    };
-
-    createVideo(requestBody);
+    const formData = new FormData();
+    formData.append("title", data?.lessonName);
+    formData.append("class", state.classValue?.value);
+    formData.append("file", data?.video);
+    createVideo(formData as any);
   };
 
   return (
@@ -106,7 +105,7 @@ const VideoDetails = () => {
             <ImageInput title="Upload Thumbnail" type="image" />
           </ThumbnailList>
         </ThumbnailSection> */}
-        <ButtonElement label="Update" width={150} type="submit" />
+        <ButtonElement label="Update" width={150} type="submit" isLoading={isLoading} />
       </DetailsContainer>
       <PreviewContainer>
         <h6>Preview</h6>
@@ -168,6 +167,7 @@ const ThumbnailList = styled.div`
     flex-direction: column;
     width: 100% !important;
   }
+
 `;
 
 const InputHolders = styled.div`
