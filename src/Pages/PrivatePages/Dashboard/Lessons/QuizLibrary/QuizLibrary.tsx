@@ -38,6 +38,7 @@ const QuizLibrary = () => {
     {
       refetchOnWindowFocus: false,
       enabled: true,
+      cacheTime:0
     }
   );
 
@@ -75,7 +76,7 @@ const QuizLibrary = () => {
         <Body>
           <ToolsContainer>
             <SearchContainer>
-              <SearchInput width={300} />
+              <SearchInput />
             </SearchContainer>
             <Utility>
               <Controller
@@ -170,12 +171,12 @@ const SelectContainer = styled.div`
 `;
 
 const SearchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  align-self: center;
   p {
     font-weight: 600;
+  }
+  @media ${devices.tabletL} {
+    width:100%;
   }
 `;
 
@@ -191,6 +192,8 @@ const ToolsContainer = styled.section`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  gap: 20px;
+  /* align-items: center; */
   @media ${devices.tabletL} {
     flex-direction: column;
   }
@@ -200,10 +203,16 @@ const Utility = styled.aside`
   button {
     font-size: 0.8rem;
     height: 38px !important;
-    width: 250px;
+    width: fit-content;
   }
   display: flex;
   gap: 10px;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    button{
+      width: 100%;
+    }
+  }
 `;
 const NoData = styled.div`
   width: 100%;

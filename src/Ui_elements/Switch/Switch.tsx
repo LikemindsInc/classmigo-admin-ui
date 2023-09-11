@@ -1,13 +1,17 @@
 import { Switch, SwitchProps } from "@mui/material";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import styled from "styled-components";
+import { UserContext } from "../../Contexts/Contexts";
 
 interface Props {
   activeState?: boolean;
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 export const SwitchElement = ({ activeState, handleChange }: Props) => {
-  return <CustomSwitch checked={activeState} onChange={handleChange} />;
+  const { user } = useContext(UserContext);
+  return user?.role === "TEACHER" ? (
+    <CustomSwitch checked={activeState} onChange={handleChange} />
+  ) : null;
 };
 
 const CustomSwitch = styled(Switch)`
@@ -17,7 +21,7 @@ const CustomSwitch = styled(Switch)`
 
     &:hover {
       background: rgba(123, 49, 178, 0.2);
-    }  
+    }
   }
   .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
     background-color: var(--primary-color);

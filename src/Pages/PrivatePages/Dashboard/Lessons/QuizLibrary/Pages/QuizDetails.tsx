@@ -121,14 +121,25 @@ const Header = styled.div`
   > div {
     display: flex;
     gap: 1%;
+    @media ${devices.tabletL} {
+      flex-direction: column;
+      gap: 5%;
+      width: 100%;
+    }
+
   }
   button {
     font-size: 0.8rem;
     height: 38px !important;
-    width: 200px;
+    width: 18vw;
   }
   @media ${devices.tabletL} {
     gap: 4%;
+    flex-direction: column;
+    button{
+      width:100%;
+      margin-bottom: 20px;
+    }
   }
 `;
 
@@ -145,6 +156,9 @@ const SearchContainer = styled.div`
 const Body = styled.section`
   width: 100%;
   padding: 0 20%;
+  @media ${devices.tabletL} {
+    padding: 0;
+  }
 `;
 
 const QuestionsContainer = styled.section``;

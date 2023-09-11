@@ -17,4 +17,19 @@ export const getGeneralQuestions = (filter:any) => {
       url: `${ADMIN_BASE_URL}/generalknowledge?${generateUrlParams(filter)}`,
       method: "GET",
     });
-  };
+};
+  
+export const  deleteGeneralQuestionUrl = (id: string | number) => {
+  return request({
+    url: `${ADMIN_BASE_URL}/generalknowledge/${id}`,
+    method: "DELETE",
+  });
+};
+
+export const  updateGeneralQuestionUrl = (data:any, id: string | number) => {
+  return request({
+    url: `${ADMIN_BASE_URL}/generalknowledge/${id}`,
+    method: "PATCH",
+    data: data
+  });
+};

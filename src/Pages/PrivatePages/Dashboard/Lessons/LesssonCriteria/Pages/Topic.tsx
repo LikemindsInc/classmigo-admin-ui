@@ -10,9 +10,16 @@ import { useApiGet } from "../../../../../../custom-hooks";
 import { Pagination, Skeleton } from "@mui/material";
 import { AddIcon } from "../../../../../../Assets/Svgs";
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
-import { ModalContext } from "../../../../../../Contexts/Contexts";
+import {
+  LessonCriteriaContext,
+  ModalContext,
+} from "../../../../../../Contexts/Contexts";
 import { CreateTopic } from "../Components/CreateTopic";
 import { generateQueryKey } from "../../../../../../utils/utilFns";
+import Error from "../../../Error/Error";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { topicSchema } from "../LessonCriteriaSchema";
 
 const SelectTopic = () => {
   const [selectTopic, setSelecttopic] = useState<any>([]);
@@ -21,10 +28,22 @@ const SelectTopic = () => {
   const [page, setPage] = useState(0);
   const location = useLocation();
   const { state } = location;
-  const { scope, classTitle } = state;
+  // const { scope, classTitle } = state;
   const dragTopic = useRef<any>(null);
   const dragOverTopic = useRef<any>(null);
   const { setOpenModal } = useContext(ModalContext);
+
+  const { subject } = useContext(LessonCriteriaContext);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(topicSchema),
+  });
+  
 
   const PAGE_SIZE = 6;
 
@@ -38,10 +57,13 @@ const SelectTopic = () => {
   };
 
   const handlePageChange = (e: any, p: number) => {
-    setPage(p-1);
+    setPage(p - 1);
   };
 
   const handleCancel = () => {
+    setValue("topic", "");
+    setValue("description", "");
+    setValue("video", null as any);
     setOpenModal(false);
   };
 
@@ -52,9 +74,9 @@ const SelectTopic = () => {
     refetch: getLessons,
   } = useApiGet(
     [generateQueryKey("lessons-get-all", page)],
-    () => getAllLessonsUrl(scope, page, PAGE_SIZE),
+    () => getAllLessonsUrl(subject?.value, page, PAGE_SIZE),
     {
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       enabled: true,
     }
   );
@@ -72,6 +94,10 @@ const SelectTopic = () => {
       setTotalPages(topics?.data?.pagination?.numberOfPages);
     }
   }, [topics]);
+
+  if (subject === null) {
+    return <Error />;
+  }
 
   return (
     <Container>
@@ -96,7 +122,7 @@ const SelectTopic = () => {
               </SkeletonContainer>
             ))}
           </div>
-        ) : !selectTopic ? (
+        ) : selectTopic.length === 0 ? (
           <NoData>
             <img src={noData} alt="No data" />
             <p>You haven’t added any classes yet.</p>
@@ -109,8 +135,8 @@ const SelectTopic = () => {
                 item={item}
                 classname={item?.lessonName}
                 key={index}
-                classTitle={scope}
-                subjectTitle={classTitle}
+                // classTitle={scope}
+                // subjectTitle={classTitle}
                 id={item?._id}
                 index={index}
                 track={index}
@@ -142,7 +168,12 @@ const SelectTopic = () => {
         width={window.innerWidth < 768 ? "90%" : "35%"}
         title="Add Topic"
       >
-        <CreateTopic scope={scope} classTitle={classTitle} />
+        <CreateTopic
+          register={register}
+          handleSubmit={handleSubmit}
+          errors={errors}
+          setValue={setValue}
+        />
       </Modal>
     </Container>
   );

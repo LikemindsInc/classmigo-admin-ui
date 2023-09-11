@@ -1,30 +1,31 @@
 import styled from "styled-components";
 import { SearchOutlined } from "@ant-design/icons";
+import React from "react";
 
-interface SearchProps {
-  onSearch?: (e:any) => void;
-  value?:string
+interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  onSearch?: (e: any) => void;
   width?: number;
+  ref?:  React.Ref<HTMLInputElement>; 
 }
 
-
-
-export const SearchInput = ({ onSearch, width, value }: SearchProps) => {
-  return (
-    <SearchContainer width={width}>
-      <input placeholder="search" onChange={onSearch} value={value} />
-      <div>
-        <SearchIcon />
-      </div>
-    </SearchContainer>
-  );
-};
-
-
-
-
-
-
+export const SearchInput = React.forwardRef<HTMLInputElement, SearchProps>(
+  ({ onSearch, width, value, ...restProps }, ref) => {
+    return (
+      <SearchContainer width={width}>
+        <input
+          ref={ref}
+          placeholder="search"
+          onChange={onSearch}
+          value={value}
+          {...restProps}
+        />
+        <div>
+          <SearchIcon />
+        </div>
+      </SearchContainer>
+    );
+  }
+);
 
 const SearchContainer = styled.div<{ width?: number }>`
   width: ${({ width }) => (width ? width + "px" : "100%")};
@@ -37,7 +38,6 @@ const SearchContainer = styled.div<{ width?: number }>`
   &:focus-within {
     border: 1px solid var(--primary-color);
     background-color: transparent;
-
   }
 
   input {

@@ -13,12 +13,11 @@ import { Controller, useForm } from "react-hook-form";
 import { useApiPost } from "../../../../../../custom-hooks";
 import { toast } from "react-toastify";
 import { createVideoUrl } from "../../../../../../Urls";
+import usePreventNavigation from "../../../../../../custom-hooks/UtilHooks/usePreventNavigation";
 
 const VideoDetails = () => {
   const location = useLocation();
   const { state } = location;
-
-  console.log(state)
 
   const {
     register,
@@ -59,6 +58,11 @@ const VideoDetails = () => {
     onError,
     ["videos"]
   );
+
+  usePreventNavigation(isLoading);
+
+  console.log(isLoading)
+
   const onSubmit = (data: any) => {
     // console.log(data);
     const formData = new FormData();
@@ -105,7 +109,12 @@ const VideoDetails = () => {
             <ImageInput title="Upload Thumbnail" type="image" />
           </ThumbnailList>
         </ThumbnailSection> */}
-        <ButtonElement label="Update" width={150} type="submit" isLoading={isLoading} />
+        <ButtonElement
+          label="Update"
+          width={150}
+          type="submit"
+          isLoading={isLoading}
+        />
       </DetailsContainer>
       <PreviewContainer>
         <h6>Preview</h6>
@@ -167,7 +176,6 @@ const ThumbnailList = styled.div`
     flex-direction: column;
     width: 100% !important;
   }
-
 `;
 
 const InputHolders = styled.div`

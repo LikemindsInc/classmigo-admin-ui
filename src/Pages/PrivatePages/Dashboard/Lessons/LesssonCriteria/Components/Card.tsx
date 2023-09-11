@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
@@ -8,15 +8,13 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { useApiPost } from "../../../../../../custom-hooks";
 import { activateUrl, deactivateUrl } from "../../../../../../Urls";
 import { toast } from "react-toastify";
+import { LessonCriteriaContext } from "../../../../../../Contexts/Contexts";
 
 interface CardProps {
   subjects?: any[];
   subjectsCount: string[];
-  id: number;
-  topics?: string[];
   classname: string;
   active: boolean;
-  index: number;
   isDraggedOver?: any;
   item: any;
   onDragStart?: () => void;
@@ -30,11 +28,8 @@ export const Card = ({
   classname,
   subjects,
   subjectsCount,
-  topics,
-  index,
   item,
   active,
-  id,
   onDragStart,
   onDragEnter,
   onDragEnd,
@@ -42,8 +37,10 @@ export const Card = ({
   isDraggedOver,
   ...otherProps
 }: CardProps) => {
+  const { setClassName } = useContext(LessonCriteriaContext);
   const navigate = useNavigate();
   let isActive = active;
+
   const onSuccess = () => {
     toast.success("Successful", {
       position: "top-right",
@@ -55,6 +52,7 @@ export const Card = ({
       theme: "light",
     });
   };
+
   const onError = (error: any) => {
     toast.error(`Something went wrong ${error.message}`, {
       position: "top-right",
@@ -70,6 +68,7 @@ export const Card = ({
   const toggleActive = () => {
     isActive ? deactivateClass() : activateClass();
   };
+
   // const { mutate: deleteClass, isLoading: isDeleting } = useApiDelete(
   //   () => deleteClassUrl(id),
   //   onSuccess,
@@ -105,12 +104,18 @@ export const Card = ({
         <Container>
           <DetailsContainer
             onClick={() => {
-              navigate(`/lessons_criteria/${classname}`, {
-                state: {
-                  title: classname,
-                  scope: item,
-                },
+              setClassName({
+                label: classname,
+                value: item,
               });
+              localStorage.setItem(
+                "className",
+                JSON.stringify({
+                  label: classname,
+                  value: item,
+                })
+              );
+              navigate(`/lessons_criteria/${classname}`, {state:{fromClass:true}});
             }}
           >
             <h6>{classname}</h6>

@@ -9,7 +9,7 @@ import { useApiGet } from "../../../../../custom-hooks";
 import { getLiveLessons } from "../../../../../Urls/LiveSessions";
 import { Controller, useForm } from "react-hook-form";
 import { getAllClassesUrl, getAllSubjectsUrl } from "../../../../../Urls";
-import { formatOptions } from "../../../../../utils/utilFns";
+import { formatOptions, generateQueryKey } from "../../../../../utils/utilFns";
 import { useQueryClient } from "@tanstack/react-query";
 
 const LiveSessions = () => {
@@ -18,8 +18,8 @@ const LiveSessions = () => {
     subjectId: null,
     className: null,
   });
-  const [classValue, setClassValue] = useState<any>("")
-  const queryClient = useQueryClient()
+  const [classValue, setClassValue] = useState<any>("");
+  const queryClient = useQueryClient();
 
   const navigate = useNavigate();
   // let classValue: any = watch("class");
@@ -29,10 +29,8 @@ const LiveSessions = () => {
       ...prev,
       className: value?.value,
     }));
-    setClassValue(value?.value)
+    setClassValue(value?.value);
   };
-
-  
 
   const changeSubject = (value: any) => {
     setFilter((prev: any) => ({
@@ -43,19 +41,19 @@ const LiveSessions = () => {
 
   const {
     data: liveLessons,
-    isFetching: isLoadingLiveLessons,
+    isFetching: isFetchingLiveLessons,
+    isLoading: isLoadingLiveLessons,
     refetch: getLiveSessions,
-  } = useApiGet(["live-sessions"],
-    () => getLiveLessons(filter), {
+  } = useApiGet(["lesson"], () => getLiveLessons(filter), {
     refetchOnWindowFocus: false,
-    enabled: true,
+    enabled: false,
+    staleTime: 0,
+    cacheTime: 0,
   });
 
-  // useEffect(() => {
-  //   if (filter) {
-  //     getLiveSessions();
-  //   }
-  // }, [filter]);
+  useEffect(() => {
+    getLiveSessions();
+  }, []);
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -67,20 +65,22 @@ const LiveSessions = () => {
   );
 
   const handleSearch = () => {
-    queryClient.invalidateQueries(["live-sessions"])
-  }
+    getLiveSessions();
+    // queryClient.invalidateQueries(["live-session"]);
+  };
 
-  const {
-    data: subjects,
-    isFetching: isLoadingSubjects,
-    refetch: fetchSubject,
-  } = useApiGet(["subject"], () => getAllSubjectsUrl(classValue && classValue), {
-    refetchOnWindowFocus: false,
-    enabled: !!classValue,
-  });
+  const { data: subjects, isFetching: isLoadingSubjects } = useApiGet(
+    ["subject"],
+    () => getAllSubjectsUrl(classValue && classValue),
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!classValue,
+    }
+  );
 
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects =  subjects?.data?.subjects.filter(
+
+  const activeSubjects = subjects?.data?.subjects.filter(
     (item: any) => item.isActive
   );
 
@@ -93,13 +93,12 @@ const LiveSessions = () => {
     return formatOptions(activeSubjects, "name", "name");
   }, [activeSubjects]);
 
-  if (isLoadingLiveLessons) {
-    return <Loader />;
-  }
   return (
     <Container>
       <Body>
-        {liveLessons ? (
+        {isFetchingLiveLessons ? (
+          <Loader />
+        ) : liveLessons ? (
           <>
             <Upcoming>
               <CreateContainer>
@@ -143,39 +142,53 @@ const LiveSessions = () => {
                 </aside>
               </CreateContainer>
 
-              <UpcomingSection>
+              {liveLessons?.data?.length > 0 ? (
+                <UpcomingSection>
+                  {liveLessons?.data.map((item: any, index: number) => {
+                    if (item?.isActive) {
+                      return (
+                        <UpcomingCard
+                          topic={item?.title}
+                          item={item}
+                          time={item?.time}
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+                </UpcomingSection>
+              ) : (
+                <Error>
+                  <img src={noData} alt="No data" />
+                  <p>You don't have any scheduled or previous live lessons.</p>
+                </Error>
+              )}
+            </Upcoming>
+            <Utilities>
+              <PastHeader>Past Live Lessons</PastHeader>
+            </Utilities>
+            {liveLessons?.data.some((item: any) => !item?.isActive) ? (
+              <LiveSection>
                 {liveLessons?.data.map((item: any, index: number) => {
-                  if (item?.isActive) {
+                  if (!item?.isActive) {
                     return (
                       <UpcomingCard
                         topic={item?.title}
                         item={item}
                         time={item?.time}
+                        key={index}
                       />
                     );
                   }
                   return null;
                 })}
-              </UpcomingSection>
-            </Upcoming>
-            <Utilities>
-              <PastHeader>Past Live Lessons</PastHeader>
-            </Utilities>
-            <LiveSection>
-              {liveLessons?.data.map((item: any, index: number) => {
-                if (!item?.isActive) {
-                  return (
-                    <UpcomingCard
-                      topic={item?.title}
-                      item={item}
-                      time={item?.time}
-                      key={index}
-                    />
-                  );
-                }
-                return null;
-              })}
-            </LiveSection>
+              </LiveSection>
+            ) : (
+              <Error>
+                <img src={noData} alt="No data" />
+                <p>You don't have any scheduled or previous live lessons.</p>
+              </Error>
+            )}
           </>
         ) : (
           <NoData>
@@ -213,6 +226,9 @@ const Container = styled.div`
   position: relative !important;
   @media ${devices.tablet} {
     padding: 0 1rem 1rem 1rem;
+  }
+  @media ${devices.tabletL} {
+    overflow-y: scroll;
   }
 `;
 
@@ -298,14 +314,17 @@ const FabContainer = styled.div`
 const LiveSection = styled.section`
   margin-top: 2rem;
   width: 100%;
-  h4 {
-    font-size: 1.3rem;
+  > h4 {
+    font-size: 1.5vw;
   }
   margin-top: 2rem;
-  gap: 1rem;
   display: grid;
-  /* grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); */
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   grid-template-columns: repeat(1, 1fr);
+
+  @media ${devices.tabletL} {
+    font-size: 1rem;
+  }
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
@@ -314,10 +333,10 @@ const LiveSection = styled.section`
 
 const UpcomingSection = styled.section`
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
   margin: 3rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(1, 1fr);
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
@@ -333,6 +352,8 @@ const Utilities = styled.section`
   display: flex;
   justify-content: space-between;
   margin: 2rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 2%;
   > aside {
     display: flex;
     gap: 10px;
@@ -348,14 +369,17 @@ const CreateContainer = styled.section`
   display: flex;
   width: 100%;
   justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 2%;
 
-  /* h4 {
-    font-size: 1rem;
-
-  } */
+  h4 {
+    font-size: 1.5vw;
+  }
   @media ${devices.tabletL} {
     h4 {
       margin-bottom: 10px;
+      font-size: 1rem;
     }
     flex-direction: column;
     align-items: center;
@@ -365,9 +389,7 @@ const CreateContainer = styled.section`
     height: 38px !important;
     width: 200px;
     @media ${devices.tabletL} {
-      button {
-        width: 100%;
-      }
+      width: 100%;
     }
   }
 
@@ -378,6 +400,22 @@ const CreateContainer = styled.section`
     @media ${devices.tabletL} {
       flex-direction: column;
       width: inherit;
+      button {
+        width: 100%;
+      }
     }
+  }
+`;
+
+const Error = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto;
+  p {
+    font-size: 0.8rem;
+    text-align: center;
   }
 `;

@@ -19,6 +19,23 @@ const LazyPayments = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Users/Payments/Payments")
 );
 
+const LazyAmigoQuiz = lazy(
+  () => import("../../Pages/PrivatePages/Dashboard/Extras/AmigoQuiz/AmigoQuiz")
+);
+
+// const LazyPracticeQuiz = lazy(
+//   () =>
+//     import(
+//       "../../Pages/PrivatePages/Dashboard/Extras/AmigoQuiz/Pages/PracticeQuiz"
+//     )
+// );
+// const LazyLeaderboard = lazy(
+//   () =>
+//     import(
+//       "../../Pages/PrivatePages/Dashboard/Extras/AmigoQuiz/Pages/Leaderboard"
+//     )
+// );
+
 //Lessons Menu routes
 const LazyLessonCriteria = lazy(
   () =>
@@ -65,10 +82,9 @@ const LazySubscription = lazy(
 );
 
 const LazySubscriptionCreatePlan = lazy(
-  () => import("../../Pages/PrivatePages/Dashboard/Subscription/Pages/CreatePlan")
+  () =>
+    import("../../Pages/PrivatePages/Dashboard/Subscription/Pages/CreatePlan")
 );
-
-
 
 const LazyScheduleLiveLessons = lazy(
   () =>
@@ -106,6 +122,13 @@ const LazyAddQuestionGeneralKnowledge = lazy(
   () =>
     import(
       "../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/AddQuestion"
+    )
+);
+
+const LazyEditQuestionGeneralKnowledge = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Extras/GeneralKnowledge/Pages/EditQuestion"
     )
 );
 
@@ -255,6 +278,10 @@ export const PrivateRoutes = () => {
       element: <LazyAddQuestionGeneralKnowledge />,
     },
     {
+      path: "/general_knowledge/edit_question/:id",
+      element: <LazyEditQuestionGeneralKnowledge />,
+    },
+    {
       path: "/general_knowledge/add_question",
       element: <LazyAddQuestionGeneralKnowledge />,
     },
@@ -304,6 +331,18 @@ export const PrivateRoutes = () => {
       path: "/admin-access/:id",
       element: <AdminDetail />,
     },
+    {
+      path: "/amigo_quiz",
+      element: <LazyAmigoQuiz />,
+    },
+    // {
+    //   path: "/amigo_quiz/practice_quiz",
+    //   element: <LazyPracticeQuiz />,
+    // },
+    // {
+    //   path: "/amigo_quiz/leaderboard",
+    //   element: <LazyLeaderboard />,
+    // },
     {
       path: "/*",
       element: <LazyErrorPage />,

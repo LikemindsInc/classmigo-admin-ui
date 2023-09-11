@@ -4,6 +4,7 @@ import { ErrorIcon, UploadIcon } from "../../Assets/Svgs";
 import { devices } from "../../utils/mediaQueryBreakPoints";
 import { ButtonElement } from "../Button/Button";
 import { VideoCameraAddOutlined } from "@ant-design/icons";
+import { UseControllerProps } from "react-hook-form";
 
 interface ImageInputProps {
   title?: string;
@@ -11,6 +12,7 @@ interface ImageInputProps {
   register?: any;
   id?: string;
   error?: any;
+  setValue?:any
   defaultImage?: string;
 }
 
@@ -20,9 +22,11 @@ export const ImageInput = ({
   register,
   id,
   error,
+  setValue,
   defaultImage
 }: ImageInputProps) => {
   const fileInputRef = useRef<any>(null);
+  const [fileReview, setFileReview] = useState(null)
   const [preview, setPreview] = useState(defaultImage || "");
 
   const handleInputChange = async (
@@ -30,6 +34,7 @@ export const ImageInput = ({
   ) => {
     const file = event.target.files?.[0] || null;
     file && setPreview(URL.createObjectURL(file));
+    console.log(file,"fdfdf")
     if (file) {
       if (register) {
         register(id, {
@@ -44,6 +49,11 @@ export const ImageInput = ({
       fileInputRef.current.click();
     }
   };
+
+  const handleClearMedia = () => {
+    setValue(id, null)
+          setPreview("")
+  }
 
   return (
     <OuterWrapper>
@@ -74,7 +84,7 @@ export const ImageInput = ({
         </ErrorContainer>
       ) : null}
       {!!preview && (
-        <ButtonElement onClick={() => setPreview("")} label="Remove" />
+        <ButtonElement onClick={handleClearMedia} label="Remove" />
       )}
     </OuterWrapper>
   );

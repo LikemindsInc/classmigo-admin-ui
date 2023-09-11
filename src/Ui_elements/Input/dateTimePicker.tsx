@@ -19,7 +19,6 @@ export const DateTimePickerElement = ({
   error,
   defaultValue,
 }: Props) => {
-  console.log(defaultValue, "llopp")
   const [incomingDateFormat, setIncomingDateFormat] = useState<any>(dayjs(defaultValue));
   const usefulDate = useFormattedDate(defaultValue);
   // console.log(incomingDateFormat, "Incoming")
@@ -33,7 +32,7 @@ export const DateTimePickerElement = ({
           setValue(id, newValue);
         }}
         minDate={dayjs(new Date())}
-        defaultValue={incomingDateFormat}
+        defaultValue={dayjs(defaultValue)}
         
       />
       {error ? (

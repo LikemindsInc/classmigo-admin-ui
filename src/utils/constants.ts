@@ -3,7 +3,7 @@ export const BASE_URL =
   "https://classmigo.herokuapp.com/api/v1/";
 export const ADMIN_BASE_URL = "admin";
 
-export const APP_ROLES = ["MANAGER", "TEACHER", "SYSTEM_ADMIN"];
+export const APP_ROLES = ["MANAGER", "TEACHER", "ACCOUNTANT", "SYSTEM_ADMIN"];
 export const WEEK_OPTIONS = [
   {
     label: 1,

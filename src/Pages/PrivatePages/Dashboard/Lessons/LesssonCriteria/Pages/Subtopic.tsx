@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import {
@@ -11,21 +11,24 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useApiPost } from "../../../../../../custom-hooks";
-import { addSubTopicUrl} from "../../../../../../Urls";
+import { addSubTopicUrl } from "../../../../../../Urls";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { subTopicSchema } from "../LessonCriteriaSchema";
+import { LessonCriteriaContext } from "../../../../../../Contexts/Contexts";
 
 const Subtopic = () => {
   const location = useLocation();
-  const navigate = useNavigate()
-  const { state } = location;
+  const navigate = useNavigate();
+  const { topic } = useContext(LessonCriteriaContext);
+  // const { state } = location;
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(subTopicSchema), 
+    resolver: yupResolver(subTopicSchema),
   });
 
   const onSuccess = () => {
@@ -38,10 +41,10 @@ const Subtopic = () => {
       draggable: true,
       theme: "light",
     });
-    navigate(-1)
+    navigate(-1);
   };
   const onError = (e: any) => {
-    toast.error(e, {
+    toast.error(`Something went wrong, ${e.message}`, {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -52,8 +55,8 @@ const Subtopic = () => {
     });
   };
 
-  const { mutate: addSubTopic, isLoading:isAddingSubtopic } = useApiPost(
-    (_: any) => addSubTopicUrl(_, state),
+  const { mutate: addSubTopic, isLoading: isAddingSubtopic } = useApiPost(
+    (_: any) => addSubTopicUrl(_, topic),
     onSuccess,
     onError
     // [`sub_topic${item?._id}`]
@@ -61,10 +64,11 @@ const Subtopic = () => {
 
   const onSubmit = (data: any) => {
     const formData = new FormData();
-    formData.append("file", data?.video);
+    data?.video && formData.append("file", data?.video);
     formData.append("topic", data?.subtopicTitle);
     formData.append("shortNote", data?.subtopicDescription);
-    formData.append("thumbnail", data?.thumbnail);
+    data?.videoUrl && formData.append("introVideo", data?.videoUrl);
+    formData.append("thumbnail", data?.thumbnail ? data?.thumbnail : "");
     addSubTopic(formData as any);
   };
   return (
@@ -73,7 +77,7 @@ const Subtopic = () => {
         <InputHolders>
           <InputElement
             label="Subtopic Title"
-            placeholder="Enter Lesson Title"
+            placeholder="Enter Subtopic Title"
             register={register}
             id="subtopicTitle"
             error={errors}
@@ -98,6 +102,16 @@ const Subtopic = () => {
             id="video"
             register={register}
             error={errors}
+            setValue={setValue}
+          />
+        </InputHolders>
+        <InputHolders>
+          <InputElement
+            label="Or Enter Video Url"
+            placeholder="Enter Video Url"
+            register={register}
+            id="videoUrl"
+            error={errors}
           />
         </InputHolders>
         <ThumbnailSection>
@@ -110,10 +124,16 @@ const Subtopic = () => {
               id="thumbnail"
               register={register}
               error={errors}
+              setValue={setValue}
             />
           </ThumbnailList>
         </ThumbnailSection>
-        <ButtonElement label="Add Subtopic" width={150} type="submit" isLoading={isAddingSubtopic} />
+        <ButtonElement
+          label="Add Subtopic"
+          width={150}
+          type="submit"
+          isLoading={isAddingSubtopic}
+        />
       </DetailsContainer>
     </Container>
   );
@@ -147,8 +167,8 @@ const DetailsContainer = styled.form`
     margin-top: 1rem;
   }
   @media ${devices.tabletL} {
-      width:100%;
-    }
+    width: 100%;
+  }
 `;
 
 const ThumbnailList = styled.div`
@@ -163,7 +183,7 @@ const ThumbnailList = styled.div`
 
 const InputHolders = styled.div`
   margin-bottom: 2rem;
-  >p {
+  > p {
     font-size: 0.8rem;
     font-weight: 600;
     margin-bottom: 0.5rem;

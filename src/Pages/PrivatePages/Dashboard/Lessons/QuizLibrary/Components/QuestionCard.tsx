@@ -11,6 +11,7 @@ import { useApiPost } from "../../../../../../custom-hooks";
 import { deleteQuizQuestionUrl } from "../../../../../../Urls";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
@@ -20,7 +21,7 @@ interface QuestionCardProp {
   answer?: any;
   detailId?: any;
   item?: any;
-  queryId?:string
+  queryId?: string;
 }
 
 export const QuestionCard = ({
@@ -31,10 +32,11 @@ export const QuestionCard = ({
   answer,
   detailId,
   item,
-  queryId
+  queryId,
 }: QuestionCardProp) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [openImage, setOpenImage] = useState(false);
 
   const { mutate: deleteQuestion, isLoading: isDeletingQuestion } = useApiPost(
     deleteQuizQuestionUrl,
@@ -48,10 +50,10 @@ export const QuestionCard = ({
         draggable: true,
         theme: "light",
       });
-      setOpen(!open)
+      setOpen(!open);
     },
-    () => {
-      toast.error(`Successfully deleted question`, {
+    (e) => {
+      toast.error(`Something went wrong, ${e}`, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -60,6 +62,7 @@ export const QuestionCard = ({
         draggable: true,
         theme: "light",
       });
+      setOpen(!open);
     },
     [`quiz${queryId}`]
   );
@@ -89,7 +92,11 @@ export const QuestionCard = ({
       </QuestionHolder>
 
       <ImageContainer>
-        <img src={imageUrl || Placeholder} alt="" />
+        <img
+          src={imageUrl || Placeholder}
+          alt=""
+          onClick={() => setOpenImage(!openImage)}
+        />
         <div>
           <ButtonElement
             outline
@@ -125,6 +132,18 @@ export const QuestionCard = ({
           </div>
         </ModalContent>
       </Modal>
+
+      <Modal
+        cancelText="Cancel"
+        width={"70%"}
+        // okay={() => handleDelete(quizId)}
+        cancel={() => setOpenImage(false)}
+        openState={openImage}
+      >
+        <ModalContent>
+          <img src={imageUrl || Placeholder} alt={"questionImage"} />
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
@@ -138,6 +157,10 @@ const Container = styled.div`
   background-color: var(--dashboardBackground);
   margin-bottom: 2rem;
   justify-content: space-between;
+  @media ${devices.mobileM} {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
 `;
 const Number = styled.div`
   background-color: var(--primary-color);
@@ -191,18 +214,32 @@ const OptionsContainer = styled.div`
       align-items: center;
       justify-content: center;
       border-radius: 50%;
+      @media ${devices.tabletL} {
+        font-size: 0.8rem;
+      }
     }
     p {
       font-size: 0.9rem;
+      @media ${devices.tabletL} {
+        font-size: 0.8rem;
+      }
     }
   }
 `;
 
 const ImageContainer = styled.div`
   img {
-    width: 200px;
-    height: 100px;
+    width: 15vw;
+    height: 150px;
+    aspect-ratio: 1;
     object-fit: cover;
+    background-color: var(--hover-color);
+    @media ${devices.mobileM} {
+      display: none;
+    }
+    @media ${devices.tabletL} {
+      width:30vw
+    }
   }
   > div {
     display: flex;
@@ -210,6 +247,9 @@ const ImageContainer = styled.div`
     justify-content: flex-end;
     align-items: center;
     margin-top: 1rem;
+    @media ${devices.mobileM} {
+      justify-content: flex-start;
+    }
     button {
       font-size: 0.7rem;
       width: fit-content !important;
@@ -226,11 +266,20 @@ const Delete = styled(DeleteOutlined)`
 const Correct = styled.h6`
   color: var(--primary-color);
   font-size: 1rem;
+  @media ${devices.tabletL} {
+    font-size: 0.8rem;
+  }
 `;
 
 const Modal = styled(CenteredDialog)``;
 const ModalContent = styled.div`
   text-align: center;
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    /* transform: scale(1.2); */
+  }
   p {
     margin: 10% 0;
   }

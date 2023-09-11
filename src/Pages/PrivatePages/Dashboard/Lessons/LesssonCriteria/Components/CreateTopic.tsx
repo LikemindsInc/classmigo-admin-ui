@@ -13,25 +13,27 @@ import {
   addTopicUrl,
 } from "../../../../../../Urls";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ModalContext } from "../../../../../../Contexts/Contexts";
+import { LessonCriteriaContext, ModalContext } from "../../../../../../Contexts/Contexts";
 import { topicSchema } from "../LessonCriteriaSchema";
 
-type Props = {
-  scope: string;
-  classTitle: string;
-};
 
-export const CreateTopic = ({ scope, classTitle }: Props) => {
+export const CreateTopic = ({
+  register,
+  handleSubmit,
+  errors,
+  setValue
+}: any) => {
   const { setOpenModal } = useContext(ModalContext);
+  const {className, subject} = useContext(LessonCriteriaContext)
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(topicSchema),
-  });
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   setValue,
+  //   formState: { errors },
+  // } = useForm({
+  //   resolver: yupResolver(topicSchema),
+  // });
 
   const handleSuccess = () => {
     toast.success("Successfully added topic", {
@@ -70,12 +72,12 @@ export const CreateTopic = ({ scope, classTitle }: Props) => {
 
   const onSubmit = (data: any) => {
     const formData = new FormData();
-    formData.append("lessonName", data?.topic);
+    formData.append("lessonName", data?.topic.trim());
     formData.append("lessonDescription", data?.description);
     formData.append("file", data?.video);
     data?.introVideo && formData.append("introVideo", data?.introVideo);
-    formData.append("schoolSubject", scope);
-    formData.append("studentClass", classTitle);
+    formData.append("schoolSubject", subject?.value);
+    formData.append("studentClass", className?.value);
     addTopic(formData as any);
   };
 
@@ -109,6 +111,7 @@ export const CreateTopic = ({ scope, classTitle }: Props) => {
           id="video"
           register={register}
           error={errors}
+          setValue={setValue}
         />
       </InputHolders>
 

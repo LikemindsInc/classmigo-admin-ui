@@ -1,9 +1,10 @@
 // import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { MenuOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
 import {
   AdminIcon,
+  AmigoQuizIcon,
   AskIcon,
   HomeIcon,
   LessonIcon,
@@ -17,9 +18,12 @@ import {
 } from "../../../Assets/Svgs";
 import { SideBarMenuItem } from "../../../Ui_elements";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
+import { UserContext } from "../../../Contexts/Contexts";
 
 export const DashboardSidebar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const { user } = useContext(UserContext);
 
   const userMenus = [
     {
@@ -83,6 +87,11 @@ export const DashboardSidebar = () => {
       title: "General Knowledge",
       icon: <UserIcon />,
     },
+    {
+      path: "/amigo_quiz",
+      title: "AmigoQuiz",
+      icon: <AmigoQuizIcon />,
+    },
   ];
 
   const subscriptionMenu = [
@@ -97,7 +106,7 @@ export const DashboardSidebar = () => {
     setMenuOpen(!menuOpen);
   };
   return (
-    <OuterContainer>
+    <OuterContainer fullWidth={menuOpen}>
       <Menu show={menuOpen} onClick={showMenu} />
 
       <Container show={menuOpen}>
@@ -111,22 +120,25 @@ export const DashboardSidebar = () => {
               setMenuOpen={setMenuOpen}
             />
           </section>
-          <section>
-            <h6>USERS</h6>
-            {userMenus.map((item, index) => {
-              return (
-                <SideBarMenuItem
-                  // setShowMenu={setMenuOpen}
-                  key={index}
-                  icon={item.icon}
-                  title={item.title}
-                  path={item.path}
-                  menuOpen={menuOpen}
-                  setMenuOpen={setMenuOpen}
-                />
-              );
-            })}
-          </section>
+          {user.role !== "TEACHER" && (
+            <section>
+              <h6>USERS</h6>
+              {userMenus.map((item, index) => {
+                return (
+                  <SideBarMenuItem
+                    // setShowMenu={setMenuOpen}
+                    key={index}
+                    icon={item.icon}
+                    title={item.title}
+                    path={item.path}
+                    menuOpen={menuOpen}
+                    setMenuOpen={setMenuOpen}
+                  />
+                );
+              })}
+            </section>
+          )}
+
           <section>
             <h6>LESSONS</h6>
             {lessonMenus.map((item, index) => {
@@ -160,33 +172,37 @@ export const DashboardSidebar = () => {
             })}
           </section>
 
-          <section>
-            <h6>SUBSCRIPTION</h6>
-            {subscriptionMenu.map((item, index) => {
-              return (
-                <SideBarMenuItem
-                  key={index}
-                  icon={item.icon}
-                  title={item.title}
-                  path={item.path}
-                  menuOpen={menuOpen}
-                  setMenuOpen={setMenuOpen}
-                />
-              );
-            })}
-          </section>
+          {user?.role !== "TEACHER" && (
+            <section>
+              <h6>SUBSCRIPTION</h6>
+              {subscriptionMenu.map((item, index) => {
+                return (
+                  <SideBarMenuItem
+                    key={index}
+                    icon={item.icon}
+                    title={item.title}
+                    path={item.path}
+                    menuOpen={menuOpen}
+                    setMenuOpen={setMenuOpen}
+                  />
+                );
+              })}
+            </section>
+          )}
         </div>
 
-        <div>
-          <SideBarMenuItem
-            // setShowMenu={setMenuOpen}
-            icon={<AdminIcon />}
-            title="Admin Access"
-            path={"/admin-access"}
-            menuOpen={menuOpen}
-            setMenuOpen={setMenuOpen}
-          />
-        </div>
+        {user?.role !== "TEACHER" && (
+          <div>
+            <SideBarMenuItem
+              // setShowMenu={setMenuOpen}
+              icon={<AdminIcon />}
+              title="Admin Access"
+              path={"/admin-access"}
+              menuOpen={menuOpen}
+              setMenuOpen={setMenuOpen}
+            />
+          </div>
+        )}
       </Container>
 
       <Touchable
@@ -199,6 +215,7 @@ export const DashboardSidebar = () => {
 
 const Container = styled.aside<{ show: boolean }>`
   max-height: 100vh;
+  height: 100vh !important;
   padding: 1.5rem 0 3.4rem 0;
   width: 19vw !important;
   background-color: white;
@@ -206,7 +223,7 @@ const Container = styled.aside<{ show: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow-y: scroll;
+  overflow-y: scroll !important;
   scroll-behavior: smooth;
   &::-webkit-scrollbar {
     display: none;
@@ -240,14 +257,18 @@ const Container = styled.aside<{ show: boolean }>`
   }
 `;
 
-const OuterContainer = styled.div`
+const OuterContainer = styled.div<{ fullWidth: boolean }>`
+  height: 100%;
+  /* min-height: 100vh; */
+  width: fit-content;
   @media ${devices.tablet} {
     display: flex;
-    width: 100vw !important ;
+    width: ${({ fullWidth }) => (fullWidth ? "100vw" : "fit-content")};
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 1;
+    overflow-y: scroll !important;
   }
 `;
 

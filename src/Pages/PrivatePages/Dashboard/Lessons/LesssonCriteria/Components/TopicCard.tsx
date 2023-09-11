@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon, ToggleIcon } from "../../../../../../Assets/Svgs";
@@ -15,13 +15,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../../../../../../Ui_elements";
 import { useNavigate } from "react-router-dom";
 import { SubtopicCard } from "./SubtopicCard";
+import { LessonCriteriaContext } from "../../../../../../Contexts/Contexts";
 
 interface CardProps {
   subjects?: string[];
   topics?: string[];
   classname: string;
-  classTitle?: any;
-  subjectTitle?: any;
+  // classTitle?: any;
+  // subjectTitle?: any;
   index: number;
   id: number;
   item: any;
@@ -44,8 +45,8 @@ export const TopicCard = ({
   id,
   track,
   active,
-  classTitle,
-  subjectTitle,
+  // classTitle,
+  // subjectTitle,
   onDragStart,
   onDragEnter,
   onDragEnd,
@@ -58,6 +59,14 @@ export const TopicCard = ({
   const [isActive, setIsActive] = useState(active);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const { className, subject, setTopic } = useContext(LessonCriteriaContext);
+
+  // useEffect(() => {
+
+  // },[])
+
+  // console.log(id, "id")
 
   const handleActivateSuccess = (data: any) => {
     queryClient.invalidateQueries(["lessons-get-all"]);
@@ -154,12 +163,13 @@ export const TopicCard = ({
               <ToolsContainer>
                 <Tools>{subtopic?.length} subtopics</Tools>
                 <AddSub
-                  onClick={() =>
+                  onClick={() => {
+                    setTopic(id)
                     navigate(
-                      `/lessons_criteria/${classTitle}/${subjectTitle}/${classname}`,
-                      { state: id }
-                    )
-                  }
+                      `/lessons_criteria/${className?.label}/${subject?.label}/${classname}`,
+                      // { state: id }
+                    );
+                  }}
                 >
                   Add Subtopic
                 </AddSub>
@@ -173,7 +183,10 @@ export const TopicCard = ({
             </Details>
           </DetailsContainer>
           <SwitchContainer>
-            <SwitchElement activeState={isActive} handleChange={()=>toggleActive()} />
+            <SwitchElement
+              activeState={isActive}
+              handleChange={() => toggleActive()}
+            />
           </SwitchContainer>
         </Container>
         <MoveIcon style={{ cursor: "move" }} />

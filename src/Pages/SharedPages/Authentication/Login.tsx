@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "./authenticationSchema";
 import { useApiPost } from "../../../custom-hooks";
 import { loginUrl } from "../../../Urls/Authentication";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useContext } from "react";
 import { UserContext } from "../../../Contexts/Contexts";
 
@@ -32,7 +32,15 @@ const Login = () => {
     navigate("/");
   };
   const handleError = (error: any) => {
-    console.log(error);
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
   };
   const { mutate: login, isLoading: isLogin } = useApiPost(
     loginUrl,
@@ -73,7 +81,6 @@ const Login = () => {
         <ButtonElement type="submit" label="LOGIN" isLoading={isLogin} />
       </Form>
       {/* {loginError ? <Error>{loginError}</Error> : null} */}
-      <ToastContainer />
     </LoginBox>
   );
 };

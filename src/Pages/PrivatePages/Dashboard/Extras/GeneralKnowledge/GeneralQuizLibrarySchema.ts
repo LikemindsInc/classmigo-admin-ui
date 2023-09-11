@@ -21,3 +21,4 @@ export const createQuizSchema = yup.object().shape({
   topic: yup.mixed().required("Please select a topic"),
   difficulty: yup.mixed().required("Please select a difficulty"),
 });
+

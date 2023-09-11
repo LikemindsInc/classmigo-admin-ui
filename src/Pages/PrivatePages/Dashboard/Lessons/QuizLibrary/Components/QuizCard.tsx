@@ -18,6 +18,8 @@ export const Card = ({ quizId, details }: Props) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  console.log(details, "details");
+
   const onSuccess = () => {
     toast.success("Successfully Deleted Quiz", {
       position: "top-right",
