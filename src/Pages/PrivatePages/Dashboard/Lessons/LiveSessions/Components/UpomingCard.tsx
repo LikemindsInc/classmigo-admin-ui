@@ -11,7 +11,8 @@ import { ButtonElement, Options, Tag } from "../../../../../../Ui_elements";
 import { cancelLiveLesson } from "../../../../../../Urls/LiveSessions";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import live from "../../../../../../Assets/live.png"
+import live from "../../../../../../Assets/live.png";
+import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 
 interface Props {
   topic: string;
@@ -70,10 +71,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
   return (
     <Container>
       <Details>
-        <img
-          src={live}
-          alt="hi"
-        />
+        <img src={live} alt="hi" />
         <div>
           <h6>{topic}</h6>
           <Time>
@@ -117,10 +115,14 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
               </Item>
             </Menu>
           </Start>
-          <Tag>{item?.subject?.name}</Tag>
+
+          <TagContainer>
+            <Tag>{item?.subject?.name}</Tag>
+            {/* <Tag>{item?.class}</Tag> */}
+          </TagContainer>
         </div>
       </Details>
-      <ButtonElement
+      {/* <ButtonElement
         label="Join"
         onClick={() =>
           navigate(`/live_lessons/${topic}`, {
@@ -129,29 +131,47 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
             },
           })
         }
-      />
+      /> */}
     </Container>
   );
 };
 
 const Container = styled.div`
-  min-width: 24vw;
+  min-width: 180px;
+  width: 100%;
+  max-width: 22vw;
   background-color: white;
   box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.15);
   border-radius: 12px;
   padding: 1rem;
+  margin-bottom: 2vh;
+  @media ${devices.tabletL} {
+    min-width: 100% !important;
+  }
 
   > button {
     margin-top: 0.8rem;
   }
 `;
 
+const TagContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  @media ${devices.tabletL} {
+    display: none !important;
+    flex-direction: column;
+  }
+`;
 const Details = styled.div`
   img {
     width: 100px;
     height: 100px;
     border-radius: 8px;
     object-fit: cover;
+    @media ${devices.laptop} {
+      display: none;
+    }
   }
   > div {
     width: 100%;
@@ -162,6 +182,13 @@ const Details = styled.div`
   }
   display: flex;
   gap: 10px;
+
+  @media ${devices.tabletL} {
+    img {
+      width: 50px;
+      height: 50px;
+    }
+  }
 `;
 
 const Time = styled.div`
@@ -169,9 +196,12 @@ const Time = styled.div`
   gap: 10px;
   margin-top: 5px;
   p {
-    font-size: 0.8rem;
-    font-weight: 00;
+    font-size: 0.8vw;
+    font-weight: 500;
     color: #585858;
+    @media ${devices.laptop} {
+      font-size: 0.7rem;
+    }
   }
 `;
 const Start = styled.div`
@@ -181,9 +211,12 @@ const Start = styled.div`
   justify-content: space-between;
 
   p {
-    font-size: 0.8rem;
+    font-size: 0.8vw;
     color: var(--primary-color);
     font-weight: 700;
+    @media ${devices.laptop} {
+      font-size: 0.7rem;
+    }
   }
   button {
     background-color: transparent;

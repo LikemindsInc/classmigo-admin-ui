@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../Assets/noData.png";
 import { useLocation } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { SubjectCard } from "../Components/SubjectCard";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
-import { Pagination, Skeleton } from "@mui/material";
+import { Skeleton } from "@mui/material";
 import { createSubjectUrl, getAllClassesUrl } from "../../../../../../Urls";
 import { ButtonElement, InputElement } from "../../../../../../Ui_elements";
 import { AddIcon } from "../../../../../../Assets/Svgs";
@@ -13,35 +13,36 @@ import { useForm } from "react-hook-form";
 import { subjectSchema } from "../LessonCriteriaSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
+import { LessonCriteriaContext } from "../../../../../../Contexts/Contexts";
+import Error from "../../../Error/Error";
 
 const SelectSubject = () => {
   const location = useLocation();
   const { state } = location;
-  const { title, scope } = state;
   const [selectSubject, setSelectSubject] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
+  const { className } = useContext(LessonCriteriaContext);
+  const [fromClass, setFromClass] = useState(false);
 
+  console.log(className, "className....");
+
+  useEffect(() => {
+    if (state) {
+      setFromClass(state?.fromClass);
+    }
+  }, [state]);
+
+  console.log(state, "state....");
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(subjectSchema),
   });
-
-  const handleSuccess = () => {
-    toast.success("Successfully Updated", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "light",
-    });
-  };
 
   const handleError = (error: any) => {
     toast.error(error?.message, {
@@ -76,7 +77,10 @@ const SelectSubject = () => {
       draggable: true,
       theme: "light",
     });
+
+    setValue("name", "");
   };
+
   const onError = (error: any) => {
     toast.error(`Something went wrong, couldn't add ${subject}. ${error}`, {
       position: "top-right",
@@ -88,6 +92,7 @@ const SelectSubject = () => {
       theme: "light",
     });
   };
+
   const { mutate: createSubject, isLoading: isCreatingSubject } = useApiPost(
     createSubjectUrl,
     onSuccess,
@@ -114,8 +119,15 @@ const SelectSubject = () => {
   }, [subjects]);
 
   const onSubmit = (data: any) => {
-    createSubject({ ...data, className: scope });
+    const requestBody: any = {
+      name: data?.name.trim().trimLeft().toString(),
+    };
+    createSubject({ ...requestBody, className: className?.value });
   };
+
+  if (className === null) {
+    return <Error />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -139,14 +151,14 @@ const SelectSubject = () => {
             <>
               {selectSubject?.map(
                 (item: any, index: number) =>
-                  item?.name === scope &&
+                  item?.name === className?.value &&
                   item?.subjects?.map((item: any) => (
                     <SubjectCard
-                      classname={item?.name}
+                      // subjectname={item?.name}
                       key={index}
                       item={item?.name}
-                      classTitle={scope}
-                      title={title}
+                      // classTitle={className?.label}
+                      // title={className?.value}
                       active={item?.isActive}
                       id={item?._id}
                       index={index}

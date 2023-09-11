@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { MoveIcon } from "../../../../../../Assets/Svgs";
@@ -13,18 +13,19 @@ import {
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../../../../../../Ui_elements";
+import { LessonCriteriaContext } from "../../../../../../Contexts/Contexts";
 
 interface CardProps {
   subjects?: string[];
   topics?: string[];
   id: number;
-  classname: string;
-  classTitle: string;
+  // subjectname: string;
+  // classTitle: string;
   active?: boolean;
   index: number;
   isDraggedOver?: any;
   item: any;
-  title: string;
+  // title: string;
   onDragStart?: () => void;
   onDragEnter?: () => void;
   onDragEnd?: () => void;
@@ -33,15 +34,15 @@ interface CardProps {
 }
 
 export const SubjectCard = ({
-  classname,
-  classTitle,
+  // subjectname,
+  // classTitle,
   subjects,
   topics,
   index,
   item,
   id,
   active,
-  title,
+  // title,
   onDragStart,
   onDragEnter,
   onDragEnd,
@@ -51,8 +52,8 @@ export const SubjectCard = ({
 }: CardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  const [isActive, setIsActive] = useState(active)
+  const [isActive, setIsActive] = useState(active);
+  const { className, setSubject, subject } = useContext(LessonCriteriaContext);
 
   const toggleActive = () => {
     if (active) {
@@ -92,18 +93,30 @@ export const SubjectCard = ({
     >
       <Container>
         <DetailsContainer
-          onClick={() =>
-            navigate(`/lessons_criteria/${title}/${classname}`, {
+          onClick={() => {
+            setSubject({
+              label: item,
+              value: item,
+            });
+            localStorage.setItem(
+              "subject",
+              JSON.stringify({
+                label: item,
+                value: item,
+              })
+            );
+
+            navigate(`/lessons_criteria/${className?.label}/${item}`, {
               state: {
-                title: classname,
-                className: title,
+                title: subject,
+                // className: title,
                 scope: item,
-                classTitle: classTitle,
+                // classTitle: classTitle,
               },
-            })
-          }
+            });
+          }}
         >
-          <h6>{classname}</h6>
+          <h6>{item}</h6>
         </DetailsContainer>
         <SwitchContainer>
           <SwitchElement activeState={isActive} handleChange={toggleActive} />

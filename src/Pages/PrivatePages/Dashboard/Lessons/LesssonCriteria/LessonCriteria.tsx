@@ -21,6 +21,7 @@ const LessonCriteria = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(classSchema),
@@ -45,9 +46,10 @@ const LessonCriteria = () => {
       draggable: true,
       theme: "light",
     });
+    setValue("classname", "")
   };
   const onError = (e: any) => {
-    toast.error(e, {
+    toast.error(`Something went wrong`, {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
@@ -83,7 +85,10 @@ const LessonCriteria = () => {
   };
 
   const onSubmit = (data: any) => {
-    createClass(data);
+    const requestBody: any = {
+      name: data?.classname.trim().toString(),
+    }
+    createClass(requestBody);
     reset()
   };
 
@@ -96,7 +101,7 @@ const LessonCriteria = () => {
               label="Create Class"
               placeholder="Enter Class"
               register={register}
-              id="name"
+              id="classname"
               error={errors}
             />
             <ButtonElement
@@ -111,11 +116,9 @@ const LessonCriteria = () => {
                 {selectClass.map((item: any, index: number) => (
                   <Card
                     item={item?.name}
-                    id={item?._id}
                     classname={item?.value}
                     active={item?.isActive}
                     key={index}
-                    index={index}
                     subjectsCount={item?.subjects.length}
                     onDragStart={() => (dragClass.current = index)}
                     onDragEnter={() => (dragOverClass.current = index)}

@@ -46,7 +46,7 @@ export const AuthenticationLayout = ({ children }: LayoutProp) => {
       </CarouselContainer>
       <LoginContainer>
         <div>
-          <Logo />
+          <LogoFix />
         </div>
 
         <div>{children}</div>
@@ -119,3 +119,7 @@ const LoginContainer = styled.section`
     padding: 3rem 0 0 3rem;
   }
 `;
+
+const LogoFix = styled(Logo)`
+  width: 300px;
+`

@@ -60,6 +60,12 @@ const Students = () => {
     isSubscribed: null,
     isActive: null,
   });
+  const hasFilter = () => {
+    const { search, className, isSubscribed, isActive } = searchFilter;
+    return [search, className, isSubscribed, isActive].some(
+      (value) => value !== null
+    );
+  };
   const { control, setValue } = useForm();
 
   //util functions
@@ -118,6 +124,19 @@ const Students = () => {
     setSearchFilter((prev: any) => ({
       ...prev,
       isSubscribed: null,
+    }));
+  };
+
+  const clearFilters = () => {
+    setValue("className", null);
+    setValue("status", null);
+    setValue("subscription", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: null,
+      className: null,
+      isSubscribed: null,
+      isActive: null,
     }));
   };
 
@@ -303,7 +322,14 @@ const Students = () => {
       ellipsis: true,
       render: (data: ISubscription[]) => {
         return (
-          <div style={{ maxWidth: 300 }}>
+          <div
+            style={{
+              maxWidth: 300,
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
             {data.map((item) => (
               <SubTag>{item.className} </SubTag>
             ))}
@@ -459,10 +485,12 @@ const Students = () => {
             </h6>
           )}
         </div>
-        <button>
+        {hasFilter() && <h5 onClick={clearFilters}>Clear filters</h5>}
+
+        {/* <button>
           Export
           <ExportIcon />
-        </button>
+        </button> */}
       </UtilsHolder>
 
       <TableElement
@@ -593,8 +621,6 @@ const Students = () => {
 
 export default Students;
 
-
-
 export const Container = styled.section`
   width: 100%;
   height: 85vh;
@@ -633,6 +659,21 @@ const UtilsHolder = styled.div`
   width: auto;
   align-items: center;
   justify-content: space-between;
+
+  h5 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: red;
+    transition: all 0.3s ease;
+    &:hover {
+      cursor: pointer;
+      color: white;
+      padding: 5px 10px;
+      background-color: red;
+      text-align: center;
+      border-radius: 6px;
+    }
+  }
 
   @media ${devices.tabletL} {
     flex-direction: column;
@@ -676,7 +717,7 @@ const UtilsHolder = styled.div`
 
     @media ${devices.tabletL} {
       margin-top: 5%;
-      width:100%;
+      width: 100%;
     }
   }
 `;
@@ -754,14 +795,14 @@ const SubTag = styled.div`
   border-radius: 6px;
   font-size: 0.7rem;
   display: inline;
-  margin: 0 5px;
+  margin: 3px 5px;
 `;
 
 const SelectContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  width:100%;
+  width: 100%;
 `;
 
 const CancelIcon = styled.div`

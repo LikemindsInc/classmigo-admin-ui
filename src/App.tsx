@@ -15,6 +15,7 @@ import { ToastContainer } from "react-toastify";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useIsOnline } from "./custom-hooks";
 import Error from "./Pages/PrivatePages/Dashboard/Error/Error";
+import { LessonCriteriaProvider } from "./Contexts/Providers/LessonCriteriaProvider";
 
 function App() {
   const { user } = useContext(UserContext);
@@ -44,17 +45,19 @@ function App() {
           <NavbarContextProvider>
             <DrawerContextProvider>
               <ModalContextProvider>
-                {isOnline ? (
-                  user ? (
-                    <PrivateRoutes />
+                <LessonCriteriaProvider>
+                  {isOnline ? (
+                    user ? (
+                      <PrivateRoutes />
+                    ) : (
+                      <SharedRoutes />
+                    )
                   ) : (
-                    <SharedRoutes />
-                  )
-                ) : (
-                  <Error />
-                )}
+                    <Error />
+                  )}
 
-                <ToastContainer />
+                  <ToastContainer />
+                </LessonCriteriaProvider>
               </ModalContextProvider>
             </DrawerContextProvider>
           </NavbarContextProvider>

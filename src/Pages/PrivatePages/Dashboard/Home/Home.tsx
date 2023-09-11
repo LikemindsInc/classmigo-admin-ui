@@ -4,15 +4,17 @@ import { PaymentData } from "./Components/PaymentData";
 import { devices } from "../../../../utils/mediaQueryBreakPoints";
 import { useApiGet } from "../../../../custom-hooks";
 import { getDashboardAnalytics } from "../../../../Urls/Home";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Skeleton } from "@mui/material";
 import { getSubscriptionAnalytics } from "../../../../Urls";
 import { generateQueryKey } from "../../../../utils/utilFns";
+import { UserContext } from "../../../../Contexts/Contexts";
 const Home = () => {
   const [analyticsData, setAnalyticsData] = useState<any>("");
   const [chartData, setChartData] = useState<any>(null);
+  const { user } = useContext(UserContext);
   const [filter, setFilter] = useState({
-    period:""
+    period: "",
   });
   const { data: analytics } = useApiGet(
     ["Analytics"],
@@ -22,7 +24,11 @@ const Home = () => {
       enabled: true,
     }
   );
-  const { data: chartAnalytics, refetch: fetchChart, isFetching } = useApiGet(
+  const {
+    data: chartAnalytics,
+    refetch: fetchChart,
+    isFetching,
+  } = useApiGet(
     [generateQueryKey("Chart-data", filter)],
     () => getSubscriptionAnalytics(filter),
     {
@@ -97,33 +103,35 @@ const Home = () => {
         </CardGrid>
       )}
 
-      <Details>
-        {chartData ? (
-          <PaymentData
-            data={chartData}
-            filter={filter}
-            setFilter={setFilter}
-            fetchAction={fetchChart}
-            isFetching={isFetching}
-          />
-        ) : (
-          <>
-            {" "}
-            <Skeleton
-              animation="wave"
-              variant="rectangular"
-              width={"100%"}
-              height={118}
+      {user?.role === "TEACHER" ? null : (
+        <Details>
+          {chartData ? (
+            <PaymentData
+              data={chartData}
+              filter={filter}
+              setFilter={setFilter}
+              fetchAction={fetchChart}
+              isFetching={isFetching}
             />
-            <Skeleton
-              animation="wave"
-              variant="rectangular"
-              width={"100%"}
-              height={118}
-            />
-          </>
-        )}
-      </Details>
+          ) : (
+            <>
+              {" "}
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={"100%"}
+                height={118}
+              />
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={"100%"}
+                height={118}
+              />
+            </>
+          )}
+        </Details>
+      )}
     </Container>
   );
 };

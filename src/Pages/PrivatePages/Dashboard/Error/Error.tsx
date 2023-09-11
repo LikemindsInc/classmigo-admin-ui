@@ -4,9 +4,11 @@ import { ButtonElement } from "../../../../Ui_elements";
 import error from "../../../../Assets/Error_404.png";
 import { devices } from "../../../../utils/mediaQueryBreakPoints";
 import { useIsOnline } from "../../../../custom-hooks";
+import { useNavigate } from "react-router-dom";
 
 const Error = () => {
   const isOnline = useIsOnline();
+  const navigate = useNavigate();
   return (
     <Container>
       <div>
@@ -17,7 +19,9 @@ const Error = () => {
             ? "You have either clicked a bad link or the URL you entered is incorrect."
             : "You are offline. Please connect to the Internet."}
         </p>
-        {isOnline ? <ButtonElement label="Go Home" /> : null}
+        {isOnline ? (
+          <ButtonElement label="Go Home" onClick={() => navigate("/")} />
+        ) : null}
       </div>
     </Container>
   );

@@ -12,7 +12,7 @@ export const Tag = ({children}:any) => {
 const Container = styled.div`
     text-align: center;
     padding: 5px 8px;
-    font-size: 0.6rem;
+    font-size: 0.7vw;
     font-weight: 600;
     width: fit-content;
     border-radius: 12px;

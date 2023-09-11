@@ -26,10 +26,6 @@ import { debounce } from "lodash";
 import { generateQueryKey } from "../../../../../utils/utilFns";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 
-
-
-
-
 const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [parent, setParent] = useState<any>([]);
@@ -58,7 +54,6 @@ const Parents = () => {
   const confirmUnlink = () => {
     setOpenModal(true);
   };
-
 
   interface DataType {
     key: string;
@@ -160,10 +155,12 @@ const Parents = () => {
     () => getParentDataUrl(searchFilter),
     {
       refetchOnWindowFocus: false,
-      enabled: false,
+      enabled: true,
       cacheTime: 0,
     }
   );
+
+  // console.log(isFetchingParentData, isLoadingParentData, "opo")
 
   const { mutate: toggleParent } = useAPiPut(
     (_: any) => toggleParentUrl(_, userId),
@@ -260,16 +257,21 @@ const Parents = () => {
       <UtilsHolder>
         <div>
           <SearchInput onSearch={handleSearchFilter} />
+          {searchFilter?.search !== "" && parent?.length > 0 && (
+            <h6>
+              {parent?.length} {parent?.length > 1 ? "Results" : "Result"}
+            </h6>
+          )}
         </div>
-        <button>
+        {/* <button>
           Export
           <ExportIcon />
-        </button>
+        </button> */}
       </UtilsHolder>
       <TableElement
         columns={updatedColumns}
         data={parent || null}
-        loading={isLoadingParentData || isFetchingParentData}
+        loading={isFetchingParentData}
         pagination
         paginationData={parentData?.data?.pagination}
         fetchFunction={getParentDataUrl}
@@ -473,7 +475,6 @@ const UserInfo = styled.div`
     }
   }
 `;
-
 
 const Details = styled.div`
   > div {

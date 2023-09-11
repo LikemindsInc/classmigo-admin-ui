@@ -50,6 +50,7 @@ const AddQuestion = () => {
     register,
     handleSubmit,
     getValues,
+    setValue,
     control,
     watch,
     formState: { errors },
@@ -204,7 +205,7 @@ const AddQuestion = () => {
       }
     } else {
       const requestBody: any = {
-        subjectId: subjectValue,
+        subjectId: subjectValue?.value,
         class: classValue,
         lessonId: data?.topic?.value,
         difficultyLevel: data?.difficulty?.label,
@@ -228,14 +229,15 @@ const AddQuestion = () => {
           <Controller
             name="class"
             control={control}
-            render={({ field }) => (
+            render={({ field: { value, onChange } }) => (
               <SelectContainer>
                 <SelectInput
-                  {...field}
+                  // value={value}
                   options={allClasses}
                   defaultValue={"Select Class"}
                   onChange={(value: any) => {
                     setClassValue(value?.value);
+                    setValue("class", value?.value)
                   }}
                   error={errors?.class}
                   isLoading={isLoadingClasses}
@@ -246,14 +248,15 @@ const AddQuestion = () => {
           <Controller
             name="subject"
             control={control}
-            render={({ field }) => (
+            render={({ field: { value, onChange } }) => (
               <SelectContainer>
                 <SelectInput
-                  {...field}
+                  // value={value}
                   options={allSubjects}
                   defaultValue={"Subject Class"}
                   onChange={(value: any) => {
                     setSubjectValue(value);
+                    setValue("subject", value?.value)
                   }}
                   error={errors?.subject}
                   isLoading={isLoadingSubjects}
@@ -431,6 +434,9 @@ const SelectHolder = styled.div`
   justify-content: space-between;
   margin-bottom: 3rem;
   gap: 3%;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+  }
 `;
 
 const SelectContainer = styled.div`
@@ -438,5 +444,6 @@ const SelectContainer = styled.div`
   width: 200px;
   @media ${devices.tabletL} {
     width: 100%;
+    margin-bottom: 20px;
   }
 `;

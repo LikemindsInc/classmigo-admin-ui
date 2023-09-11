@@ -33,6 +33,11 @@ const Payments = () => {
     planType: null,
     sort: null,
   });
+  
+  const hasFilter = () => {
+    const { search, className, planType, sort } = searchFilter;
+    return [search, className, planType, sort].some((value) => value !== null);
+  };
 
   const { control, setValue } = useForm();
 
@@ -74,7 +79,18 @@ const Payments = () => {
     setValue("subscription", null);
     setSearchFilter((prev: any) => ({
       ...prev,
-      planId: null,
+      planType: null,
+    }));
+  };
+
+  const clearFilters = () => {
+    setValue("className", null);
+    setValue("subscription", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      planType: null,
+      className: null,
+      search: null,
     }));
   };
 
@@ -258,7 +274,7 @@ const Payments = () => {
                   defaultValue="Subscription"
                   // width={200}
                 />
-                {typeof searchFilter?.isSubscribed === "boolean" && (
+                {searchFilter?.planType !== null && (
                   <CancelIcon onClick={handleClearSubscription}>
                     &#8855;
                   </CancelIcon>
@@ -268,12 +284,19 @@ const Payments = () => {
           />
 
           {/* <DatePickerInput width={400} label={"Sort By Date"} /> */}
-          {/* <h6>2,500 Results</h6> */}
+          {searchFilter?.search !== "" && payment?.length > 0 && (
+            <h6>
+              {payment?.length} {payment?.length > 1 ? "Results" : "Result"}
+            </h6>
+          )}
         </div>
-        <Button>
+
+        {hasFilter() && <h5 onClick={clearFilters}>Clear filters</h5>}
+
+        {/* <Button>
           Export
           <ExportIcon />
-        </Button>
+        </Button> */}
       </UtilsHolder>
       <TableElement
         columns={updatedColumns}
@@ -392,6 +415,21 @@ const UtilsHolder = styled.div`
   width: auto;
   align-items: center;
   justify-content: space-between;
+
+  h5 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: red;
+    transition: all 0.3s ease;
+    &:hover {
+      cursor: pointer;
+      color: white;
+      padding: 5px 10px;
+      background-color: red;
+      text-align: center;
+      border-radius: 6px;
+    }
+  }
 
   @media ${devices.tabletL} {
     flex-direction: column;

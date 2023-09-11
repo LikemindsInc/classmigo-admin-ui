@@ -48,6 +48,7 @@ const GeneralKnowledge = () => {
     {
       refetchOnWindowFocus: false,
       enabled: true,
+      cacheTime: 0,
     }
   );
 
@@ -56,7 +57,7 @@ const GeneralKnowledge = () => {
     isLoading: isLoadingQuizes,
     refetch: fetchQuiz,
   } = useApiGet(
-    [generateQueryKey("general-questions", searchFilter)],
+    [generateQueryKey("general-questions", searchFilter), "general-questions"],
     () => getGeneralQuestions(searchFilter),
     {
       refetchOnWindowFocus: false,
@@ -128,13 +129,13 @@ const GeneralKnowledge = () => {
           <ButtonElement
             icon={<CsvIcon />}
             label="Upload CSV"
-            width={200}
+            // width={200}
             onClick={() => setOpenModal(true)}
           />
           <ButtonElement
             icon={<AddIcon />}
             label="Add New Question"
-            width={200}
+            // width={200}
             onClick={() => navigate("/general_knowledge/add_question")}
           />
         </div>
@@ -164,7 +165,9 @@ const GeneralKnowledge = () => {
                 key={question?._id}
                 question={question?.question}
                 options={question?.options}
-                answer={question?.answer}
+                answer={question?.correctOption}
+                queryId={question?._id}
+                item={question}
               />
             ))}
           </div>
@@ -216,18 +219,26 @@ const UtilsHolder = styled.div`
   width: 100%;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
+  @media ${devices.tabletL} {
+    flex-direction: column;
+  }
+
+  button {
+    font-size: 0.8rem;
+    width: 20vw;
+    @media ${devices.tabletL} {
+      width: 100% !important;
+    }
+  }
 
   > div {
     display: flex;
     align-items: center;
     gap: 1rem;
-
-    button {
-      font-size: 0.8rem;
-      width: 300px;
-      @media ${devices.tablet} {
-        width: 100%;
-      }
+    @media ${devices.tabletL} {
+      width: 100%;
+      flex-direction: column;
     }
 
     h6 {
@@ -252,6 +263,9 @@ const ModalContent = styled.div`
 
 const QuestionsContainer = styled.div`
   padding: 0 20%;
+  @media ${devices.tabletL} {
+    padding: 0;
+  }
 `;
 
 const SearchContainer = styled.div`
@@ -270,8 +284,8 @@ const SelectContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 300px;
-  @media ${devices.tablet} {
+  width: 10vw;
+  @media ${devices.tabletL} {
     width: 100%;
   }
 `;

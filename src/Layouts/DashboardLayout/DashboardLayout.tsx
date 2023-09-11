@@ -17,21 +17,21 @@ export const DashboardLayout = ({ children }: DashboardProp) => {
         {children}
       </Main>
     </Container>
-  )
-}
+  );
+};
 
 //styles
 
 const Container = styled.div`
   display: flex;
   width: 100%;
-  min-height: 100vh !important;
+  max-height: 100vh;
+  overflow-y: hidden !important;
   height: auto;
   background-color: var(--dashboardBackground);
 `;
 const Main = styled.main`
   max-height: 100vh;
-  overflow-y: hidden;
   width: 100%;
   padding-top: 1.5rem;
   padding-left: 2rem;
@@ -41,6 +41,8 @@ const Main = styled.main`
   @media ${devices.tabletL} {
     padding: 1rem;
     width: 100vw !important;
+    overflow-y: scroll;
+
     /* margin-left:3rem; */
   }
 `;

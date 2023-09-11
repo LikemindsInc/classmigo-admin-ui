@@ -22,7 +22,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { liveSessionSchema } from "../LiveSessionsSchema";
 import { useLocation, useNavigate } from "react-router-dom";
 import { DateTimePickerElement } from "../../../../../../Ui_elements/Input/dateTimePicker";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 const LiveSessionsForm = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -42,6 +42,7 @@ const LiveSessionsForm = () => {
       title: state?.title || null,
       note: state?.note || null,
       liveUrl: state?.liveUrl || null,
+      date: state?.date,
       durationInMinutes: state?.durationInMinutes || null,
     },
   });
@@ -158,7 +159,7 @@ const LiveSessionsForm = () => {
       date: data?.date?.$d,
       liveUrl: data?.liveUrl,
       title: data?.title,
-      durationInMinutes: data?.durationInMinutes
+      durationInMinutes: data?.durationInMinutes,
     };
     updateSession(requestBody);
   };
@@ -171,7 +172,7 @@ const LiveSessionsForm = () => {
       date: data?.date,
       liveUrl: data?.liveUrl,
       title: data?.title,
-      durationInMinutes: data?.durationInMinutes
+      durationInMinutes: data?.durationInMinutes,
     };
     createLiveLesson(requestBody);
   };
@@ -237,7 +238,7 @@ const LiveSessionsForm = () => {
           id="date"
           setValue={setValue}
           error={errors?.date}
-          defaultValue={state ? new Date() : null}
+          defaultValue={state ? new Date(state?.date) : null}
         />
       </InputHolder>
 
@@ -317,13 +318,9 @@ const Header = styled.div`
   }
 `;
 
-
-
-
 const InputHolder = styled.div`
   width: 50%;
 `;
-
 
 const ThumbnailSection = styled.section`
   margin-top: 2rem;
