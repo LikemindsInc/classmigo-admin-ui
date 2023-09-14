@@ -10,3 +10,11 @@ export const getPaymentDataUrl = (filter?:any) => {
 
   });
 };
+
+
+export const getSubscriptionDataUrl = (id:string) => {
+  return request({
+    url: `${ADMIN_BASE_URL}/student-subscription/${id}/payment-detail`,
+    method: "GET",
+  });
+};

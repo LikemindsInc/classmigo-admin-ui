@@ -9,7 +9,7 @@ interface Props {
 }
 export const SwitchElement = ({ activeState, handleChange }: Props) => {
   const { user } = useContext(UserContext);
-  return user?.role === "TEACHER" ? (
+  return user?.role === "TEACHER" || "MANAGER" ? (
     <CustomSwitch checked={activeState} onChange={handleChange} />
   ) : null;
 };

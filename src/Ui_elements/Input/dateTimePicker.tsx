@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { formatIncomingDate } from "../../utils/utilFns";
 import moment from "moment";
 import useFormattedDate from "../../custom-hooks/UtilHooks/IncomingFormatDate";
+import { SxProps } from "@mui/material";
 
 interface Props {
   id: string;
@@ -19,21 +20,30 @@ export const DateTimePickerElement = ({
   error,
   defaultValue,
 }: Props) => {
-  const [incomingDateFormat, setIncomingDateFormat] = useState<any>(dayjs(defaultValue));
+  const [incomingDateFormat, setIncomingDateFormat] = useState<any>(
+    dayjs(defaultValue)
+  );
   const usefulDate = useFormattedDate(defaultValue);
   // console.log(incomingDateFormat, "Incoming")
 
-
+  // const popperSx: SxProps = {
+  //   "& .MuiPaper-root": {
+  //     backgroundColor: "red";
+  //   }
+  // }
   return (
     <Container>
       <Picker
-        label="Enter time and date"
+        // InputProps={{ sx: { "& .MuiSvgIcon-root": { color: "red" } } }}
+        // PopperProps={{
+        //   sx:popperSx
+        // }}
+        label="Enter time and date-"
         onChange={(newValue) => {
           setValue(id, newValue);
         }}
         minDate={dayjs(new Date())}
         defaultValue={dayjs(defaultValue)}
-        
       />
       {error ? (
         <ErrorContainer>
@@ -48,6 +58,9 @@ export const DateTimePickerElement = ({
 const Container = styled.div``;
 
 const Picker = styled(DateTimePicker)`
+   & .MuiPaper-root {
+    background-color: red;
+  }
   &:focus {
     label {
       color: var(--primary-color);
@@ -66,7 +79,6 @@ const ErrorContainer = styled.div`
     color: red;
     font-size: 0.7rem !important;
   }
-
 `;
 
 const Error = styled(ErrorIcon)`
