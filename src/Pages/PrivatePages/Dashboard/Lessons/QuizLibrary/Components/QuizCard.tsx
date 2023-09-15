@@ -13,6 +13,7 @@ import { ModalContext } from "../../../../../../Contexts/Contexts";
 interface Props {
   quizId?: number | string;
   details?: any;
+  
 }
 export const Card = ({ quizId, details }: Props) => {
   const navigate = useNavigate();

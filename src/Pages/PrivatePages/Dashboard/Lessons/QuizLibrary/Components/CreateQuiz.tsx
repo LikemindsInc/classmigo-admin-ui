@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useMemo } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import styled from "styled-components";
@@ -19,7 +25,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { createQuizSchema } from "../QuizLibrarySchema";
 import { ModalContext } from "../../../../../../Contexts/Contexts";
 
-export const CreateQuiz = () => {
+interface CreateQuizProps {
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const CreateQuiz: React.FC<CreateQuizProps> = ({ setModal }) => {
   const {
     handleSubmit,
     watch,
@@ -32,7 +42,6 @@ export const CreateQuiz = () => {
   });
 
   const { setOpenModal } = useContext(ModalContext);
-
 
   let classValue: any = watch("class");
   let subjectValue: any = watch("subject");
@@ -66,7 +75,7 @@ export const CreateQuiz = () => {
     setValue("name", " ");
     setValue("topic", "");
     setValue("difficulty", null as any);
-    setOpenModal(false);
+    setModal(false);
   };
 
   const onError = (error: any) => {
@@ -123,11 +132,13 @@ export const CreateQuiz = () => {
     }
   }, [fetchTopic, subjectValue]);
 
-
-
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects  =  subjects?.data?.subjects.filter((item: any) => item.isActive);
-  const activeTopics  =  topics?.data?.content.filter((item: any) => item.isActive);
+  const activeSubjects = subjects?.data?.subjects.filter(
+    (item: any) => item.isActive
+  );
+  const activeTopics = topics?.data?.content.filter(
+    (item: any) => item.isActive
+  );
 
   const allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
@@ -234,8 +245,8 @@ const Container = styled.form`
   flex-direction: column;
   gap: 1rem;
   align-items: center;
-  input{
-    width:inherit !important;
+  input {
+    width: inherit !important;
   }
 `;
 

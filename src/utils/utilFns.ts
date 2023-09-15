@@ -97,10 +97,6 @@ export const formatDate = (date: Date): string => {
   return date.toLocaleDateString(undefined, options);
 };
 
-
-
-
-
 export const formatIncomingDate = (incomingDate: string): string => {
   console.log("Incoming Date:", incomingDate);
 
@@ -126,11 +122,6 @@ if (accessToken) {
   token = JSON.parse(accessToken);
 }
 
-
-
-
-
-
 export async function customPost<T>(
   url: string,
   requestData: any
@@ -153,12 +144,6 @@ export async function customPost<T>(
   }
 }
 
-
-
-
-
-
-
 export const CalculateDiscount = (value: number, total: number) => {
   if (total === 0) {
     return 0;
@@ -166,22 +151,15 @@ export const CalculateDiscount = (value: number, total: number) => {
   return Math.floor((value / total) * 100);
 };
 
-
-
-
-
-
-
-
-export const generateUrlParams = (obj:any) => {
-	let generatedUrl = ``;
-	const arrayOfObjectKeys = Object.keys(obj);
-	arrayOfObjectKeys.forEach((key) => {
-		if (obj[key] || obj[key] === false) {
-			generatedUrl += `${key}=${obj[key]}&`;
-		}
-	});
-	return generatedUrl;
+export const generateUrlParams = (obj: any) => {
+  let generatedUrl = ``;
+  const arrayOfObjectKeys = Object.keys(obj);
+  arrayOfObjectKeys.forEach((key) => {
+    if (obj[key] || obj[key] === false) {
+      generatedUrl += `${key}=${obj[key]}&`;
+    }
+  });
+  return generatedUrl;
 };
 
 export const generateQueryKey = (baseKey: string, searchFilter: any) => {
@@ -189,4 +167,16 @@ export const generateQueryKey = (baseKey: string, searchFilter: any) => {
   const queryKey = `${baseKey}-${searchFilterString}`;
 
   return queryKey;
+};
+
+export const convertKoboToNaira = (kobo:number) => {
+  // if (typeof kobo !== "number") {
+  //   throw new Error("Input must be a valid number");
+  // }
+
+  const naira = kobo / 100;
+
+  const formattedNaira = naira.toLocaleString();
+
+  return formattedNaira;
 };

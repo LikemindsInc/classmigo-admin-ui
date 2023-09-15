@@ -45,10 +45,10 @@ const QuizDetails = () => {
         <ButtonElement outline={true} label="Download CSV Format" />
       </Header>
       <Body>
-        <SearchContainer>
+        {/* <SearchContainer>
           <SearchInput width={300} />
           <p>250 Results</p>
-        </SearchContainer>
+        </SearchContainer> */}
 
         <QuestionsContainer>
           {isLoadingQuizQuestions ? (

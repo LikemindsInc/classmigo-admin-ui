@@ -188,7 +188,7 @@ const VideoLibrary = () => {
       </form>
       {videos?.length > 0 ? (
         <VideoIntro>
-          <Banner>
+          {/* <Banner>
             <VideoPlayerElement
               height="100%"
               source={"https://www.youtube.com/watch?v=ImEr7Paglb0"}
@@ -214,7 +214,7 @@ const VideoLibrary = () => {
 
             <h4>Description</h4>
             <p>Topic Description</p>
-          </Banner>
+          </Banner> */}
           <h5>Subtopic Videos</h5>
           <VideosHolder>
             {videos ? (

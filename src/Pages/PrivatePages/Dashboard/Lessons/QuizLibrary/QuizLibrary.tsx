@@ -17,19 +17,52 @@ import { CreateQuiz } from "./Components/CreateQuiz";
 import { Card } from "./Components/QuizCard";
 import { Skeleton } from "@mui/material";
 import noData from "../../../../../Assets/noData.png";
-import { formatOptions } from "../../../../../utils/utilFns";
+import { formatOptions, generateQueryKey } from "../../../../../utils/utilFns";
 import { Controller, useForm } from "react-hook-form";
+import { debounce } from "lodash";
 
 const QuizLibrary = () => {
-  // const navigate = useNavigate();
-  const { setOpenModal } = useContext(ModalContext);
-  // const [deleteModal, setDeleteModal] = useState(false);
+  // const { setOpenModal } = useContext(ModalContext);
+  const [openModal, setOpenModal] = useState(false);
   const [quiz, setQuiz] = useState<any>([]);
+
+  const { control, watch, setValue } = useForm();
+
+  const [searchFilter, setSearchFilter] = useState<any>({
+    search: null,
+    className: null,
+  });
+
+  const debouncedSearchFilterUpdate = debounce((value) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: value,
+    }));
+  }, 1500);
+
+  const handleClearClass = () => {
+    setValue("className", null);
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: null,
+    }));
+  };
+
+  const onSelectClassname = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: value?.value,
+    }));
+  };
+
+  const handleSearchFilter = (e: any) => {
+    const searchValue = e.target.value;
+    debouncedSearchFilterUpdate(searchValue.trim());
+  };
   const handleCancel = () => {
     setOpenModal(false);
   };
 
-  const { control, watch } = useForm();
   let classValue: any = watch("className");
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
@@ -38,7 +71,7 @@ const QuizLibrary = () => {
     {
       refetchOnWindowFocus: false,
       enabled: true,
-      cacheTime:0
+      cacheTime: 0,
     }
   );
 
@@ -53,10 +86,14 @@ const QuizLibrary = () => {
     data: quizes,
     isLoading: isLoadingQuizes,
     refetch: fetchQuiz,
-  } = useApiGet(["quizes"], () => getAllQuizUrl(), {
-    refetchOnWindowFocus: false,
-    enabled: true,
-  });
+  } = useApiGet(
+    [generateQueryKey("quizes", searchFilter)],
+    () => getAllQuizUrl(searchFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
   useEffect(() => {
     if (classValue) {
@@ -76,7 +113,7 @@ const QuizLibrary = () => {
         <Body>
           <ToolsContainer>
             <SearchContainer>
-              <SearchInput />
+              <SearchInput onSearch={handleSearchFilter} />
             </SearchContainer>
             <Utility>
               <Controller
@@ -86,10 +123,17 @@ const QuizLibrary = () => {
                   <SelectContainer>
                     <SelectInput
                       {...field}
+                      id={"className"}
                       options={allClasses}
-                      defaultValue="Class Filter"
+                      onChange={onSelectClassname}
+                      defaultValue="Fitler By Class"
                       isLoading={isLoadingClasses}
                     />
+                    {typeof searchFilter?.className === "string" && (
+                      <CancelIcon onClick={handleClearClass}>
+                        &#8855;
+                      </CancelIcon>
+                    )}
                   </SelectContainer>
                 )}
               />
@@ -102,7 +146,7 @@ const QuizLibrary = () => {
           </ToolsContainer>
 
           <QuestionsContainer>
-            {quiz?.length > 0 ? (
+            {quiz?.length > 0 && !isLoadingQuizes ? (
               <div>
                 {quiz.map((item: any, index: number) => (
                   <Card details={item} key={index} quizId={item?._id} />
@@ -136,8 +180,12 @@ const QuizLibrary = () => {
         <CreateQuiz />
       </Modal> */}
 
-      <Modal cancel={handleCancel} width={"35%"}>
-        <CreateQuiz />
+      <Modal
+        openState={openModal}
+        cancel={() => setOpenModal(false)}
+        width={"35%"}
+      >
+        <CreateQuiz setModal={setOpenModal}  />
       </Modal>
     </>
   );
@@ -164,6 +212,8 @@ const Container = styled.section`
 
 const SelectContainer = styled.div`
   display: flex;
+  align-items: center;
+  gap: 10px;
   width: 200px;
   @media ${devices.tabletL} {
     width: 100%;
@@ -176,7 +226,7 @@ const SearchContainer = styled.div`
     font-weight: 600;
   }
   @media ${devices.tabletL} {
-    width:100%;
+    width: 100%;
   }
 `;
 
@@ -209,7 +259,7 @@ const Utility = styled.aside`
   gap: 10px;
   @media ${devices.tabletL} {
     flex-direction: column;
-    button{
+    button {
       width: 100%;
     }
   }
@@ -236,3 +286,10 @@ const QuestionsContainer = styled.section`
   margin-top: 2rem;
 `;
 const Modal = styled(CenteredDialog)``;
+
+const CancelIcon = styled.div`
+  color: red;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+`;

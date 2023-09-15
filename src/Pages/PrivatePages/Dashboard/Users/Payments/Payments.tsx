@@ -22,10 +22,12 @@ import { getAllClassesUrl } from "../../../../../Urls";
 import { debounce } from "lodash";
 import { Controller, useForm } from "react-hook-form";
 import { SUBSCRIPTION_TYPES } from "../../../../../utils/constants";
+import { Receipt } from "./Components/Receipt";
 
 const Payments = () => {
   const { setOpenModal } = useContext(ModalContext);
   const [payment, setPayment] = useState<DataType[]>([]);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
   const [searchFilter, setSearchFilter] = useState<any>({
     page: 0,
     search: null,
@@ -33,7 +35,7 @@ const Payments = () => {
     planType: null,
     sort: null,
   });
-  
+
   const hasFilter = () => {
     const { search, className, planType, sort } = searchFilter;
     return [search, className, planType, sort].some((value) => value !== null);
@@ -152,7 +154,11 @@ const Payments = () => {
       title: "",
       dataIndex: "options",
       key: "options",
-      render: () => <ModalOptions />,
+      render: (_, row) => (
+        <div onClick={() => handleRowClick(row)}>
+          <ModalOptions />
+        </div>
+      ),
     },
   ];
 
@@ -184,6 +190,10 @@ const Payments = () => {
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
+
+  const handleRowClick = (data: DataType) => {
+    setPaymentId(data?.key);
+  };
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -309,82 +319,11 @@ const Payments = () => {
         setSearchFilter={setSearchFilter}
         searchFilter={searchFilter}
       />
-      <Modal cancel={handleCancel} width={"80%"}>
-        <TransactionHeader>
-          <p>
-            Transaction <span>&gt;</span> 841951890
-          </p>
-        </TransactionHeader>
-        <Divider />
-        <TransactionDetailsContainer>
-          <ReceiptContainer>
-            <ReceiptHeader>
-              <div>
-                <p>Split Payment</p>
-                <h6>NGN 2,000.00</h6>
-              </div>
-              <ReceiptHeaderTag>Success</ReceiptHeaderTag>
-            </ReceiptHeader>
-            <Divider />
-            <ReceiptElements>
-              <p>Reference</p>
-              <h6>37492-71853-32684</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>Channel</p>
-              <h6>Card</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>Fees</p>
-              <h6>NGN 30.00</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>Your Account</p>
-              <h6>NGN 3,700.00</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>Your balance</p>
-              <h6>NGN 1,600</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>Paid At</p>
-              <h6>November 14, 2020 2:05 PM UTC</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>Message</p>
-              <h6>Approved</h6>
-            </ReceiptElements>
-            <Divider />
-            <ReceiptElements>
-              <p>WhatsApp number</p>
-              <h6>+234 810 000 0000</h6>
-            </ReceiptElements>
-          </ReceiptContainer>
-          <ReceiptTimeline>
-            <Timeline
-              items={[
-                {
-                  children: "Created a payment request",
-                },
-                {
-                  children: "Initiated a payment process at 2015-09-01",
-                },
-                {
-                  children: "Technical testing 2015-09-01",
-                },
-                {
-                  children: "Network problems being solved 2015-09-01",
-                },
-              ]}
-            />
-          </ReceiptTimeline>
-        </TransactionDetailsContainer>
+      <Modal
+        cancel={handleCancel}
+        width={window.innerWidth < 768 ? "80%" : "50%"}
+      >
+        <Receipt id={paymentId} />
       </Modal>
     </Container>
   );
@@ -463,75 +402,6 @@ const UtilsHolder = styled.div`
 `;
 
 const Modal = styled(CenteredDialog)``;
-const TransactionHeader = styled.div`
-  width: 100%;
-  p,
-  span {
-    color: gray;
-    font-size: 0.8rem;
-  }
-  span {
-    margin: 0 5px;
-  }
-`;
-const TransactionDetailsContainer = styled.div`
-  display: flex;
-  p,
-  h6 {
-    font-size: 0.8rem !important;
-  }
-`;
-const ReceiptContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 0.6;
-`;
-const ReceiptHeader = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-const ReceiptHeaderTag = styled.p`
-  padding: 0.3rem 1rem;
-  color: white;
-  background-color: green;
-  border-radius: 20px;
-`;
-const ReceiptElements = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  p {
-    color: gray;
-  }
-`;
-
-const ReceiptTimeline = styled.div`
-  flex: 0.4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Button = styled.button`
-  background-color: var(--primary-color);
-  padding: 0.6rem;
-  color: white;
-  display: flex;
-  font-size: 0.8rem;
-  outline: none;
-  border: none;
-  border-radius: 12px;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  cursor: pointer;
-  @media ${devices.tabletL} {
-    margin-top: 5%;
-  }
-`;
 
 const SelectContainer = styled.div`
   display: flex;
