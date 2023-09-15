@@ -62,12 +62,6 @@ export const TopicCard = ({
 
   const { className, subject, setTopic } = useContext(LessonCriteriaContext);
 
-  // useEffect(() => {
-
-  // },[])
-
-  // console.log(id, "id")
-
   const handleActivateSuccess = (data: any) => {
     queryClient.invalidateQueries(["lessons-get-all"]);
     setIsActive(!isActive);
@@ -164,9 +158,9 @@ export const TopicCard = ({
                 <Tools>{subtopic?.length} subtopics</Tools>
                 <AddSub
                   onClick={() => {
-                    setTopic(id)
+                    setTopic(id);
                     navigate(
-                      `/lessons_criteria/${className?.label}/${subject?.label}/${classname}`,
+                      `/lessons_criteria/${className?.label}/${subject?.label}/${classname}`
                       // { state: id }
                     );
                   }}

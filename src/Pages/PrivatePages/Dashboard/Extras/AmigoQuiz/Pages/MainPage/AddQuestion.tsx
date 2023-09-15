@@ -3,8 +3,13 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 
-
-import { ButtonElement, ImageInput, InputElement, SelectInput, TextAreaInput } from "../../../../../../../Ui_elements";
+import {
+  ButtonElement,
+  ImageInput,
+  InputElement,
+  SelectInput,
+  TextAreaInput,
+} from "../../../../../../../Ui_elements";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -14,6 +19,7 @@ import { CenteredDialog } from "../../../../../../../Ui_elements/Modal/Modal";
 import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
 import { customPost, formatOptions } from "../../../../../../../utils/utilFns";
 import { OptionsCard } from "./Components/OptionsCard";
+import { createAmigoQuizQuestionUrl } from "../../../../../../../Urls";
 
 export const AddQuizQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
@@ -25,7 +31,7 @@ export const AddQuizQuestion = () => {
   // const { setOpenModal } = useContext(ModalContext);
   const { state } = useLocation();
   const navigate = useNavigate();
-  const [openModal, setOpenModal] = useState(false)
+  const [openModal, setOpenModal] = useState(false);
   const handleCancel = () => {
     setOpenModal(false);
   };
@@ -41,89 +47,10 @@ export const AddQuizQuestion = () => {
     // resolver: yupResolver(addGeneralQuestionSchema),
   });
 
-  const difficulties = [
-    {
-      value: 0,
-      label: "BEGINNER",
-    },
-    {
-      value: 1,
-      label: "INTERMEDIATE",
-    },
-    {
-      value: 2,
-      label: "ADVANCED",
-    },
-  ];
-
   // console.log(errors, "error");
 
   // let classValue: any = watch("class");
   // let subjectValue: any = watch("subject");
-
-  const { data: classes, isFetching: isLoadingClasses } = useApiGet(
-    ["allClasses"],
-    // () => getAllClassesUrl(),
-    () => { },
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
-
-  const {
-    data: subjects,
-    isFetching: isLoadingSubjects,
-    refetch: fetchSubject,
-  } = useApiGet(
-    ["allSubjects"],
-      // () => getAllSubjectsUrl(classValue && classValue),
-    () => { },
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!classValue,
-    }
-  );
-
-  const {
-    data: topics,
-    isFetching: isLoadingTopics,
-    refetch: fetchTopic,
-  } = useApiGet(
-    ["lessonTopic"],
-      // () => getAllLessonsUrl(subjectValue && subjectValue?.label),
-    () => { },
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!subjectValue,
-      staleTime: 0,
-    }
-  );
-
-  if (topics) {
-    console.log(topics, "topics");
-  }
-
-  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects = subjects?.data?.subjects.filter(
-    (item: any) => item.isActive
-  );
-  const activeTopics = topics?.data?.content.filter(
-    (item: any) => item.isActive
-  );
-
-  const allClasses = useMemo(
-    () => formatOptions(activeClasses, "value", "name"),
-    [activeClasses]
-  );
-
-  const allSubjects = useMemo(() => {
-    return formatOptions(activeSubjects, "name", "_id");
-  }, [activeSubjects]);
-
-  const allTopics = useMemo(() => {
-    return formatOptions(activeTopics, "lessonName", "_id");
-  }, [activeTopics]);
 
   const onSuccess = () => {
     toast.success("Successfully added question", {
@@ -151,8 +78,7 @@ export const AddQuizQuestion = () => {
   };
 
   const { mutate: addQuestion, isLoading: isAddingQuestion } = useApiPost(
-    // addGeneralKnowledgeUrl,
-    ()=>{},
+    createAmigoQuizQuestionUrl,
     onSuccess,
     onError
   );
@@ -171,39 +97,40 @@ export const AddQuizQuestion = () => {
           setIsUploadingImage(false);
         }
         const requestBody: any = {
-          subjectId: subjectValue?.value,
-          class: classValue,
-          lessonId: data?.topic?.value,
-          difficultyLevel: data?.difficulty?.label,
-          question: data.question,
-          imageUrl: response?.data?.data?.url,
-          explanation: data?.explanation,
-          options: options.map((label) => ({
-            label,
-            value: data[`option${label}`],
-          })),
-          correctOption: selectedOption,
-          score: parseInt(data.score),
+          questions: [
+            {
+              question: data.question,
+              imageUrl: response?.data?.data?.url,
+              explanation: data?.explanation,
+              options: options.map((label) => ({
+                label,
+                value: data[`option${label}`],
+              })),
+              correctOption: selectedOption,
+              score: Number(data.score),
+            },
+          ],
+          quizId: state._id,
         };
-        console.log(requestBody, "request");
         addQuestion(requestBody);
       } catch (e) {
         console.log(e);
       }
     } else {
       const requestBody: any = {
-        subjectId: subjectValue,
-        class: classValue,
-        lessonId: data?.topic?.value,
-        difficultyLevel: data?.difficulty?.label,
-        question: data.question,
-        explanation: data?.explanation,
-        options: options.map((label) => ({
-          label,
-          value: data[`option${label}`],
-        })),
-        correctOption: selectedOption,
-        score: data.score,
+        questions: [
+          {
+            question: data.question,
+            explanation: data?.explanation,
+            options: options.map((label) => ({
+              label,
+              value: data[`option${label}`],
+            })),
+            correctOption: selectedOption,
+            score: Number(data.score),
+          },
+        ],
+        quizId: state._id,
       };
       addQuestion(requestBody);
     }
@@ -212,75 +139,6 @@ export const AddQuizQuestion = () => {
   return (
     <>
       <Container onSubmit={handleSubmit(onSubmit)}>
-        <SelectHolder>
-          <Controller
-            name="class"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <SelectContainer>
-                <SelectInput
-                  value={value}
-                  options={allClasses}
-                  defaultValue={"Select Class"}
-                  onChange={(value: any) => {
-                    setClassValue(value?.value);
-                  }}
-                  error={errors?.class}
-                  isLoading={isLoadingClasses}
-                />
-              </SelectContainer>
-            )}
-          />
-          <Controller
-            name="subject"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <SelectContainer>
-                <SelectInput
-                  value={value}
-                  options={allSubjects}
-                  defaultValue={"Subject Class"}
-                  // onChange={(value: any) => {
-                  //   setSubjectValue(value);
-                  // }}
-                  error={errors?.subject}
-                  isLoading={isLoadingSubjects}
-                />
-              </SelectContainer>
-            )}
-          />
-          <Controller
-            name="topic"
-            control={control}
-            render={({ field }) => (
-              <SelectContainer>
-                <SelectInput
-                  {...field}
-                  options={allTopics}
-                  defaultValue={"Subject Class"}
-                  error={errors?.topic}
-                  isLoading={isLoadingTopics}
-                />
-              </SelectContainer>
-            )}
-          />
-
-          <Controller
-            name="difficulty"
-            control={control}
-            render={({ field }) => (
-              <SelectContainer>
-                <SelectInput
-                  {...field}
-                  options={difficulties}
-                  defaultValue={"Select Difficulty"}
-                  error={errors?.difficulty}
-                />
-              </SelectContainer>
-            )}
-          />
-        </SelectHolder>
-
         {/* <InputHolder>
           <InputElement
             label="Name"
@@ -354,11 +212,10 @@ export const AddQuizQuestion = () => {
           />
         </ModalContent>
       </Modal>
-      ;
+      
     </>
   );
 };
-
 
 const Container = styled.form`
   width: 100%;
@@ -395,7 +252,11 @@ const ButtonHolder = styled.div`
   justify-content: space-between;
   margin-top: 2rem;
   input {
-    width: 5vw;
+    width: 4vw;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:5px;
   }
 `;
 

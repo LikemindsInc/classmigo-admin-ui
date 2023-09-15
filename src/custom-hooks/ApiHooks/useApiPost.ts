@@ -14,7 +14,6 @@ export const useApiPost = (
           queryClient.invalidateQueries(key);
         });
       success && success(data);
-      console.log(data, "JJJ")
     },
     onError: error,
     retry: 1,

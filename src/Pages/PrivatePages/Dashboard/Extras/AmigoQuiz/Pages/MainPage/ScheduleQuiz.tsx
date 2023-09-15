@@ -1,40 +1,50 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 import {
   ButtonElement,
   InputElement,
+  Loader,
   SelectInput,
 } from "../../../../../../../Ui_elements";
 import { DateTimePickerElement } from "../../../../../../../Ui_elements/Input/dateTimePicker";
 import { CsvIcon, CsvIconPrimary } from "../../../../../../../Assets/Svgs";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { scheduleQuizSchema } from "./MainPageSchema";
-import { useApiPost } from "../../../../../../../custom-hooks";
-import { scheduleAmigoQuizUrl } from "../../../../../../../Urls";
+import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
+import {
+  getAllClassesUrl,
+  scheduleAmigoQuizUrl,
+  updateAmigoQuizUrl,
+} from "../../../../../../../Urls";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import { formatOptions } from "../../../../../../../utils/utilFns";
 
 interface MainProp {
   classOptions: { value: any; label: any }[];
   isLoadingClassOptions: boolean;
 }
 
-export const ScheduleQuiz = ({
-  classOptions,
-  isLoadingClassOptions,
-}: MainProp) => {
+export const ScheduleQuiz = () => {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+
   const {
     register,
     control,
-    watch,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm({
+    defaultValues: {
+      class: state?.item?.className || "",
+      tag: state?.item?.tag || null,
+      date: state?.item?.startDateTime || null,
+    },
     resolver: yupResolver(scheduleQuizSchema),
   });
-
 
   const success = () => {
     toast.success("Successfully Scheduled Quiz", {
@@ -46,9 +56,10 @@ export const ScheduleQuiz = ({
       draggable: true,
       theme: "light",
     });
-  }
+    navigate(-1);
+  };
 
-  const error = (error:AxiosError) => {
+  const error = (error: AxiosError) => {
     toast.error(`Something went wrong, ${error}`, {
       position: "top-right",
       autoClose: 3000,
@@ -58,7 +69,7 @@ export const ScheduleQuiz = ({
       draggable: true,
       theme: "light",
     });
-  }
+  };
 
   const { mutate: scheduleAmigoQuiz, isLoading: isScheduling } = useApiPost(
     scheduleAmigoQuizUrl,
@@ -66,15 +77,48 @@ export const ScheduleQuiz = ({
     error
   );
 
+  const { mutate: updateAmigoQuiz, isLoading: isUpdating } = useApiPost(
+    (_: any) => updateAmigoQuizUrl(_, state?.item?._id),
+    success,
+    error
+  );
+
+  const { data: classes, isLoading: isLoadingClassOptions } = useApiGet(
+    ["allClassesA"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+
+  const allClasses = useMemo(
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
+  );
+
   const onSubmit = (data: any) => {
     const requestBody: any = {
       tag: data.tag,
-      className: data.class.value,
+      className: data.class.value || data.class,
       startDateTime: data.date,
       questionCompletionTimeInSecond: data.time,
     };
-    scheduleAmigoQuiz(requestBody);
+
+    if (state) {
+      updateAmigoQuiz(requestBody);
+    } else {
+      scheduleAmigoQuiz(requestBody);
+    }
   };
+
+  if (isLoadingClassOptions) {
+    return <Loader/>
+  }
 
   return (
     <Container onSubmit={handleSubmit(onSubmit)}>
@@ -85,7 +129,7 @@ export const ScheduleQuiz = ({
           render={({ field }) => (
             <SelectInput
               {...field}
-              options={classOptions}
+              options={allClasses}
               defaultValue={"Select a class"}
               error={errors?.class}
               isLoading={isLoadingClassOptions}
@@ -118,7 +162,7 @@ export const ScheduleQuiz = ({
           id="date"
           setValue={setValue}
           error={errors?.date}
-          // defaultValue={state ? new Date() : null}
+          defaultValue={state ? new Date(state?.item?.startDateTime) : null}
         />
       </InputHolder>
 
@@ -134,9 +178,9 @@ export const ScheduleQuiz = ({
       <InputHolder>
         <ButtonElement
           type="submit"
-          label="Schedule"
+          label={state ? "Schedule" : "Update Quiz"}
           width={250}
-          isLoading={isScheduling}
+          isLoading={isScheduling || isUpdating}
         />
       </InputHolder>
 
@@ -151,6 +195,5 @@ const InputHolder = styled.div`
   margin-bottom: 5%;
   & > button {
     width: 200px !important;
-  }import { AxiosError } from 'axios';
-
+  }
 `;

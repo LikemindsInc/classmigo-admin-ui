@@ -160,7 +160,6 @@ const Parents = () => {
     }
   );
 
-  // console.log(isFetchingParentData, isLoadingParentData, "opo")
 
   const { mutate: toggleParent } = useAPiPut(
     (_: any) => toggleParentUrl(_, userId),

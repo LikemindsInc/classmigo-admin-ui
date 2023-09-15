@@ -14,7 +14,6 @@ export const getAllLessonsUrl = (
 };
 
 export const getAllSubjectsUrl = (className: string) => {
-  console.log(className, "url")
   return request({
     url: `class/${className}/subjects`,
     method: "GET",

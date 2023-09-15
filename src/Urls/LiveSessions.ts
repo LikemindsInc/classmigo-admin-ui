@@ -17,7 +17,6 @@ export const updateLiveLesson = (data: any, id: string | number) =>
   });
 
 export const getLiveLessons = (filter?: any) => {
-  console.log(filter, "from Api");
   return request({
     url: `${ADMIN_BASE_URL}/live-lessons?${generateUrlParams(filter)}`,
     method: "GET",

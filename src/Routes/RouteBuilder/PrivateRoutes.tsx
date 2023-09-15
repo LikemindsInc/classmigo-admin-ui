@@ -1,8 +1,9 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Loader } from "../../Ui_elements";
 import { DashboardLayout } from "../../Layouts/DashboardLayout/DashboardLayout";
 import { Container } from "../../Pages/PrivatePages/Dashboard/Users/Students/Students";
+import { UserContext } from "../../Contexts/Contexts";
 
 const LazyHome = lazy(
   () => import("../../Pages/PrivatePages/Dashboard/Home/Home")
@@ -195,10 +196,13 @@ const LazyAddSubtopic = lazy(
 );
 
 export const PrivateRoutes = () => {
+  const { user } = useContext(UserContext);
+
   interface RouteConfig {
     path: string;
     element: any;
     children?: RouteConfig[];
+    restrictedRole?: string[];
   }
 
   const privateRoutes: RouteConfig[] = [
@@ -209,14 +213,17 @@ export const PrivateRoutes = () => {
     {
       path: "/students",
       element: <LazyStudents />,
+      restrictedRole: ["TEACHER"],
     },
     {
       path: "/parents",
       element: <LazyParents />,
+      restrictedRole: ["TEACHER"],
     },
     {
       path: "/payments",
       element: <LazyPayments />,
+      restrictedRole: ["TEACHER"],
     },
 
     //lesson routes
@@ -312,28 +319,34 @@ export const PrivateRoutes = () => {
     {
       path: "/subscription",
       element: <LazySubscription />,
+      restrictedRole: ["TEACHER"],
     },
     {
       path: "/subscription/create_plan",
       element: <LazySubscriptionCreatePlan />,
+      restrictedRole: ["TEACHER"],
     },
 
     {
       path: "/admin-access/create-user",
       element: <CreateAdmin />,
+      restrictedRole: ["TEACHER"],
     },
 
     {
       path: "/admin-access",
       element: <AdminAccess />,
+      restrictedRole: ["TEACHER"],
     },
     {
       path: "/admin-access/:id",
       element: <AdminDetail />,
+      restrictedRole: ["TEACHER"],
     },
     {
       path: "/amigo_quiz",
       element: <LazyAmigoQuiz />,
+      restrictedRole: ["TEACHER"],
     },
     // {
     //   path: "/amigo_quiz/practice_quiz",
@@ -349,6 +362,7 @@ export const PrivateRoutes = () => {
     },
   ];
 
+
   return (
     <Routes>
       {privateRoutes.map((route: RouteConfig, index: number) => (
@@ -357,7 +371,15 @@ export const PrivateRoutes = () => {
           path={route.path}
           element={
             <DashboardLayout>
-              <Suspense fallback={<Loader />}>{route.element}</Suspense>
+              <Suspense fallback={<Loader />}>
+                {route.restrictedRole &&
+                route.restrictedRole.length > 0 &&
+                route.restrictedRole.includes(user?.role) ? (
+                  <LazyErrorPage />
+                ) : (
+                  route.element
+                )}
+              </Suspense>
             </DashboardLayout>
           }
         ></Route>

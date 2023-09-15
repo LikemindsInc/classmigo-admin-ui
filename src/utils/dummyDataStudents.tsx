@@ -376,4 +376,3 @@ const newData = realData.map((item: any) => ({
   image: item.image || "https://img.freepik.com/free-photo/portrait-handsome-man-with-dark-hairstyle-bristle-toothy-smile-dressed-white-sweatshirt-feels-very-glad-poses-indoor-pleased-european-guy-being-good-mood-smiles-positively-emotions-concept_273609-61405.jpg?w=2000"
 }));
 
-console.log(newData, "new");

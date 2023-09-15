@@ -147,9 +147,6 @@ const Students = () => {
     toggleStudent(requestBody);
   };
 
-  // useEffect(() => {
-  //   console.log(searchFilter,"Search")
-  // },[searchFilter])
 
   useEffect(() => {
     setOpenDrawer(false);

@@ -67,7 +67,6 @@ export const QuestionCard = ({
   );
 
   const handleDelete = (quizId: any) => {
-    console.log(quizId, "llop");
     deleteQuestion(quizId);
   };
   return (
