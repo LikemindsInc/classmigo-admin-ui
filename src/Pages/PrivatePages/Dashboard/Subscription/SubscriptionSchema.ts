@@ -12,14 +12,7 @@ export const subscriptionSchema = yup.object().shape({
     .number()
     .typeError("Please Enter A Valid Number")
     .required("Please Enter A Subscription Duration")
-    .positive("Duration must be a positive number")
-    .integer("Duration must be an integer"),
-  // discount: yup
-  //   .number()
-  //   .nullable()
-  //   .typeError("Please Enter A Valid Number")
-  //   .positive("Discount must be a positive number")
-  //   .integer("Discount must be an integer")
-  //   .notRequired(),
+    .integer("Price must be an integer")
+    .min(0, "Price cannot be negative"),
   subscriptionName: yup.string().required("Please Enter A Subscription Name"),
 });
