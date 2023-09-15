@@ -5,51 +5,52 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { useApiPost } from "../../../../../../../custom-hooks";
-import { ButtonElement, ImageInput, InputElement, TextAreaInput } from "../../../../../../../Ui_elements";
+import {
+  ButtonElement,
+  ImageInput,
+  InputElement,
+  TextAreaInput,
+} from "../../../../../../../Ui_elements";
 import { OptionsCard } from "./Components/OptionsCard";
 import { UploadTick } from "../../../../../../../Assets/Svgs";
 import { CenteredDialog } from "../../../../../../../Ui_elements/Modal/Modal";
 import { customPost } from "../../../../../../../utils/utilFns";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
+import { createAmigoQuizQuestionUrl } from "../../../../../../../Urls";
 
-
-export const AddQuizQuestion = () => {
+export const EditQuizQuestion = () => {
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   // const { setOpenModal } = useContext(ModalContext);
   const [openModal, setOpenModal] = useState(false);
-  // const { state } = useLocation();
-  // const { item } = state;
-  // const [selectedOption, setSelectedOption] = useState<any>(item.correctOption);
-  const [selectedOption, setSelectedOption] = useState<any>();
-  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const { state } = useLocation();
+  const { item } = state;
+  const [selectedOption, setSelectedOption] = useState<any>(
+    item ? item.correctOption : ""
+  );
+  // const [selectedOption, setSelectedOption] = useState<any>();
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const initialOption = ["A", "B", "C", "D"].indexOf(item.correctOption);
-  //   setSelectionOptionId(initialOption);
-  // }, [item.correctOption]);
-
+  useEffect(() => {
+    const initialOption = ["A", "B", "C", "D"].indexOf(item.correctOption);
+    setSelectionOptionId(initialOption);
+  }, [item.correctOption]);
 
   const handleCancel = () => {
     setOpenModal(false);
   };
 
-  const {
-    register,
-    handleSubmit,
-    getValues,
-  } = useForm({
-    // defaultValues: {
-    //   question: item?.question,
-    //   explanation: item?.explanation,
-    //   optionA: item?.options[0]?.value,
-    //   optionB: item?.options[1]?.value,
-    //   optionC: item?.options[2]?.value,
-    //   optionD: item?.options[3]?.value,
-    //   score: item?.score,
-    // },
+  const { register, handleSubmit, getValues } = useForm({
+    defaultValues: {
+      question: item?.question,
+      explanation: item?.explanation,
+      optionA: item?.options[0]?.value,
+      optionB: item?.options[1]?.value,
+      optionC: item?.options[2]?.value,
+      optionD: item?.options[3]?.value,
+      score: item?.score,
+    },
   });
-
 
   const onSuccess = () => {
     toast.success("Successfully edited question", {
@@ -76,9 +77,8 @@ export const AddQuizQuestion = () => {
     });
   };
 
-  const { mutate: updateQuestion, isLoading: isUpdatingQuestion } = useApiPost(
-    // (_: any) => updateGeneralQuestionUrl(_, item?._id),
-    () => { },
+  const { mutate: addQuestion, isLoading: isUpdatingQuestion } = useApiPost(
+    createAmigoQuizQuestionUrl,
     onSuccess,
     onError
   );
@@ -93,38 +93,48 @@ export const AddQuizQuestion = () => {
       const formData = new FormData();
       formData.append("file", data?.image);
       try {
-        setIsUploadingImage(true)
+        setIsUploadingImage(true);
         const response: any = await customPost(imageUploadUrl, formData);
         if (response) {
-          setIsUploadingImage(false)
+          setIsUploadingImage(false);
         }
         const requestBody: any = {
-          question: data.question,
-          imageUrl: response?.data?.data?.url,
-          options: options.map((label) => ({
-            label,
-            value: data[`option${label}`],
-          })),
-          correctOption: selectedOption,
-          explanation: data?.explanation,
-          score: data.score,
+          questions: [
+            {
+              question: data.question,
+              imageUrl: response?.data?.data?.url,
+              explanation: data?.explanation,
+              options: options.map((label) => ({
+                label,
+                value: data[`option${label}`],
+              })),
+              correctOption: selectedOption,
+              score: data.score,
+            },
+          ],
+          quizId: state,
         };
-        updateQuestion(requestBody);
+        addQuestion(requestBody);
       } catch (e) {
         console.log(e);
       }
     } else {
       const requestBody: any = {
-        question: data.question,
-        options: options.map((label) => ({
-          label,
-          value: data[`option${label}`],
-        })),
-        correctOption: selectedOption,
-        explanation: data?.explanation,
-        score: data.score,
+        questions: [
+          {
+            question: data.question,
+            explanation: data?.explanation,
+            options: options.map((label) => ({
+              label,
+              value: data[`option${label}`],
+            })),
+            correctOption: selectedOption,
+            score: data.score,
+          },
+        ],
+        quizId: state,
       };
-      updateQuestion(requestBody);
+      addQuestion(requestBody);
     }
   };
 
@@ -174,20 +184,20 @@ export const AddQuizQuestion = () => {
           ))}
         </OptionsContainer>
         <ButtonHolder>
-          <InputElement
-            placeholder="Score"
-            register={register}
-            id="score"
-          />
+          <InputElement placeholder="Score" register={register} id="score" />
           <ButtonElement
             label="Edit Question"
             width={140}
             type="submit"
-            isLoading={isUpdatingQuestion || isUploadingImage }
+            isLoading={isUpdatingQuestion || isUploadingImage}
           />
         </ButtonHolder>
       </Container>
-      <Modal cancel={handleCancel} width={"40%"}>
+      <Modal
+        cancel={handleCancel}
+        width={"40%"}
+        openState={openModal}
+      >
         <ModalContent>
           <UploadTick />
           <p>Question Edited Successfully</p>
@@ -202,7 +212,6 @@ export const AddQuizQuestion = () => {
     </>
   );
 };
-
 
 const Container = styled.form`
   width: 100%;

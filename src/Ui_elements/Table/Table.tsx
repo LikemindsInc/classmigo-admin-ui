@@ -63,7 +63,6 @@ export const TableElement = ({
         pageSize: pagination.pageSize,
         current: pagination.current,
         onChange: (page) => {
-          console.log(page, "page")
           handlePagination(page);
         },
       }}

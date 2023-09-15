@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../../Assets/noData.png";
-import { ButtonElement, DatePickerInput, SelectInput } from "../../../../../../../Ui_elements";
+import {
+  ButtonElement,
+  DatePickerInput,
+  Loader,
+  SelectInput,
+} from "../../../../../../../Ui_elements";
 import {
   Outlet,
   Route,
@@ -18,16 +23,15 @@ import { getAmigoQuizUrl } from "../../../../../../../Urls";
 import { useApiGet } from "../../../../../../../custom-hooks";
 
 interface MainProp {
-  classOptions: { value: any; label: any; }[]
-  isLoadingClassOptions:boolean
+  classOptions: { value: any; label: any }[];
+  isLoadingClassOptions: boolean;
 }
 
-export const MainPage = ({classOptions, isLoadingClassOptions}: MainProp) => {
+export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const [quizes, setQuizes] = useState([])
-  
+  const [quizes, setQuizes] = useState([]);
 
   const {
     register,
@@ -38,10 +42,8 @@ export const MainPage = ({classOptions, isLoadingClassOptions}: MainProp) => {
     formState: { errors },
   } = useForm({});
 
-
-
-  const { data: amigoQuiz, isFetching: isLoadingAmigoQuiz} = useApiGet(
-    ["allClasses"],
+  const { data: amigoQuiz, isFetching: isLoadingAmigoQuiz } = useApiGet(
+    ["amigoQuiz"],
     () => getAmigoQuizUrl(),
     {
       refetchOnWindowFocus: false,
@@ -50,11 +52,14 @@ export const MainPage = ({classOptions, isLoadingClassOptions}: MainProp) => {
   );
 
   useEffect(() => {
-    if (amigoQuiz?.data) {
-      setQuizes(quizes)
+    if (amigoQuiz?.data?.content) {
+      setQuizes(amigoQuiz?.data?.content);
     }
-  },[amigoQuiz?.data, quizes])
+  }, [amigoQuiz?.data?.content]);
 
+  if (isLoadingAmigoQuiz) {
+    return <Loader />;
+  }
 
   return (
     <Container>
@@ -101,9 +106,13 @@ export const MainPage = ({classOptions, isLoadingClassOptions}: MainProp) => {
               />
             )}
           /> */}
-          <DatePickerInput/>
+          <DatePickerInput />
         </SelectContainer>
-        <ButtonElement label="Schedule Amigo Quiz" width={300} onClick={()=>navigate("#quiz/schedule_quiz")} />
+        <ButtonElement
+          label="Schedule Amigo Quiz"
+          width={300}
+          onClick={() => navigate("#quiz/schedule_quiz")}
+        />
       </FilterContainer>
 
       <DetailsContainer>
@@ -111,29 +120,54 @@ export const MainPage = ({classOptions, isLoadingClassOptions}: MainProp) => {
           <h4>Upcoming Amigo Quiz</h4>
           <h6>Upcoming Scheduled Amigo Quiz Dates</h6>
           <CardContainer>
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
+            {quizes.some((item: any) => item?.isActive) ? (
+              <CardContainer>
+                {quizes.map((el: any) => {
+                  if (el?.isActive) {
+                    return (
+                      <QuizCard
+                        item={el}
+                        isActive={el.isActive}
+                        dateTime={el.startDateTime}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </CardContainer>
+            ) : (
+              <Error>
+                <img src={noData} alt="No data" />
+                <p>You don't have any past quizes.</p>
+              </Error>
+            )}
           </CardContainer>
         </UpcomingSection>
         <UpcomingSection>
           <h4>Past Amigo Quiz</h4>
           <h6>Past Scheduled Amigo Quiz Dates</h6>
-          <CardContainer>
-            <QuizCard isActive={false} />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-            <QuizCard />
-          </CardContainer>
+
+          {quizes.some((item: any) => !item?.isActive) ? (
+            <CardContainer>
+              {quizes.map((item: any) => {
+                if (!item?.isActive) {
+                  return (
+                    <QuizCard
+                      item={item}
+                      isActive={item.isActive}
+                      dateTime={item.startDateTime}
+                    />
+                  );
+                }
+                return null;
+              })}
+            </CardContainer>
+          ) : (
+            <Error>
+              <img src={noData} alt="No data" />
+              <p>You don't have any past quizes.</p>
+            </Error>
+          )}
         </UpcomingSection>
       </DetailsContainer>
     </Container>
@@ -195,4 +229,17 @@ const CardContainer = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 2%;
+`;
+
+const Error = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 5% auto;
+  p {
+    font-size: 0.8rem;
+    text-align: center;
+  }
 `;

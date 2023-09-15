@@ -34,7 +34,6 @@ export const ImageInput = ({
   ) => {
     const file = event.target.files?.[0] || null;
     file && setPreview(URL.createObjectURL(file));
-    console.log(file,"fdfdf")
     if (file) {
       if (register) {
         register(id, {

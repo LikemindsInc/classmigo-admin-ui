@@ -4,7 +4,6 @@ import { Tooltip } from 'antd';
 
 
 export const ToolTipElement = ({ children, paymentDetails }) => {
-    console.log(paymentDetails, "mkmm");
     const Details = () => (
         <Container>
             <h6>Subscription Details</h6>

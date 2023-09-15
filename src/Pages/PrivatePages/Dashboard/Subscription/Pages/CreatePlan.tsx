@@ -90,8 +90,8 @@ const CreatePlan = () => {
         dayCount: data.duration,
         price: data.price,
         friendlyName: data.subscriptionName,
-        discountedPrice: data.discount,
-        label:data.type.label
+        discountedPrice: Number(data.discount),
+        label: data.type.label,
       };
       updateSub(requestBody);
     } else {
@@ -100,8 +100,8 @@ const CreatePlan = () => {
         dayCount: data.duration,
         price: data.price,
         friendlyName: data.subscriptionName,
-        discountedPrice: data.discount || 0,
-        label:data.type.label
+        discountedPrice: Number(data.discount) || 0,
+        label: data.type.label,
       };
       addSubscription(requestBody);
     }

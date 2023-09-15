@@ -41,7 +41,6 @@ export const updateSubscription = (data: any, id: any) => {
 };
 
 export const getSubscriptionAnalytics = (filter: any) => {
-  console.log(filter);
   return request({
     url: `${BASE_URL}/subscription/analytics?${generateUrlParams(filter)}`,
     method: "GET",

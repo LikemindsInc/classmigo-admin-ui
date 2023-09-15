@@ -48,7 +48,6 @@ const Login = () => {
     handleError
   );
 
-  // loginError && console.log(loginError)
 
   const onSubmit: SubmitHandler<Inputs | any> = (data: any) => {
     login(data);

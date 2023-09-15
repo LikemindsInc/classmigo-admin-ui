@@ -3,14 +3,23 @@ import styled from "styled-components";
 import { MoreIcon } from "../../../../../../../../Assets/Svgs";
 import { Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import { useApiDelete } from "../../../../../../../../custom-hooks";
+import { deleteAmigoQuizUrl } from "../../../../../../../../Urls";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
-  isActive?: false;
+  isActive: false;
+  dateTime: string;
+  item: any;
 }
-export const QuizCard = ({ isActive }: Props) => {
+export const QuizCard = ({ isActive, dateTime, item }: Props) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+  const queryClient = useQueryClient()
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -18,12 +27,45 @@ export const QuizCard = ({ isActive }: Props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const success = () => {
+    toast.success("Successfully Scheduled Quiz", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+    queryClient.invalidateQueries(["amigoQuiz"])
+
+  };
+
+  const error = (error: AxiosError) => {
+    toast.error(`Something went wrong, ${error}`, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  };
+
+  const { mutate: deleteAmigoQuiz, isLoading: isDeleting } = useApiDelete(
+    () => deleteAmigoQuizUrl(item?._id),
+    success,
+    error
+  );
+
   return (
     <Container>
       <section>
-        <div id="basic-button" onClick={handleClick}>
+        <MoreContainer id="basic-button" onClick={handleClick}>
           <MoreIcon />
-        </div>
+        </MoreContainer>
         {isActive === false ? (
           <Menu
             id="basic-menu"
@@ -65,15 +107,14 @@ export const QuizCard = ({ isActive }: Props) => {
               },
             }}
           >
-            <Item onClick={() => navigate("#quiz/schedule_quiz")}>
+            <Item
+              onClick={() =>
+                navigate("#quiz/schedule_quiz", { state: { item } })
+              }
+            >
               Edit Details
             </Item>
-            <Item
-              style={{ color: "red" }}
-              // onClick={() => cancelSession(item?._id)}
-            >
-              Delete Quiz
-            </Item>
+
             <Item
             // onClick={() => cancelSession(item?._id)}
             >
@@ -124,17 +165,20 @@ export const QuizCard = ({ isActive }: Props) => {
               },
             }}
           >
-            <Item onClick={() => navigate("#quiz/schedule_quiz")}>
+            <Item
+              onClick={() =>
+                navigate("#quiz/schedule_quiz", { state: { item } })
+              }
+            >
               Edit Details
             </Item>
-            <Item
-              style={{ color: "red" }}
-              // onClick={() => cancelSession(item?._id)}
-            >
-              Delete Quiz
+              <Item style={{ color: "red" }} onClick={() => {
+                deleteAmigoQuiz()
+              }}>
+              {isDeleting ? "Deleting..." : "Delete Quiz"}
             </Item>
             <Item
-              onClick={() => navigate(`#quiz/schedule_quiz/view_questions`)}
+              onClick={() => navigate(`#quiz/schedule_quiz/view_questions`, {state:{item}})}
             >
               View Quiz Questions
             </Item>
@@ -142,8 +186,8 @@ export const QuizCard = ({ isActive }: Props) => {
         )}
       </section>
       <div>
-        <h6>October 7, 2023</h6>
-        <p>8:00AM</p>
+        <h6>{dayjs(dateTime).format("MMMM D, YYYY")}</h6>
+        <p>{dayjs(dateTime).format("h:mm A")}</p>
       </div>
     </Container>
   );
@@ -172,5 +216,12 @@ const Container = styled.div`
 const Item = styled(MenuItem)`
   font-size: 0.8rem;
   font-weight: 700 !important;
-  width: 200px;
+  width: 200px;import { useQueryClient } from '@tanstack/react-query';
+
+`;
+
+const MoreContainer = styled.div`
+  &:hover {
+    cursor: pointer;
+  }
 `;

@@ -114,10 +114,6 @@ const AddQuestion = () => {
     }
   );
 
-  if (topics) {
-    console.log(topics, "topics");
-  }
-
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
   const activeSubjects = subjects?.data?.subjects.filter(
     (item: any) => item.isActive
@@ -198,7 +194,6 @@ const AddQuestion = () => {
           correctOption: selectedOption,
           score: parseInt(data.score),
         };
-        console.log(requestBody, "request");
         addQuestion(requestBody);
       } catch (e) {
         console.log(e);

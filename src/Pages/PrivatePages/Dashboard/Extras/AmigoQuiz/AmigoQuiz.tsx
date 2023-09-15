@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Tab, Tabs } from "@mui/material";
-import { TabNavigation } from "../../../../../Ui_elements";
+import { Loader, TabNavigation } from "../../../../../Ui_elements";
 import {
   Outlet,
   Route,
@@ -19,12 +19,13 @@ import { ScheduleQuiz } from "./Pages/MainPage/ScheduleQuiz";
 import { PracticePageRouter } from "./Pages/PracticePage/RouteBuilder";
 import { LeaderboardRouter } from "./Pages/LeaderboardPage/Routebuilder";
 import { ViewQuestions } from "./Pages/MainPage/ViewQuestions";
-import { AddQuizQuestion } from "./Pages/MainPage/EditQuestion";
+import { EditQuizQuestion } from "./Pages/MainPage/EditQuestion";
 import { QuizLeaderboard } from "./Pages/MainPage/Leaderboard";
 import { AddPracticeQuizQuestion } from "./Pages/PracticePage/AddQuestion";
 import { getAllClassesUrl } from "../../../../../Urls";
 import { useApiGet } from "../../../../../custom-hooks";
 import { formatOptions } from "../../../../../utils/utilFns";
+import { AddQuizQuestion } from "./Pages/MainPage/AddQuestion";
 
 const AmigoQuiz = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const AmigoQuiz = () => {
   });
 
   const { data: classes, isLoading: isLoadingClassOptions } = useApiGet(
-    ["allClasses"],
+    ["allClassesAmigo"],
     () => getAllClassesUrl(),
     {
       refetchOnWindowFocus: false,
@@ -64,6 +65,7 @@ const AmigoQuiz = () => {
       }
     }
   }, [location.hash, navigate]);
+
   const routes = [
     {
       id: 0,
@@ -82,6 +84,9 @@ const AmigoQuiz = () => {
     },
   ];
 
+  if (isLoadingClassOptions) {
+    return <Loader />;
+  }
   const handleChange = (event: any, newValue: any) => {
     navigate(`#${routes[newValue].route}`);
     setPage(newValue);
@@ -104,13 +109,8 @@ const AmigoQuiz = () => {
       )}
       {location.hash === "#practice" && <PracticeQuiz />}
       {location.hash === "#leaderboard" && <Leaderboard />}
-      {location.hash === "#quiz/schedule_quiz" && (
-        <ScheduleQuiz
-          classOptions={allClasses}
-          isLoadingClassOptions={isLoadingClassOptions}
-        />
-      )}
-      {location.hash === "#quiz/add_quiz" && <AddQuizQuestion />}
+      {location.hash === "#quiz/schedule_quiz" && <ScheduleQuiz />}
+      {location.hash === "#quiz/edit_question" && <EditQuizQuestion />}
       {location.hash === "#quiz/quiz_leaderboard" && <QuizLeaderboard />}
       {location.hash === "#quiz/schedule_quiz/view_questions" && (
         <ViewQuestions />

@@ -32,7 +32,6 @@ const SelectSubject = () => {
     }
   }, [state]);
 
-  console.log(state, "state....");
 
   const {
     register,
