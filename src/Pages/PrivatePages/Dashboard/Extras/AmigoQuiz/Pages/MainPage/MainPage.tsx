@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../../Assets/noData.png";
 import { ButtonElement, DatePickerInput, SelectInput } from "../../../../../../../Ui_elements";
@@ -14,10 +14,20 @@ import { ScheduleQuiz } from "./ScheduleQuiz";
 import { Controller, useForm } from "react-hook-form";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { QuizCard } from "./Components/QuizCard";
+import { getAmigoQuizUrl } from "../../../../../../../Urls";
+import { useApiGet } from "../../../../../../../custom-hooks";
 
-export const MainPage = () => {
+interface MainProp {
+  classOptions: { value: any; label: any; }[]
+  isLoadingClassOptions:boolean
+}
+
+export const MainPage = ({classOptions, isLoadingClassOptions}: MainProp) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  const [quizes, setQuizes] = useState([])
+  
 
   const {
     register,
@@ -27,6 +37,24 @@ export const MainPage = () => {
     setValue,
     formState: { errors },
   } = useForm({});
+
+
+
+  const { data: amigoQuiz, isFetching: isLoadingAmigoQuiz} = useApiGet(
+    ["allClasses"],
+    () => getAmigoQuizUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  useEffect(() => {
+    if (amigoQuiz?.data) {
+      setQuizes(quizes)
+    }
+  },[amigoQuiz?.data, quizes])
+
 
   return (
     <Container>
@@ -48,11 +76,11 @@ export const MainPage = () => {
             render={({ field }) => (
               <SelectInput
                 {...field}
-                options={[]}
+                options={classOptions}
                 defaultValue={"Select a class"}
                 width={200}
                 error={errors?.class}
-                isLoading={false}
+                isLoading={isLoadingClassOptions}
               />
             )}
           />
@@ -75,7 +103,7 @@ export const MainPage = () => {
           /> */}
           <DatePickerInput/>
         </SelectContainer>
-        <ButtonElement label="Schedule Amigo Quiz" width={300} />
+        <ButtonElement label="Schedule Amigo Quiz" width={300} onClick={()=>navigate("#quiz/schedule_quiz")} />
       </FilterContainer>
 
       <DetailsContainer>

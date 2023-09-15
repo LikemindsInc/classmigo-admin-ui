@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Tab, Tabs } from "@mui/material";
@@ -16,13 +16,15 @@ import { MainPage } from "./Pages/MainPage/MainPage";
 import { Leaderboard } from "./Pages/LeaderboardPage/Leaderboard";
 import { PracticeQuiz } from "./Pages/PracticePage/PracticeQuiz";
 import { ScheduleQuiz } from "./Pages/MainPage/ScheduleQuiz";
-import { MainPageRouter } from "./Pages/MainPage/RouteBuilder";
 import { PracticePageRouter } from "./Pages/PracticePage/RouteBuilder";
 import { LeaderboardRouter } from "./Pages/LeaderboardPage/Routebuilder";
 import { ViewQuestions } from "./Pages/MainPage/ViewQuestions";
 import { AddQuizQuestion } from "./Pages/MainPage/EditQuestion";
 import { QuizLeaderboard } from "./Pages/MainPage/Leaderboard";
 import { AddPracticeQuizQuestion } from "./Pages/PracticePage/AddQuestion";
+import { getAllClassesUrl } from "../../../../../Urls";
+import { useApiGet } from "../../../../../custom-hooks";
+import { formatOptions } from "../../../../../utils/utilFns";
 
 const AmigoQuiz = () => {
   const navigate = useNavigate();
@@ -33,6 +35,22 @@ const AmigoQuiz = () => {
     return storedPage ? Number(storedPage) : undefined;
   });
 
+  const { data: classes, isLoading: isLoadingClassOptions } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+
+  const allClasses = useMemo(
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
+  );
+
   useEffect(() => {
     if (location.hash === "") {
       navigate("#quiz");
@@ -40,7 +58,6 @@ const AmigoQuiz = () => {
       const route = routes.find(
         (item) => item.route === location.hash.substring(1)
       );
-      console.log(route);
       if (route) {
         setPage(route.id);
         localStorage.setItem("page", String(route.id));
@@ -79,10 +96,20 @@ const AmigoQuiz = () => {
           handleChange={handleChange}
         />
       </TabContainer>
-      {location.hash === "#quiz" && <MainPage />}
+      {location.hash === "#quiz" && (
+        <MainPage
+          isLoadingClassOptions={isLoadingClassOptions}
+          classOptions={allClasses}
+        />
+      )}
       {location.hash === "#practice" && <PracticeQuiz />}
       {location.hash === "#leaderboard" && <Leaderboard />}
-      {location.hash === "#quiz/schedule_quiz" && <ScheduleQuiz />}
+      {location.hash === "#quiz/schedule_quiz" && (
+        <ScheduleQuiz
+          classOptions={allClasses}
+          isLoadingClassOptions={isLoadingClassOptions}
+        />
+      )}
       {location.hash === "#quiz/add_quiz" && <AddQuizQuestion />}
       {location.hash === "#quiz/quiz_leaderboard" && <QuizLeaderboard />}
       {location.hash === "#quiz/schedule_quiz/view_questions" && (
@@ -91,8 +118,9 @@ const AmigoQuiz = () => {
       {location.hash === "#quiz/schedule_quiz/add_quiz_question" && (
         <AddQuizQuestion />
       )}
-      {location.hash === "#practice/add_question" && <AddPracticeQuizQuestion />}
-
+      {location.hash === "#practice/add_question" && (
+        <AddPracticeQuizQuestion />
+      )}
     </Container>
   );
 };
