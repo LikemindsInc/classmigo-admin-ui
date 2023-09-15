@@ -6,8 +6,21 @@ import { AddIcon, CsvIcon } from "../../../../../../../Assets/Svgs";
 import noData from "../../../../../../../Assets/noData.png";
 import { useNavigate } from "react-router-dom";
 import { QuestionCard } from "./Components/QuestionCard";
+import { useApiGet } from "../../../../../../../custom-hooks";
+import { getPracticeQuestionUrl } from "../../../../../../../Urls";
 export const PracticeQuiz = () => {
   const navigate = useNavigate();
+
+  const { data } = useApiGet(
+    ["practice-question"],
+    () => getPracticeQuestionUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  
   return (
     <Container>
       <UtilHolder>

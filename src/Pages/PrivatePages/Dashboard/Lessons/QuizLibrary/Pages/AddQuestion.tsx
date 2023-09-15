@@ -41,7 +41,6 @@ const AddQuestion = () => {
     resolver: yupResolver(addQuestionSchema),
   });
 
-  console.log(errors, "error")
 
 
   const onSuccess = () => {
@@ -77,7 +76,6 @@ const AddQuestion = () => {
 
   const onSubmit = async (data: any) => {
     const options = ["A", "B", "C", "D"];
-    console.log("I rean")
     const imageUploadUrl =
       "https://classmigo.herokuapp.com/api/v1/admin/upload";
     if (data?.image) {

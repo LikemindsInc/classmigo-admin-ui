@@ -27,7 +27,6 @@ const QuizDetails = () => {
     }
   );
 
-  // quizQuestions && console.log(quizQuestions?.data?.questions);
 
   return (
     <Container>

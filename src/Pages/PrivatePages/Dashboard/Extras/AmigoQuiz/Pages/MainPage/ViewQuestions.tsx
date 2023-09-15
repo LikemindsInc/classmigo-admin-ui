@@ -1,20 +1,32 @@
 import React from "react";
 import { QuestionCard } from "./Components/QuestionCard";
 import styled from "styled-components";
-import {
-  ButtonElement,
-  SearchInput,
-} from "../../../../../../../Ui_elements";
+import { ButtonElement, SearchInput } from "../../../../../../../Ui_elements";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { AddIcon } from "../../../../../../../Assets/Svgs";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import { useApiGet } from "../../../../../../../custom-hooks";
+import { getPracticeQuestionUrl } from "../../../../../../../Urls";
 
 export const ViewQuestions = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const { item } = state;
+
+  // const { data } = useApiGet(
+  //   ["amigoQuestion"],
+  //   () => getPracticeQuestionUrl(),
+  //   {
+  //     refetchOnWindowFocus: false,
+  //     enabled: true,
+  //   }
+  // );
+
   return (
     <Container>
-      <h6>SSS 3</h6>
-      <h3>October 7, 2023</h3>
+      <h6>{item?.className}</h6>
+      <h3>{dayjs(item?.startDateTime).format("MMMM D, YYYY")}</h3>
       <UtilsHolder>
         <SearchContainer>
           <SearchInput />
@@ -22,7 +34,9 @@ export const ViewQuestions = () => {
         <ButtonElement
           icon={<AddIcon />}
           label="Add New Question"
-          onClick={()=>navigate("#quiz/add_quiz")}
+          onClick={() =>
+            navigate("#quiz/schedule_quiz/add_quiz_question", { state: item })
+          }
           width={200}
         />
       </UtilsHolder>

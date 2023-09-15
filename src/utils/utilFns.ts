@@ -98,13 +98,10 @@ export const formatDate = (date: Date): string => {
 };
 
 export const formatIncomingDate = (incomingDate: string): string => {
-  console.log("Incoming Date:", incomingDate);
 
   const newDateTime = new Date(incomingDate);
-  console.log("New Date Object:", newDateTime);
 
   const formattedDateTime = newDateTime.toISOString().slice(0, 16);
-  console.log("Formatted Date:", formattedDateTime);
 
   return formattedDateTime;
 };

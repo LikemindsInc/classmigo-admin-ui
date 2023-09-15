@@ -61,10 +61,7 @@ const VideoDetails = () => {
 
   usePreventNavigation(isLoading);
 
-  console.log(isLoading)
-
   const onSubmit = (data: any) => {
-    // console.log(data);
     const formData = new FormData();
     formData.append("title", data?.lessonName);
     formData.append("class", state.classValue?.value);

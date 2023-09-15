@@ -119,7 +119,6 @@ const VideoLibrary = () => {
   }, [allVideos, videos]);
 
   const onSubmit = () => {
-    console.log(topicValue, "lakaka");
     getAllVideos();
   };
 

@@ -31,7 +31,6 @@ const Chat = () => {
   ]);
 
   const handleSubmitMessage = (message: string) => {
-    console.log("AHHHH!!!");
     setMessages((prevMessages) => [
       ...prevMessages,
       {
