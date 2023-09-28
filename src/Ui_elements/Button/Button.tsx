@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { devices } from "../../utils/mediaQueryBreakPoints";
 import { Spinner } from "../Spinner/Spinner";
 interface ButtonProp {
   label: React.ReactNode;
@@ -58,4 +59,8 @@ const Button = styled.button<StyledButtonProps>`
   border: ${({ outline }) =>
     outline ? "1px solid var(--primary-color)" : "none"};
   cursor: pointer;
+
+  @media ${devices.tablet} {
+    width: 100% !important;
+  }
 `;

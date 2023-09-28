@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import styled from "styled-components";
 import {
@@ -8,10 +8,15 @@ import {
 } from "../../../../../../../Ui_elements";
 import { TableElement } from "../../../../../../../Ui_elements/Table/Table";
 import { ColumnsType } from "antd/es/table";
-import { getStudentDataUrl } from "../../../../../../../Urls";
+import { getAllClassesUrl, getLeaderboardUrl } from "../../../../../../../Urls";
 import { useApiGet } from "../../../../../../../custom-hooks";
 import { UserDetails } from "../MainPage/Components/UserDetails";
-import { IParent, ISubscription } from "@appModel";
+import { debounce } from "lodash";
+import {
+  formatOptions,
+  generateQueryKey,
+} from "../../../../../../../utils/utilFns";
+import dayjs from "dayjs";
 
 interface DataType {
   key: string;
@@ -19,49 +24,139 @@ interface DataType {
   username: string;
   class: string;
   phoneNumber: number;
-  status: string;
-  subscription: ISubscription[];
   image: string;
   _id: string;
-  isActive: boolean;
-  parent?: IParent | null;
+  index: number;
 }
 
 export const Leaderboard = () => {
   const [student, setStudent] = useState<any>([]);
-
-  const {
-    data: studentData,
-    isLoading: isLoadingStudentData,
-    isFetching: isFetchingStudentData,
-    refetch: fetchStudent,
-  } = useApiGet(["lala"], () => getStudentDataUrl(), {
-    refetchOnWindowFocus: false,
-    enabled: true,
-    cacheTime: 0,
+  const [searchFilter, setSearchFilter] = useState<any>({
+    page: 0,
+    pageSize: 10,
+    query: null,
+    className: null,
+    endDate: null,
+    startDate: null,
   });
 
+  const hasFilter = () => {
+    const { query, className, endDate, startDate } = searchFilter;
+    return [query, className, endDate, startDate].some(
+      (value) => value !== null
+    );
+  };
+
+  const debouncedSearchFilterUpdate = debounce((value) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      query: value,
+    }));
+  }, 1500);
+
+  const handleSearchFilter = (e: any) => {
+    const searchValue = e.target.value;
+    debouncedSearchFilterUpdate(searchValue.trim());
+  };
+
+  const onSelectClassname = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: value?.value,
+    }));
+  };
+
+  const handleFromDateChange = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      startDate: dayjs(value).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+    }));
+  };
+
+  const handleToDateChange = (value: any) => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      endDate: dayjs(value).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+    }));
+  };
+
+  const handleClearClass = () => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      className: null,
+    }));
+  };
+  const handleClearFromDate = () => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      startDate: null,
+    }));
+  };
+
+  const handleClearEndDate = () => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      endDate: null,
+    }));
+  };
+
+  const clearFilters = () => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      query: null,
+      className: null,
+      fromDate: null,
+      endDate: null,
+    }));
+  };
+
+  const {
+    data: leaderboardData,
+    isLoading: isLoadingLeaderboardData,
+    isFetching: isFetchingLeaderboardData,
+    refetch: fetchLeader,
+  } = useApiGet(
+    [generateQueryKey("Leaderboard-data", searchFilter)],
+    () => getLeaderboardUrl(searchFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+      // cacheTime: 0,
+    }
+  );
+
+  const { data: classes, isLoading: isLoadingClasses } = useApiGet(
+    ["allClasses"],
+    () => getAllClassesUrl(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
+
+  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
+
+  const allClasses = useMemo(
+    () => formatOptions(activeClasses, "value", "name"),
+    [activeClasses]
+  );
+
   useEffect(() => {
-    if (studentData) {
+    if (leaderboardData) {
       setStudent(() =>
-        studentData?.data?.content.map((item: any) => ({
+        leaderboardData?.data?.content.map((item: any, index: number) => ({
           key: item._id,
-          name: `${item.firstName} ${item.lastName}`,
-          username: item.userName,
-          phoneNumber: item.phoneNumber,
-          class:
-            (item.class && item.class.length > 0
-              ? item.class.map((classItem: any) => classItem.name)
-              : "" || null) || "",
-          status: item.isActive ? "Active" : "Inactive",
-          isActive: item.isActive,
-          subscription: item.subcription,
-          parent: item.parent,
-          image: item.image,
+          index: index,
+          name: `${item?.student?.firstName} ${item?.student?.lastName}`,
+          username: item?.student?.userName,
+          phoneNumber: item?.student?.phoneNumber,
+          points: item?.score,
+          class: item?.className,
+          image: item?.student?.profileImageUrl,
         }))
       );
     }
-  }, [studentData]);
+  }, [leaderboardData]);
 
   const headerStyle = {
     color: "gray",
@@ -75,9 +170,17 @@ export const Leaderboard = () => {
       dataIndex: "name",
       key: "name",
       ellipsis: true,
-      render: (name: string, record: DataType) => (
-        <UserDetails image={record.image} name={name} />
-      ),
+      render: (name: string, record: DataType) => {
+        return (
+          <UserDetails index={record?.index} image={record.image} name={name} />
+        );
+      },
+    },
+    {
+      title: "POINTS",
+      dataIndex: "points",
+      key: "points",
+      ellipsis: true,
     },
     {
       title: "USERNAME",
@@ -86,15 +189,15 @@ export const Leaderboard = () => {
       ellipsis: true,
     },
     {
-      title: "PHONE NUMBER",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
+      title: "CLASS",
+      dataIndex: "class",
+      key: "class",
       ellipsis: true,
     },
     {
-      title: "STATUS",
-      dataIndex: "status",
-      key: "status",
+      title: "PHONE NUMBER",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
       ellipsis: true,
     },
   ];
@@ -105,17 +208,11 @@ export const Leaderboard = () => {
       case "name":
         updatedColumn.width = "25%";
         break;
-      case "phoneNumber":
+      case "points":
         updatedColumn.width = "15%";
-        break;
-      case "subscription":
-        updatedColumn.width = "15%";
-        break;
-      case "status":
-        updatedColumn.width = "10%";
         break;
       case "username":
-        updatedColumn.width = "15";
+        updatedColumn.width = "15%";
         break;
       case "class":
         updatedColumn.width = "10";
@@ -132,28 +229,54 @@ export const Leaderboard = () => {
         <div>
           <SelectContainer>
             <SelectInput
-              options={[]}
+              id="className"
+              options={allClasses}
+              onChange={onSelectClassname}
               defaultValue={"Select a class"}
-              width={200}
-              isLoading={false}
+              isLoading={isLoadingClasses}
             />
+            {typeof searchFilter?.className === "string" && (
+              <CancelIcon onClick={handleClearClass}>&#8855;</CancelIcon>
+            )}
           </SelectContainer>
 
           <SelectContainer>
-            <DatePickerInput />
+            <DatePickerInput
+              hint={"From Date"}
+              onChange={handleFromDateChange}
+            />
+            {typeof searchFilter?.startDate === "string" && (
+              <CancelIcon onClick={handleClearFromDate}>&#8855;</CancelIcon>
+            )}
+          </SelectContainer>
+
+          <SelectContainer>
+            <DatePickerInput hint={"To Date"} onChange={handleToDateChange} />
+
+            {typeof searchFilter?.endDate === "string" && (
+              <CancelIcon onClick={handleClearEndDate}>&#8855;</CancelIcon>
+            )}
           </SelectContainer>
         </div>
 
-        <SearchContainer>
-          <SearchInput />
-        </SearchContainer>
+        <div>
+          <SearchInput onSearch={handleSearchFilter} />
+        </div>
+
+        {hasFilter() && <h5 onClick={clearFilters}>Clear filters</h5>}
       </UtilHolder>
 
       <Content>
         <TableElement
           data={student || null}
+          loading={isLoadingLeaderboardData || isFetchingLeaderboardData}
           pagination
-          paginationData={studentData?.data?.pagination}
+          columns={updatedColumns}
+          paginationData={leaderboardData?.data?.pagination}
+          fetchFunction={getLeaderboardUrl}
+          fetchAction={fetchLeader}
+          setSearchFilter={setSearchFilter}
+          searchFilter={searchFilter}
         />
       </Content>
     </Container>
@@ -186,23 +309,54 @@ const UtilHolder = styled.section`
     display: flex;
     align-items: center;
     gap: 10px;
+    &::last-child {
+      width: 50%;
+    }
+    @media ${devices.tabletL} {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      margin-top: 15px;
+    }
+  }
+
+  h5 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: red;
+    transition: all 0.3s ease;
+    &:hover {
+      cursor: pointer;
+      color: white;
+      padding: 5px 10px;
+      background-color: red;
+      text-align: center;
+      border-radius: 6px;
+    }
+  }
+
+  @media ${devices.tabletL} {
+    flex-direction: column;
+    align-items: flex-start;
+    input {
+      width: fill !important;
+    }
   }
 `;
 
 const SelectContainer = styled.div`
   display: flex;
-  width: 200px;
-  @media ${devices.tabletL} {
-    width: 100%;
-  }
+  align-items: center;
+  gap: 10px;
+  width: 100%;
 `;
 
-const SearchContainer = styled.div`
-  display: flex;
-  width: 300px;
-  @media ${devices.tabletL} {
-    width: 100%;
-  }
-`;
 
 const Content = styled.section``;
+
+const CancelIcon = styled.div`
+  color: red;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+`;

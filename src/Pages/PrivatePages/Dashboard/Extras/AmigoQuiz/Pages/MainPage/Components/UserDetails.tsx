@@ -1,15 +1,23 @@
- import { Avatar } from "@mui/material";
+import { Avatar } from "@mui/material";
 import styled from "styled-components";
+import { MedalIcon } from "../../../../../../../../Assets/Svgs";
 
 export const UserDetails = ({
   image,
   name,
+  index,
 }: {
   image: string;
   name: string;
+  index?: number;
 }) => {
   return (
     <Container>
+      {index === 0 && (
+        <i>
+          <MedalIcon />
+        </i>
+      )}
       <Avatar
         sx={{
           backgroundColor: "var(--hover-color)",

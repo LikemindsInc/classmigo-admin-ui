@@ -411,7 +411,6 @@ const Students = () => {
       <UtilsHolder>
         <div>
           <SearchInput
-            // value={searchValue}
             onSearch={handleSearchFilter}
           />
           <Controller

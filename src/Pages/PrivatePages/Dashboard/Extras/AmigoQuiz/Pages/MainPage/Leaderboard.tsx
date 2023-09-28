@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { TableElement } from "../../../../../../../Ui_elements/Table/Table";
 import { useApiGet } from "../../../../../../../custom-hooks";
-import { getStudentDataUrl } from "../../../../../../../Urls";
+import {
+  getSingleLeaderboardUrl,
+} from "../../../../../../../Urls";
 import { ColumnsType } from "antd/es/table";
-import { IParent, ISubscription } from "@appModel";
 import { UserDetails } from "./Components/UserDetails";
-
-
-
+import { useLocation, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import noData from "../../../../../../../Assets/noData.png"
 
 interface DataType {
   key: string;
@@ -15,58 +16,46 @@ interface DataType {
   username: string;
   class: string;
   phoneNumber: number;
-  status: string;
-  subscription: ISubscription[];
   image: string;
   _id: string;
-  isActive: boolean;
-  parent?: IParent | null;
+  index: number;
 }
 
-
-
-
 export const QuizLeaderboard = () => {
-  const [student, setStudent] = useState<any>([]);
+  const [boardData, setBoardData] = useState<any>([]);
+  const navigate = useNavigate()
 
-  const {
-    data: studentData,
-    isLoading: isLoadingStudentData,
-    isFetching: isFetchingStudentData,
-    refetch: fetchStudent,
-  } = useApiGet(
+  const { state } = useLocation();
+
+  if (!state) {
+    navigate ("/amigo_quiz")
+  }
+  const { data, isLoading, isFetching, refetch } = useApiGet(
     ["lala"],
-    () => getStudentDataUrl(),
+    () => getSingleLeaderboardUrl(state._id),
     {
       refetchOnWindowFocus: false,
       enabled: true,
-      cacheTime:0
+      cacheTime: 0,
     }
-    );
-  
-
+  );
 
   useEffect(() => {
-    if (studentData) {
-      setStudent(() =>
-        studentData?.data?.content.map((item: any) => ({
+    if (data) {
+      setBoardData(() =>
+        data?.data?.content.map((item: any, index: number) => ({
           key: item._id,
-          name: `${item.firstName} ${item.lastName}`,
-          username: item.userName,
-          phoneNumber: item.phoneNumber,
-          class:
-            (item.class && item.class.length > 0
-              ? item.class.map((classItem: any) => classItem.name)
-              : "" || null) || "",
-          status: item.isActive ? "Active" : "Inactive",
-          isActive: item.isActive,
-          subscription: item.subcription,
-          parent: item.parent,
-          image: item.image,
+          index: index,
+          name: `${item?.student?.firstName} ${item?.student?.lastName}`,
+          username: item?.student?.userName,
+          phoneNumber: item?.student?.phoneNumber,
+          points: item?.score,
+          class: item?.className,
+          image: item?.student?.profileImageUrl,
         }))
       );
     }
-  }, [studentData]);
+  }, [data?.data?.content, data]);
 
   const headerStyle = {
     color: "gray",
@@ -80,9 +69,18 @@ export const QuizLeaderboard = () => {
       dataIndex: "name",
       key: "name",
       ellipsis: true,
-      render: (name: string, record: DataType) => (
-        <UserDetails image={record.image} name={name} />
-      ),
+      render: (name: string, record: DataType) => {
+        console.log(record, "record");
+        return (
+          <UserDetails index={record?.index} image={record.image} name={name} />
+        );
+      },
+    },
+    {
+      title: "POINTS",
+      dataIndex: "points",
+      key: "points",
+      ellipsis: true,
     },
     {
       title: "USERNAME",
@@ -91,18 +89,17 @@ export const QuizLeaderboard = () => {
       ellipsis: true,
     },
     {
+      title: "CLASS",
+      dataIndex: "class",
+      key: "class",
+      ellipsis: true,
+    },
+    {
       title: "PHONE NUMBER",
       dataIndex: "phoneNumber",
       key: "phoneNumber",
       ellipsis: true,
     },
-    {
-      title: "STATUS",
-      dataIndex: "status",
-      key: "status",
-      ellipsis: true,
-    },
-
   ];
 
   const updatedColumns = columns.map((column: any) => {
@@ -111,17 +108,11 @@ export const QuizLeaderboard = () => {
       case "name":
         updatedColumn.width = "25%";
         break;
-      case "phoneNumber":
+      case "points":
         updatedColumn.width = "15%";
-        break;
-      case "subscription":
-        updatedColumn.width = "15%";
-        break;
-      case "status":
-        updatedColumn.width = "10%";
         break;
       case "username":
-        updatedColumn.width = "15";
+        updatedColumn.width = "15%";
         break;
       case "class":
         updatedColumn.width = "10";
@@ -132,9 +123,45 @@ export const QuizLeaderboard = () => {
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
-  return <TableElement
-    data={student || null}
-    pagination
-    paginationData={studentData?.data?.pagination}
-  />;
+
+  return (
+    <>
+      {boardData.length > 0 ? (
+        <TableElement
+          data={boardData}
+          loading={isLoading || isFetching}
+          pagination
+          columns={updatedColumns}
+          paginationData={data?.data?.pagination}
+          fetchFunction={getSingleLeaderboardUrl}
+          fetchAction={refetch}
+        />
+      ) : (
+        <NoData>
+          <img src={noData} alt="No data" />
+          <p>No Student Has Taken This Quiz.</p>
+        </NoData>
+      )}
+    </>
+  );
 };
+
+const NoData = styled.div`
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  img {
+    margin-bottom: 1rem;
+  }
+  p {
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  button {
+    margin-top: 1rem;
+    width: fit-content;
+  }
+`;

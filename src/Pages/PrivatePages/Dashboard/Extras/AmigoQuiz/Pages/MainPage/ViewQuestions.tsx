@@ -5,23 +5,25 @@ import { ButtonElement, SearchInput } from "../../../../../../../Ui_elements";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { AddIcon } from "../../../../../../../Assets/Svgs";
 import { useLocation, useNavigate } from "react-router-dom";
+import noData from "../../../../../../../Assets/noData.png";
 import dayjs from "dayjs";
 import { useApiGet } from "../../../../../../../custom-hooks";
-import { getPracticeQuestionUrl } from "../../../../../../../Urls";
+import { getAmigoQuizSingleQuestionsUrl } from "../../../../../../../Urls";
+import { Skeleton } from "@mui/material";
 
 export const ViewQuestions = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { item } = state;
 
-  // const { data } = useApiGet(
-  //   ["amigoQuestion"],
-  //   () => getPracticeQuestionUrl(),
-  //   {
-  //     refetchOnWindowFocus: false,
-  //     enabled: true,
-  //   }
-  // );
+  const { data, isLoading } = useApiGet(
+    ["amigoQuestion"],
+    () => getAmigoQuizSingleQuestionsUrl(item._id),
+    {
+      refetchOnWindowFocus: false,
+      enabled: true,
+    }
+  );
 
   return (
     <Container>
@@ -34,15 +36,46 @@ export const ViewQuestions = () => {
         <ButtonElement
           icon={<AddIcon />}
           label="Add New Question"
+          width={200}
           onClick={() =>
             navigate("#quiz/schedule_quiz/add_quiz_question", { state: item })
           }
-          width={200}
         />
       </UtilsHolder>
       <QuestionContainer>
-        <QuestionCard />
-        <QuestionCard />
+        {data?.data?.questions.length > 0 ? (
+          data?.data?.questions.map((item: any, index: number) => (
+            <QuestionCard
+              key={index}
+              id={index + 1}
+              question={item?.question}
+              options={item?.options}
+              imageUrl={item?.imageUrl}
+              answer={item?.correctOption}
+              detailId={item?._id}
+              item={item}
+              queryId={state}
+            />
+          ))
+        ) : isLoading ? (
+          <div>
+            {[...Array(4)].map((_, index) => (
+              <SkeletonContainer key={index}>
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={"100%"}
+                  height={118}
+                />
+              </SkeletonContainer>
+            ))}
+          </div>
+        ) : (
+          <NoData>
+            <img src={noData} alt="No data" />
+            <p>You do not have any questions yet.</p>
+          </NoData>
+        )}
       </QuestionContainer>
     </Container>
   );
@@ -59,11 +92,14 @@ const Container = styled.section`
 
 const UtilsHolder = styled.div`
   display: flex;
-  margin-top: 3rem;
+  margin: 3rem 0;
   width: 100%;
   align-items: center;
   justify-content: space-between;
 
+  @media ${devices.tablet} {
+    flex-direction: column;
+  }
   > div {
     display: flex;
     align-items: center;
@@ -84,17 +120,40 @@ const UtilsHolder = styled.div`
   }
 `;
 
+export const SkeletonContainer = styled.div`
+  margin-bottom: 10px;
+`;
+
 const SearchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
   width: 30%;
   p {
     font-weight: 600;
+  }
+  @media ${devices.tablet} {
+    width: 100%;
+    margin-bottom: 20px;
   }
 `;
 
 const QuestionContainer = styled.section`
   padding: 0 20%;
+`;
+
+const NoData = styled.div`
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  img {
+    margin-bottom: 1rem;
+  }
+  p {
+    text-align: center;
+    font-size: 0.8rem;
+  }
 `;

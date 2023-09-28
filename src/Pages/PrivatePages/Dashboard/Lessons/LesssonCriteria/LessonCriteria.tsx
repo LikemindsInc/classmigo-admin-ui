@@ -235,7 +235,3 @@ const Header = styled.div`
     gap: 4%;
   }
 `;
-
-const PaginationContainer = styled.div`
-  /* margin: 2rem 0; */
-`;

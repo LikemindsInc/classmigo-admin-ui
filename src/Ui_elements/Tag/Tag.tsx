@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { devices } from '../../utils/mediaQueryBreakPoints'
 
 export const Tag = ({children}:any) => {
   return (
@@ -17,4 +18,8 @@ const Container = styled.div`
     width: fit-content;
     border-radius: 12px;
     background-color: var(--hover-color);
+
+    @media ${devices.tabletL}{
+        font-size: 0.6rem;
+    }
 `

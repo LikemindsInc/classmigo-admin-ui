@@ -10,23 +10,20 @@ import {
 import { DateTimePickerElement } from "../../../../../../../Ui_elements/Input/dateTimePicker";
 import { CsvIconPrimary } from "../../../../../../../Assets/Svgs";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { scheduleQuizSchema } from "./MainPageSchema";
+import { scheduleQuizSchema } from "./PracticeQuizSchema";
 import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
 import {
   getAllClassesUrl,
-  scheduleAmigoQuizUrl,
+  schedulePracticeQuizUrl,
   updateAmigoQuizUrl,
 } from "../../../../../../../Urls";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatOptions } from "../../../../../../../utils/utilFns";
-import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 
 
-
-
-export const ScheduleQuiz = () => {
+export const SchedulePracticeQuiz = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
@@ -38,7 +35,7 @@ export const ScheduleQuiz = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      class: state?.item?.className || null,
+      class: state?.item?.className || "",
       tag: state?.item?.tag || null,
       date: state?.item?.startDateTime || null,
     },
@@ -71,7 +68,7 @@ export const ScheduleQuiz = () => {
   };
 
   const { mutate: scheduleAmigoQuiz, isLoading: isScheduling } = useApiPost(
-    scheduleAmigoQuizUrl,
+    schedulePracticeQuizUrl,
     success,
     error
   );
@@ -114,9 +111,8 @@ export const ScheduleQuiz = () => {
   };
 
   if (isLoadingClassOptions) {
-    return <Loader/>
+    return <Loader />;
   }
-
 
   return (
     <Container onSubmit={handleSubmit(onSubmit)}>
@@ -145,6 +141,15 @@ export const ScheduleQuiz = () => {
           error={errors}
         />
       </InputHolder>
+      {/* <InputHolder>
+        <InputElement
+          label="Question Completion Time (In Seconds)"
+          placeholder="Enter Question Time"
+          register={register}
+          id="time"
+          error={errors}
+        />
+      </InputHolder> */}
 
       <InputHolder>
         <DateTimePickerElement
@@ -159,6 +164,7 @@ export const ScheduleQuiz = () => {
         <ButtonElement
           outline
           label="Upload Questions.CSV"
+          width={350}
           icon={<CsvIconPrimary />}
         />
       </InputHolder>
@@ -179,13 +185,9 @@ export const ScheduleQuiz = () => {
 
 const Container = styled.form``;
 const InputHolder = styled.div`
-  width: 18%;
-  margin-bottom: 3%;
+  width: 20%;
+  margin-bottom: 5%;
   & > button {
-    width: 100%;
-  }
-  @media ${devices.tabletL}{
-    width:100%;
-    margin-bottom:10%;
+    width: 200px !important;
   }
 `;

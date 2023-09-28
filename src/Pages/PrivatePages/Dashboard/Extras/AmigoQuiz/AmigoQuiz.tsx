@@ -1,31 +1,21 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
-import { Tab, Tabs } from "@mui/material";
 import { Loader, TabNavigation } from "../../../../../Ui_elements";
-import {
-  Outlet,
-  Route,
-  Router,
-  Routes,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MainPage } from "./Pages/MainPage/MainPage";
 import { Leaderboard } from "./Pages/LeaderboardPage/Leaderboard";
-import { PracticeQuiz } from "./Pages/PracticePage/PracticeQuiz";
+import { ViewPracticeQuiz } from "./Pages/PracticePage/ViewPracticeQuiz";
 import { ScheduleQuiz } from "./Pages/MainPage/ScheduleQuiz";
-import { PracticePageRouter } from "./Pages/PracticePage/RouteBuilder";
-import { LeaderboardRouter } from "./Pages/LeaderboardPage/Routebuilder";
 import { ViewQuestions } from "./Pages/MainPage/ViewQuestions";
 import { EditQuizQuestion } from "./Pages/MainPage/EditQuestion";
 import { QuizLeaderboard } from "./Pages/MainPage/Leaderboard";
-import { AddPracticeQuizQuestion } from "./Pages/PracticePage/AddQuestion";
+import { AddPracticeQuizQuestion } from "./Pages/PracticePage/AddPracticeQuestion";
 import { getAllClassesUrl } from "../../../../../Urls";
 import { useApiGet } from "../../../../../custom-hooks";
 import { formatOptions } from "../../../../../utils/utilFns";
 import { AddQuizQuestion } from "./Pages/MainPage/AddQuestion";
+import { SchedulePracticeQuiz } from "./Pages/PracticePage/SchedulePracticeQuiz";
 
 const AmigoQuiz = () => {
   const navigate = useNavigate();
@@ -52,6 +42,27 @@ const AmigoQuiz = () => {
     [activeClasses]
   );
 
+  const routes = useMemo(
+    () => [
+      {
+        id: 0,
+        name: "Amigo Quiz",
+        route: "quiz",
+      },
+      {
+        id: 1,
+        name: "Practice Quiz",
+        route: "practice",
+      },
+      {
+        id: 2,
+        name: "Leader board",
+        route: "leaderboard",
+      },
+    ],
+    []
+  );
+
   useEffect(() => {
     if (location.hash === "") {
       navigate("#quiz");
@@ -64,34 +75,18 @@ const AmigoQuiz = () => {
         localStorage.setItem("page", String(route.id));
       }
     }
-  }, [location.hash, navigate]);
-
-  const routes = [
-    {
-      id: 0,
-      name: "Amigo Quiz",
-      route: "quiz",
-    },
-    {
-      id: 1,
-      name: "Practice Quiz",
-      route: "practice",
-    },
-    {
-      id: 2,
-      name: "Leader board",
-      route: "leaderboard",
-    },
-  ];
+  }, [location.hash, navigate, routes]);
 
   if (isLoadingClassOptions) {
     return <Loader />;
   }
+
   const handleChange = (event: any, newValue: any) => {
     navigate(`#${routes[newValue].route}`);
     setPage(newValue);
     localStorage.setItem("page", String(newValue));
   };
+
   return (
     <Container>
       <TabContainer>
@@ -107,18 +102,27 @@ const AmigoQuiz = () => {
           classOptions={allClasses}
         />
       )}
-      {location.hash === "#practice" && <PracticeQuiz />}
+      {location.hash === "#practice/schedule_practice_quiz/view_questions" && (
+        <ViewPracticeQuiz />
+      )}
+      {location.hash === "#practice" && <ViewPracticeQuiz />}
       {location.hash === "#leaderboard" && <Leaderboard />}
       {location.hash === "#quiz/schedule_quiz" && <ScheduleQuiz />}
-      {location.hash === "#quiz/edit_question" && <EditQuizQuestion />}
+      {location.hash === "#practice/schedule_practice_quiz" && (
+        <SchedulePracticeQuiz />
+      )}
+      {location.hash === "#quiz/schedule_quiz/edit_question" && (
+        <EditQuizQuestion />
+      )}
       {location.hash === "#quiz/quiz_leaderboard" && <QuizLeaderboard />}
       {location.hash === "#quiz/schedule_quiz/view_questions" && (
         <ViewQuestions />
       )}
+
       {location.hash === "#quiz/schedule_quiz/add_quiz_question" && (
         <AddQuizQuestion />
       )}
-      {location.hash === "#practice/add_question" && (
+      {location.hash === "#practice/schedule_pactice_quiz/add_question" && (
         <AddPracticeQuizQuestion />
       )}
     </Container>

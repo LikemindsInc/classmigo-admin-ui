@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { UploadTick } from "../../../../../../Assets/Svgs";
@@ -14,21 +14,18 @@ import {
 } from "../../../../../../Ui_elements";
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
 import {
-  addQuestionUrl,
   getAllClassesUrl,
   getAllLessonsUrl,
   getAllSubjectsUrl,
 } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import {
-  convertToBase64,
   customPost,
   formatOptions,
 } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { addGeneralQuestionSchema } from "../GeneralQuizLibrarySchema";
-import { useLocation, useNavigate } from "react-router-dom";
-import { uploadImageUrl } from "../../../../../../Urls/Utils";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { addGeneralKnowledgeUrl } from "../../../../../../Urls/GeneralKnowledge";
 
@@ -40,7 +37,6 @@ const AddQuestion = () => {
   const [subjectValue, setSubjectValue] = useState<any>(null);
 
   const { setOpenModal } = useContext(ModalContext);
-  const { state } = useLocation();
   const navigate = useNavigate();
   const handleCancel = () => {
     setOpenModal(false);
@@ -52,7 +48,6 @@ const AddQuestion = () => {
     getValues,
     setValue,
     control,
-    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(addGeneralQuestionSchema),
@@ -73,10 +68,6 @@ const AddQuestion = () => {
     },
   ];
 
-  // console.log(errors, "error");
-
-  // let classValue: any = watch("class");
-  // let subjectValue: any = watch("subject");
 
   const { data: classes, isFetching: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -90,7 +81,6 @@ const AddQuestion = () => {
   const {
     data: subjects,
     isFetching: isLoadingSubjects,
-    refetch: fetchSubject,
   } = useApiGet(
     ["allSubjects"],
     () => getAllSubjectsUrl(classValue && classValue),
@@ -103,7 +93,6 @@ const AddQuestion = () => {
   const {
     data: topics,
     isFetching: isLoadingTopics,
-    refetch: fetchTopic,
   } = useApiGet(
     ["lessonTopic"],
     () => getAllLessonsUrl(subjectValue && subjectValue?.label),

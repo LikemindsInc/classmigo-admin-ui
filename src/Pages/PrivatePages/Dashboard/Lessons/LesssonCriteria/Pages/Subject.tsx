@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../Assets/noData.png";
-import { useLocation } from "react-router-dom";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { SubjectCard } from "../Components/SubjectCard";
 import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
@@ -17,20 +16,9 @@ import { LessonCriteriaContext } from "../../../../../../Contexts/Contexts";
 import Error from "../../../Error/Error";
 
 const SelectSubject = () => {
-  const location = useLocation();
-  const { state } = location;
   const [selectSubject, setSelectSubject] = useState<any>([]);
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
   const { className } = useContext(LessonCriteriaContext);
-  const [fromClass, setFromClass] = useState(false);
-
-  console.log(className, "className....");
-
-  useEffect(() => {
-    if (state) {
-      setFromClass(state?.fromClass);
-    }
-  }, [state]);
 
 
   const {
@@ -153,11 +141,8 @@ const SelectSubject = () => {
                   item?.name === className?.value &&
                   item?.subjects?.map((item: any) => (
                     <SubjectCard
-                      // subjectname={item?.name}
                       key={index}
                       item={item?.name}
-                      // classTitle={className?.label}
-                      // title={className?.value}
                       active={item?.isActive}
                       id={item?._id}
                       index={index}
@@ -302,9 +287,9 @@ const Header = styled.div`
   }
 `;
 
-const PaginationContainer = styled.div`
-  margin-top: 2rem;
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
+// const PaginationContainer = styled.div`
+//   margin-top: 2rem;
+//   width: 100%;
+//   display: flex;
+//   justify-content: flex-end;
+// `;

@@ -5,11 +5,10 @@ import { Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useApiDelete } from "../../../../../../../../custom-hooks";
-import { deleteAmigoQuizUrl } from "../../../../../../../../Urls";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
-import { Tag } from "../../../../../../../../Ui_elements";
+import { deletePracticeQuizUrl } from "../../../../../../../../Urls";
 
 interface Props {
   isActive: false;
@@ -54,8 +53,8 @@ export const QuizCard = ({ isActive, dateTime, item }: Props) => {
     });
   };
 
-  const { mutate: deleteAmigoQuiz, isLoading: isDeleting } = useApiDelete(
-    () => deleteAmigoQuizUrl(item?._id),
+  const { mutate: deletePracticeQuiz, isLoading: isDeleting } = useApiDelete(
+    () => deletePracticeQuizUrl(item?._id),
     success,
     error
   );
@@ -107,30 +106,20 @@ export const QuizCard = ({ isActive, dateTime, item }: Props) => {
               },
             }}
           >
-            {/* <Item
+            <Item
               onClick={() =>
                 navigate("#quiz/schedule_quiz", { state: { item } })
               }
             >
               Edit Details
-            </Item> */}
+            </Item>
 
             <Item
-              onClick={() =>
-                navigate(`#quiz/schedule_quiz/view_questions`, {
-                  state: { item },
-                })
-              }
+            // onClick={() => cancelSession(item?._id)}
             >
               View Quiz Questions
             </Item>
-            <Item
-              onClick={() =>
-                navigate("#quiz/quiz_leaderboard", {
-                  state: item,
-                })
-              }
-            >
+            <Item onClick={() => navigate("#quiz/quiz_leaderboard")}>
               View Leaderboard
             </Item>
           </Menu>
@@ -185,14 +174,14 @@ export const QuizCard = ({ isActive, dateTime, item }: Props) => {
             <Item
               style={{ color: "red" }}
               onClick={() => {
-                deleteAmigoQuiz();
+                deletePracticeQuiz();
               }}
             >
               {isDeleting ? "Deleting..." : "Delete Quiz"}
             </Item>
             <Item
               onClick={() =>
-                navigate(`#quiz/schedule_quiz/view_questions`, {
+                navigate(`#practice/schedule_practice_quiz/view_questions`, {
                   state: { item },
                 })
               }
@@ -205,9 +194,6 @@ export const QuizCard = ({ isActive, dateTime, item }: Props) => {
       <div>
         <h6>{dayjs(dateTime).format("MMMM D, YYYY")}</h6>
         <p>{dayjs(dateTime).format("h:mm A")}</p>
-        <div style={{ marginTop: "10px" }}>
-          <Tag>{item?.tag}</Tag>
-        </div>
       </div>
     </Container>
   );
@@ -236,8 +222,7 @@ const Container = styled.div`
 const Item = styled(MenuItem)`
   font-size: 0.8rem;
   font-weight: 700 !important;
-  width: 200px;import { useQueryClient } from '@tanstack/react-query';
-
+  width: 200px;
 `;
 
 const MoreContainer = styled.div`

@@ -6,7 +6,6 @@ import {
   Loader,
   SelectInput,
   Spinner,
-  VideoPlayerElement,
 } from "../../../../../Ui_elements";
 import { VideoCard } from "./Component/VideoCard";
 import { useEffect, useMemo, useState } from "react";
@@ -20,12 +19,12 @@ import {
 import { formatOptions } from "../../../../../utils/utilFns";
 import { Controller, useForm } from "react-hook-form";
 import noData from "../../../../../Assets/noData.png";
-import { Menu, MenuItem } from "@mui/material";
+import { MenuItem } from "@mui/material";
 
 const VideoLibrary = () => {
   const [videos, setVideos] = useState([]);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  // const open = Boolean(anchorEl);
 
   const { handleSubmit, watch, control, setValue } = useForm({});
 
@@ -33,12 +32,12 @@ const VideoLibrary = () => {
   let subjectValue = watch("subject");
   let topicValue = watch("topic");
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
   const {
     data: allVideos,
@@ -61,7 +60,7 @@ const VideoLibrary = () => {
   });
   const {
     data: subjects,
-    isLoading: isLoadingSubjects,
+    // isLoading: isLoadingSubjects,
     isFetching: isFetchingSubjects,
     refetch: fetchSubject,
   } = useApiGet(["allSubjects"], () => getAllSubjectsUrl(classValue?.value), {
@@ -70,7 +69,7 @@ const VideoLibrary = () => {
   });
   const {
     data: topics,
-    isLoading: isLoadingTopics,
+    // isLoading: isLoadingTopics,
     isFetching: isFetchingTopics,
     refetch: fetchTopic,
   } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.value), {
@@ -139,9 +138,8 @@ const VideoLibrary = () => {
                   {...field}
                   options={allClasses}
                   value={classValue}
-                  defaultValue="Subject Class"
+                  defaultValue="Select Class"
                   isLoading={isLoadingClasses || isFetchingClasses}
-                  // width={200}
                 />
               </SelectContainer>
             )}
@@ -155,7 +153,7 @@ const VideoLibrary = () => {
                 <SelectInput
                   {...field}
                   options={allSubjects}
-                  defaultValue="Subject Subject"
+                  defaultValue="Select Subject"
                   isLoading={isFetchingSubjects}
                 />
               </SelectContainer>
@@ -171,7 +169,7 @@ const VideoLibrary = () => {
                   {...field}
                   value={topicValue}
                   options={allTopics}
-                  defaultValue="Subject Topic"
+                  defaultValue="Select Topic"
                   isLoading={isFetchingTopics}
                 />
               </SelectContainer>
@@ -331,8 +329,8 @@ const NoData = styled.div`
 `;
 
 const VideoIntro = styled.div`
-  h5{
-    font-size:2rem;
+  h5 {
+    font-size: 2rem;
     margin: 1.5rem 0;
   }
 `;
@@ -343,7 +341,7 @@ const Banner = styled.div`
   margin-bottom: 20%;
   position: relative;
 
-  h4{
+  h4 {
     font-weight: 600;
     font-size: 1.2rem;
     margin-bottom: 0;
@@ -369,12 +367,10 @@ const Banner = styled.div`
       border-radius: 8px;
       transition: all 0.4s ease;
 
-
-      &:hover{
+      &:hover {
         background-color: white;
         color: black;
         cursor: pointer;
-        
       }
     }
     h6 {

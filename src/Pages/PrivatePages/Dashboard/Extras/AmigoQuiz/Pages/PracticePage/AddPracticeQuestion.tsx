@@ -1,13 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
 import {
   ButtonElement,
   ImageInput,
   InputElement,
-  SelectInput,
   TextAreaInput,
 } from "../../../../../../../Ui_elements";
 
@@ -16,19 +15,20 @@ import { toast } from "react-toastify";
 import { UploadTick } from "../../../../../../../Assets/Svgs";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { CenteredDialog } from "../../../../../../../Ui_elements/Modal/Modal";
-import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
-import { customPost, formatOptions } from "../../../../../../../utils/utilFns";
+import { useApiPost } from "../../../../../../../custom-hooks";
+import { customPost } from "../../../../../../../utils/utilFns";
 import { OptionsCard } from "./Components/OptionsCard";
+import { createPracticeQuizQuestionUrl } from "../../../../../../../Urls";
+import { addQuizQuestionSchema } from "./PracticeQuizSchema";
 
 export const AddPracticeQuizQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [classValue, setClassValue] = useState<any>(null);
-  const [subjectValue, setSubjectValue] = useState<any>(null);
 
   // const { setOpenModal } = useContext(ModalContext);
   const { state } = useLocation();
+  console.log(state, "state");
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const handleCancel = () => {
@@ -39,94 +39,10 @@ export const AddPracticeQuizQuestion = () => {
     register,
     handleSubmit,
     getValues,
-    control,
-    watch,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(addGeneralQuestionSchema),
+    resolver: yupResolver(addQuizQuestionSchema),
   });
-
-  const difficulties = [
-    {
-      value: 0,
-      label: "BEGINNER",
-    },
-    {
-      value: 1,
-      label: "INTERMEDIATE",
-    },
-    {
-      value: 2,
-      label: "ADVANCED",
-    },
-  ];
-
-  // console.log(errors, "error");
-
-  // let classValue: any = watch("class");
-  // let subjectValue: any = watch("subject");
-
-  const { data: classes, isFetching: isLoadingClasses } = useApiGet(
-    ["allClasses"],
-    // () => getAllClassesUrl(),
-    () => {},
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
-
-  const {
-    data: subjects,
-    isFetching: isLoadingSubjects,
-    refetch: fetchSubject,
-  } = useApiGet(
-    ["allSubjects"],
-    // () => getAllSubjectsUrl(classValue && classValue),
-    () => {},
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!classValue,
-    }
-  );
-
-  const {
-    data: topics,
-    isFetching: isLoadingTopics,
-    refetch: fetchTopic,
-  } = useApiGet(
-    ["lessonTopic"],
-    // () => getAllLessonsUrl(subjectValue && subjectValue?.label),
-    () => {},
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!subjectValue,
-      staleTime: 0,
-    }
-  );
-
-
-
-  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects = subjects?.data?.subjects.filter(
-    (item: any) => item.isActive
-  );
-  const activeTopics = topics?.data?.content.filter(
-    (item: any) => item.isActive
-  );
-
-  const allClasses = useMemo(
-    () => formatOptions(activeClasses, "value", "name"),
-    [activeClasses]
-  );
-
-  const allSubjects = useMemo(() => {
-    return formatOptions(activeSubjects, "name", "_id");
-  }, [activeSubjects]);
-
-  const allTopics = useMemo(() => {
-    return formatOptions(activeTopics, "lessonName", "_id");
-  }, [activeTopics]);
 
   const onSuccess = () => {
     toast.success("Successfully added question", {
@@ -155,7 +71,7 @@ export const AddPracticeQuizQuestion = () => {
 
   const { mutate: addQuestion, isLoading: isAddingQuestion } = useApiPost(
     // addGeneralKnowledgeUrl,
-    () => {},
+    createPracticeQuizQuestionUrl,
     onSuccess,
     onError
   );
@@ -172,40 +88,42 @@ export const AddPracticeQuizQuestion = () => {
         const response: any = await customPost(imageUploadUrl, formData);
         if (response) {
           setIsUploadingImage(false);
+          const requestBody: any = {
+            questions: [
+              {
+                question: data.question,
+                imageUrl: response?.data?.data?.url,
+                explanation: data?.explanation,
+                options: options.map((label) => ({
+                  label,
+                  value: data[`option${label}`],
+                })),
+                correctOption: selectedOption,
+                score: Number(data.score),
+              },
+            ],
+            quizId: state?._id,
+          };
+          addQuestion(requestBody);
         }
-        const requestBody: any = {
-          subjectId: subjectValue?.value,
-          class: classValue,
-          lessonId: data?.topic?.value,
-          difficultyLevel: data?.difficulty?.label,
-          question: data.question,
-          imageUrl: response?.data?.data?.url,
-          explanation: data?.explanation,
-          options: options.map((label) => ({
-            label,
-            value: data[`option${label}`],
-          })),
-          correctOption: selectedOption,
-          score: parseInt(data.score),
-        };
-        addQuestion(requestBody);
       } catch (e) {
         console.log(e);
       }
     } else {
       const requestBody: any = {
-        subjectId: subjectValue,
-        class: classValue,
-        lessonId: data?.topic?.value,
-        difficultyLevel: data?.difficulty?.label,
-        question: data.question,
-        explanation: data?.explanation,
-        options: options.map((label) => ({
-          label,
-          value: data[`option${label}`],
-        })),
-        correctOption: selectedOption,
-        score: data.score,
+        questions: [
+          {
+            question: data.question,
+            explanation: data?.explanation,
+            options: options.map((label) => ({
+              label,
+              value: data[`option${label}`],
+            })),
+            correctOption: selectedOption,
+            score: Number(data.score),
+          },
+        ],
+        quizId: state?._id,
       };
       addQuestion(requestBody);
     }
@@ -356,7 +274,6 @@ export const AddPracticeQuizQuestion = () => {
           />
         </ModalContent>
       </Modal>
-      ;
     </>
   );
 };
