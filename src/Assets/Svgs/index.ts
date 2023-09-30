@@ -40,7 +40,9 @@ import { ReactComponent as EndIcon } from '../Svgs/VideoCallIcons/endCall.svg';
 import { ReactComponent as Disconnected } from '../Error_404.svg';
 import { ReactComponent as SubscriptionIcon } from "../Svgs/DashboardIcons/subscriptionIcon.svg";
 import { ReactComponent as AmigoQuizIcon } from "../Svgs/DashboardIcons/amigoQuiz.svg";
-import { ReactComponent as CsvIconPrimary} from "../Svgs/DashboardIcons/CsvIconPrimary.svg";
+import { ReactComponent as CsvIconPrimary } from "../Svgs/DashboardIcons/CsvIconPrimary.svg";
+import { ReactComponent as MedalIcon} from "../Svgs/DashboardIcons/medal.svg";
+
 
 
 
@@ -89,5 +91,6 @@ export {
     Disconnected,
     SubscriptionIcon,
     AmigoQuizIcon,
-    CsvIconPrimary
+    CsvIconPrimary,
+    MedalIcon
 }

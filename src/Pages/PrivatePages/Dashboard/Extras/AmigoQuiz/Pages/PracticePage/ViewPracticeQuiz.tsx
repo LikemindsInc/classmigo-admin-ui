@@ -1,14 +1,11 @@
-import React from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { ButtonElement, SelectInput } from "../../../../../../../Ui_elements";
 import { AddIcon, CsvIcon } from "../../../../../../../Assets/Svgs";
-import noData from "../../../../../../../Assets/noData.png";
-import { useNavigate } from "react-router-dom";
-import { QuestionCard } from "./Components/QuestionCard";
+import {useNavigate } from "react-router-dom";
 import { useApiGet } from "../../../../../../../custom-hooks";
 import { getPracticeQuestionUrl } from "../../../../../../../Urls";
-export const PracticeQuiz = () => {
+export const ViewPracticeQuiz = () => {
   const navigate = useNavigate();
 
   const { data } = useApiGet(
@@ -20,7 +17,6 @@ export const PracticeQuiz = () => {
     }
   );
 
-  
   return (
     <Container>
       <UtilHolder>
@@ -42,23 +38,40 @@ export const PracticeQuiz = () => {
             label="Add Question"
             icon={<AddIcon />}
             width={200}
-            onClick={() => navigate("#practice/add_question")}
+            onClick={() =>
+              navigate("#practice/schedule_pactice_quiz/add_question", {
+                
+              })
+            }
           />
         </div>
         <ButtonElement label="Download CSV Format" outline width={300} />
       </UtilHolder>
 
       <Content>
-        {/* <NoData>
-          <img src={noData} alt="No data" />
-          <p>Select your preferred class and use the upload csv or </p>
-          <p>add new question to add questions to practice quiz</p>
-        </NoData> */}
-
-        <QuestionContainer>
-          <QuestionCard />
-          <QuestionCard />
-        </QuestionContainer>
+        {/* <QuestionContainer>
+          {data ? (
+            data?.data?.content?.map((item: any, index: number) => (
+              <QuestionCard
+                key={index}
+                id={index + 1}
+                question={item?.question}
+                options={item?.options}
+                imageUrl={item?.imageUrl}
+                answer={item?.correctOption}
+                detailId={item?._id}
+                item={item}
+                queryId={state}
+              />
+            ))
+          ) : (
+            <NoData>
+              <img src={noData} alt="No data" />
+              <p>Select your preferred class and use the upload csv or </p>
+              <p>add new question to add questions to practice quiz</p>
+            </NoData>
+          )}
+        </QuestionContainer> */}
       </Content>
     </Container>
   );
@@ -105,26 +118,26 @@ const SelectContainer = styled.div`
 
 const Content = styled.section``;
 
-const NoData = styled.div`
-  width: 100%;
-  height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  img {
-    margin-bottom: 1rem;
-  }
-  p {
-    text-align: center;
-    font-size: 0.8rem;
-  }
-  button {
-    margin-top: 1rem;
-    width: fit-content;
-  }
-`;
+// const NoData = styled.div`
+//   width: 100%;
+//   height: 60vh;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   flex-direction: column;
+//   img {
+//     margin-bottom: 1rem;
+//   }
+//   p {
+//     text-align: center;
+//     font-size: 0.8rem;
+//   }
+//   button {
+//     margin-top: 1rem;
+//     width: fit-content;
+//   }
+// `;
 
-const QuestionContainer = styled.section`
-  padding: 0 20%;
-`;
+// const QuestionContainer = styled.section`
+//   padding: 0 20%;
+// `;

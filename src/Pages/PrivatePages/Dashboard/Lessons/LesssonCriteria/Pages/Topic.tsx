@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import noData from "../../../../../../Assets/noData.png";
-import { useLocation } from "react-router-dom";
 import { ButtonElement } from "../../../../../../Ui_elements";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { TopicCard } from "../Components/TopicCard";
@@ -26,9 +25,6 @@ const SelectTopic = () => {
   const [isDraggedOver, setIsDraggedOver] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [page, setPage] = useState(0);
-  const location = useLocation();
-  const { state } = location;
-  // const { scope, classTitle } = state;
   const dragTopic = useRef<any>(null);
   const dragOverTopic = useRef<any>(null);
   const { setOpenModal } = useContext(ModalContext);

@@ -1,19 +1,14 @@
-import React, { useContext, useState } from "react";
+import {useState } from "react";
 import styled from "styled-components";
-// import { DeleteIcon, EditIcon } from "../../../../../../Assets/Svgs";
 import { DeleteOutlined } from "@ant-design/icons";
 import Placeholder from "../../../../../../../../Assets/placeholder.png";
-// import { ButtonElement } from "../../../../../../Ui_elements";
-// import { ModalContext } from "../../../../../../Contexts/Contexts";
-import caution from "../../../../../../Assets/caution.png";
-// import { useApiPost } from "../../../../../../custom-hooks";
-// import { deleteQuizQuestionUrl } from "../../../../../../Urls";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CenteredDialog } from "../../../../../../../../Ui_elements/Modal/Modal";
 import { ButtonElement } from "../../../../../../../../Ui_elements";
 import { EditIcon } from "../../../../../../../../Assets/Svgs";
 import { useApiPost } from "../../../../../../../../custom-hooks";
+import { deleteQuizQuestionUrl } from "../../../../../../../../Urls";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
@@ -41,8 +36,7 @@ export const QuestionCard = ({
   const [openImage, setOpenImage] = useState(false);
 
   const { mutate: deleteQuestion, isLoading: isDeletingQuestion } = useApiPost(
-    // deleteQuizQuestionUrl,
-    () => {},
+    () => deleteQuizQuestionUrl(detailId),
     () => {
       toast.success(`Successfully deleted question`, {
         position: "top-right",
@@ -67,7 +61,8 @@ export const QuestionCard = ({
       });
       setOpen(!open);
     },
-    [`quiz${queryId}`]
+    ["amigoQuestion"]
+    // [`quiz${queryId}`]
   );
 
   const handleDelete = (quizId: any) => {
@@ -82,15 +77,15 @@ export const QuestionCard = ({
         </Number>
         <QuestionContainer>
           <h5>{question}</h5>
-          {/* <OptionsContainer>
+          <OptionsContainer>
             {options.map((option: any, index: number) => (
               <div key={index}>
                 <h6>{option.label}</h6>
                 <p>{option.value}</p>{" "}
               </div>
             ))}
-          </OptionsContainer> */}
-          {/* <Correct>Correct Answer: {answer}</Correct> */}
+          </OptionsContainer>
+          <Correct>Correct Answer: {answer}</Correct>
         </QuestionContainer>
       </QuestionHolder>
 
@@ -106,7 +101,7 @@ export const QuestionCard = ({
             icon={<EditIcon />}
             label="Edit"
             onClick={() =>
-              navigate(`#quiz/schedule_quiz/add_quiz_question`, {
+              navigate(`#quiz/schedule_quiz/edit_question`, {
                 state: { id: detailId, item: item },
               })
             }

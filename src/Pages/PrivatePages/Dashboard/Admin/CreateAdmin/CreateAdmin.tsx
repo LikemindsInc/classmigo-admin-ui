@@ -13,8 +13,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { ICreateAdminDTO } from "@appModel";
 import { Form } from "../../../../SharedPages/Authentication/Login";
 import { APP_ROLES } from "../../../../../utils/constants";
-import { useApiGet, useApiPost } from "../../../../../custom-hooks";
-import { createAdminAccess, getAllClassesUrl } from "../../../../../Urls";
+import { useApiPost } from "../../../../../custom-hooks";
+import { createAdminAccess } from "../../../../../Urls";
 import { toast } from "react-toastify";
 import { generateRandom } from "../../../../../utils/utilFns";
 
