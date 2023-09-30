@@ -8,15 +8,8 @@ import {
   SelectInput,
 } from "../../../../../../../Ui_elements";
 import {
-  Outlet,
-  Route,
-  Routes,
-  useLocation,
   useNavigate,
-  useParams,
 } from "react-router-dom";
-import { ScheduleQuiz } from "./ScheduleQuiz";
-import { Controller, useForm } from "react-hook-form";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { QuizCard } from "./Components/QuizCard";
 import { getAmigoQuizUrl } from "../../../../../../../Urls";
@@ -28,28 +21,25 @@ interface MainProp {
 }
 
 export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
-  const { pathname } = useLocation();
   const navigate = useNavigate();
-
   const [quizes, setQuizes] = useState([]);
+  const [filter, setFilter] = useState({
+    className: "",
+    page:null
+  });
 
   const {
-    register,
-    control,
-    watch,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm({});
+    data: amigoQuiz,
+    isFetching: isLoadingAmigoQuiz,
+    refetch,
+  } = useApiGet(["amigoQuiz"], () => getAmigoQuizUrl(filter), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
 
-  const { data: amigoQuiz, isFetching: isLoadingAmigoQuiz } = useApiGet(
-    ["amigoQuiz"],
-    () => getAmigoQuizUrl(),
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
-  );
+  useEffect(() => {
+    refetch();
+  }, [filter, refetch]);
 
   useEffect(() => {
     if (amigoQuiz?.data?.content) {
@@ -63,94 +53,63 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
 
   return (
     <Container>
-      {/* <NoData>
-        <img src={noData} alt="No data" />
-        <p>You don’t have any scheduled or previous amigo quiz.</p>
-        <p>Use the schedule amigo quiz below to schedule a quiz.</p>
-        <ButtonElement
-          label="Schedule Amigo Quiz"
-          onClick={() => navigate(`#quiz/schedule_quiz`)}
-        />
-      </NoData> */}
-
       <FilterContainer>
         <SelectContainer>
-          <Controller
-            name="class"
-            control={control}
-            render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={classOptions}
-                defaultValue={"Select a class"}
-                width={200}
-                error={errors?.class}
-                isLoading={isLoadingClassOptions}
-              />
-            )}
+          <SelectInput
+            options={classOptions}
+            defaultValue={"Select a class"}
+            onChange={(value) => {
+              setFilter({ ...filter, className: value?.value });
+            }}
+            isLoading={isLoadingClassOptions}
           />
         </SelectContainer>
 
         <SelectContainer>
-          {/* <Controller
-            name="class"
-            control={control}
-            render={({ field }) => (
-              <SelectInput
-                {...field}
-                options={[]}
-                defaultValue={"Select a class"}
-                width={200}
-                error={errors?.class}
-                isLoading={false}
-              />
-            )}
-          /> */}
           <DatePickerInput />
         </SelectContainer>
-        <ButtonElement
-          label="Schedule Amigo Quiz"
-          width={300}
-          onClick={() => navigate("#quiz/schedule_quiz")}
-        />
+        <SelectContainer>
+          <ButtonElement
+            label="Schedule Amigo Quiz"
+            onClick={() => navigate("#quiz/schedule_quiz")}
+          />
+        </SelectContainer>
       </FilterContainer>
 
       <DetailsContainer>
         <UpcomingSection>
           <h4>Upcoming Amigo Quiz</h4>
           <h6>Upcoming Scheduled Amigo Quiz Dates</h6>
-          <CardContainer>
-            {quizes.some((item: any) => item?.isActive) ? (
-              <CardContainer>
-                {quizes.map((el: any) => {
-                  if (el?.isActive) {
-                    return (
-                      <QuizCard
-                        item={el}
-                        isActive={el.isActive}
-                        dateTime={el.startDateTime}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </CardContainer>
-            ) : (
-              <Error>
-                <img src={noData} alt="No data" />
-                <p>You don't have any past quizes.</p>
-              </Error>
-            )}
-          </CardContainer>
+          {quizes.some((item: any) => item?.isActive) ? (
+            <CardContainer>
+              {quizes.map((el: any) => {
+                if (el?.isActive) {
+                  return (
+                    <QuizCard
+                      item={el}
+                      isActive={el.isActive}
+                      dateTime={el.startDateTime}
+                    />
+                  );
+                }
+                return null;
+              })}
+            </CardContainer>
+          ) : (
+            <Error>
+              <img src={noData} alt="No data" />
+              <p>You don't have any past quizes.</p>
+            </Error>
+          )}
         </UpcomingSection>
         <UpcomingSection>
           <h4>Past Amigo Quiz</h4>
           <h6>Past Scheduled Amigo Quiz Dates</h6>
 
-          {quizes.some((item: any) => !item?.isActive) ? (
+          {quizes.some((item: any) => item?.isPast) ? (
             <CardContainer>
               {quizes.map((item: any) => {
-                if (!item?.isActive) {
+                if (item?.isPast) {
                   return (
                     <QuizCard
                       item={item}
@@ -174,40 +133,52 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
   );
 };
 
-const Container = styled.section``;
+const Container = styled.section`
+  width: 100%;
+  height: 85vh;
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10%;
+  overflow-y: scroll;
+  position: relative !important;
+  > button {
+    font-size: 0.8rem;
+    width: 10vw;
+    @media ${devices.tabletL} {
+      width: 100% !important;
+    }
+  }
+  @media ${devices.tablet} {
+    padding: 0 1rem 1rem 1rem;
+  }
+  @media ${devices.tabletL} {
+    overflow-y: scroll;
+  }
+`;
 
 const FilterContainer = styled.div`
-  width: fit-content;
+  width: 100%;
   gap: 2%;
   display: flex;
   align-items: center;
+  @media ${devices.tabletL} {
+    width: 100%;
+    flex-direction: column;
+  }
 `;
 
-const NoData = styled.div`
-  width: 100%;
-  height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  img {
-    margin-bottom: 1rem;
-  }
-  p {
-    text-align: center;
-    font-size: 0.8rem;
-  }
-  button {
-    margin-top: 1rem;
-    width: fit-content;
-  }
-`;
 
 const SelectContainer = styled.div`
   display: flex;
-  width: 200px;
+  align-items: center;
+  gap: 10px;
+  width: 10vw;
   @media ${devices.tabletL} {
     width: 100%;
+    margin-bottom: 20px;
   }
 `;
 
@@ -229,6 +200,11 @@ const CardContainer = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 2%;
+  width: 100%;
+
+  @media ${devices.mobileL} {
+    flex-direction: column;
+  }
 `;
 
 const Error = styled.div`

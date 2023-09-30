@@ -1,13 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import {useState } from "react";
+import {useForm } from "react-hook-form";
 import styled from "styled-components";
 
 import {
   ButtonElement,
   ImageInput,
   InputElement,
-  SelectInput,
   TextAreaInput,
 } from "../../../../../../../Ui_elements";
 
@@ -16,17 +15,16 @@ import { toast } from "react-toastify";
 import { UploadTick } from "../../../../../../../Assets/Svgs";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { CenteredDialog } from "../../../../../../../Ui_elements/Modal/Modal";
-import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
-import { customPost, formatOptions } from "../../../../../../../utils/utilFns";
+import {  useApiPost } from "../../../../../../../custom-hooks";
+import { customPost, } from "../../../../../../../utils/utilFns";
 import { OptionsCard } from "./Components/OptionsCard";
 import { createAmigoQuizQuestionUrl } from "../../../../../../../Urls";
+import { addQuestionSchema } from "../../../../Lessons/QuizLibrary/QuizLibrarySchema";
 
 export const AddQuizQuestion = () => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [classValue, setClassValue] = useState<any>(null);
-  const [subjectValue, setSubjectValue] = useState<any>(null);
 
   // const { setOpenModal } = useContext(ModalContext);
   const { state } = useLocation();
@@ -36,21 +34,18 @@ export const AddQuizQuestion = () => {
     setOpenModal(false);
   };
 
+  if (!state) {
+    navigate("/")
+  }
   const {
     register,
     handleSubmit,
     getValues,
-    control,
-    watch,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(addGeneralQuestionSchema),
+    resolver: yupResolver(addQuestionSchema),
   });
 
-  // console.log(errors, "error");
-
-  // let classValue: any = watch("class");
-  // let subjectValue: any = watch("subject");
 
   const onSuccess = () => {
     toast.success("Successfully added question", {
@@ -95,24 +90,24 @@ export const AddQuizQuestion = () => {
         const response: any = await customPost(imageUploadUrl, formData);
         if (response) {
           setIsUploadingImage(false);
+          const requestBody: any = {
+            questions: [
+              {
+                question: data.question,
+                imageUrl: response?.data?.data?.url,
+                explanation: data?.explanation,
+                options: options.map((label) => ({
+                  label,
+                  value: data[`option${label}`],
+                })),
+                correctOption: selectedOption,
+                score: Number(data.score),
+              },
+            ],
+            quizId: state._id,
+          };
+          addQuestion(requestBody);
         }
-        const requestBody: any = {
-          questions: [
-            {
-              question: data.question,
-              imageUrl: response?.data?.data?.url,
-              explanation: data?.explanation,
-              options: options.map((label) => ({
-                label,
-                value: data[`option${label}`],
-              })),
-              correctOption: selectedOption,
-              score: Number(data.score),
-            },
-          ],
-          quizId: state._id,
-        };
-        addQuestion(requestBody);
       } catch (e) {
         console.log(e);
       }
@@ -139,13 +134,6 @@ export const AddQuizQuestion = () => {
   return (
     <>
       <Container onSubmit={handleSubmit(onSubmit)}>
-        {/* <InputHolder>
-          <InputElement
-            label="Name"
-            register={register}
-            id="name"
-          />
-        </InputHolder> */}
         <InputHolder>
           <TextAreaInput
             label="Question"
@@ -212,7 +200,6 @@ export const AddQuizQuestion = () => {
           />
         </ModalContent>
       </Modal>
-      
     </>
   );
 };
@@ -253,10 +240,10 @@ const ButtonHolder = styled.div`
   margin-top: 2rem;
   input {
     width: 4vw;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
   }
 `;
 
@@ -270,21 +257,5 @@ const ModalContent = styled.div`
 
   p {
     font-weight: 600;
-  }
-`;
-
-const SelectHolder = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  margin-bottom: 3rem;
-  gap: 3%;
-`;
-
-const SelectContainer = styled.div`
-  display: flex;
-  width: 200px;
-  @media ${devices.tabletL} {
-    width: 100%;
   }
 `;

@@ -19,6 +19,9 @@ export const TabNavigation = ({ routes, page, handleChange }: TabProps) => {
         value={page}
         onChange={handleChange}
         aria-label="Amigo quiz tab"
+        variant="scrollable"
+        scrollButtons
+        allowScrollButtonsMobile
         TabIndicatorProps={{
           style: { backgroundColor: "#7b31b2" },
         }}

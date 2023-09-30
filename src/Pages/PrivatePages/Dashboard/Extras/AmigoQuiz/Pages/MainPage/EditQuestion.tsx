@@ -1,5 +1,4 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -20,7 +19,6 @@ import { createAmigoQuizQuestionUrl } from "../../../../../../../Urls";
 
 export const EditQuizQuestion = () => {
   const [selectionOptionId, setSelectionOptionId] = useState<any>(null);
-  // const { setOpenModal } = useContext(ModalContext);
   const [openModal, setOpenModal] = useState(false);
   const { state } = useLocation();
   const { item } = state;
@@ -109,10 +107,10 @@ export const EditQuizQuestion = () => {
                 value: data[`option${label}`],
               })),
               correctOption: selectedOption,
-              score: data.score,
+              score: Number(data.score),
             },
           ],
-          quizId: state,
+          quizId: item._id,
         };
         addQuestion(requestBody);
       } catch (e) {
@@ -129,14 +127,18 @@ export const EditQuizQuestion = () => {
               value: data[`option${label}`],
             })),
             correctOption: selectedOption,
-            score: data.score,
+            score: Number(data.score),
           },
         ],
-        quizId: state,
+        quizId: item._id,
       };
       addQuestion(requestBody);
     }
   };
+
+  if (!state) {
+    navigate("/")
+  }
 
   return (
     <>
@@ -162,7 +164,7 @@ export const EditQuizQuestion = () => {
             type="image"
             register={register}
             id="image"
-            // defaultImage={item?.imageUrl}
+            defaultImage={item?.imageUrl}
           />
         </InputHolder>
         <OptionsContainer>

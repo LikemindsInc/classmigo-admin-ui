@@ -1,5 +1,4 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { UploadTick } from "../../../../../../Assets/Svgs";
@@ -12,14 +11,11 @@ import {
   TextAreaInput,
 } from "../../../../../../Ui_elements";
 import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
-import { addQuestionUrl, updateQuizQuestionUrl } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
-import { convertToBase64, customPost } from "../../../../../../utils/utilFns";
+import {  customPost } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { useLocation, useNavigate } from "react-router-dom";
-import { uploadImageUrl } from "../../../../../../Urls/Utils";
 import { toast } from "react-toastify";
-import { addGeneralQuestionSchema } from "../GeneralQuizLibrarySchema";
 import { updateGeneralQuestionUrl } from "../../../../../../Urls/GeneralKnowledge";
 
 const EditQuestion = () => {

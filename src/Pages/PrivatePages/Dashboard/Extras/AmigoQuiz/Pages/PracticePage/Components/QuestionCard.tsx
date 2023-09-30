@@ -82,15 +82,15 @@ export const QuestionCard = ({
         </Number>
         <QuestionContainer>
           <h5>{question}</h5>
-          {/* <OptionsContainer>
+          <OptionsContainer>
             {options.map((option: any, index: number) => (
               <div key={index}>
                 <h6>{option.label}</h6>
                 <p>{option.value}</p>{" "}
               </div>
             ))}
-          </OptionsContainer> */}
-          {/* <Correct>Correct Answer: {answer}</Correct> */}
+          </OptionsContainer>
+          <Correct>Correct Answer: {answer}</Correct>
         </QuestionContainer>
       </QuestionHolder>
 
