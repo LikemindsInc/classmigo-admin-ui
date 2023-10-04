@@ -159,6 +159,7 @@ export const generateUrlParams = (obj: any) => {
   return generatedUrl;
 };
 
+
 export const generateQueryKey = (baseKey: string, searchFilter: any) => {
   const searchFilterString = JSON.stringify(searchFilter);
   const queryKey = `${baseKey}-${searchFilterString}`;
@@ -167,9 +168,6 @@ export const generateQueryKey = (baseKey: string, searchFilter: any) => {
 };
 
 export const convertKoboToNaira = (kobo:number) => {
-  // if (typeof kobo !== "number") {
-  //   throw new Error("Input must be a valid number");
-  // }
 
   const naira = kobo / 100;
 

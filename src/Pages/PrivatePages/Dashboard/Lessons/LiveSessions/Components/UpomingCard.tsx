@@ -7,7 +7,7 @@ import {
   useApiPost,
   useFormattedDateTime,
 } from "../../../../../../custom-hooks";
-import { ButtonElement, Options, Tag } from "../../../../../../Ui_elements";
+import { Tag } from "../../../../../../Ui_elements";
 import { cancelLiveLesson } from "../../../../../../Urls/LiveSessions";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
@@ -64,6 +64,7 @@ export const UpcomingCard = ({ topic, time, date, item }: Props) => {
     handleError,
     ["live-sessions"]
   );
+
   const handleClose = () => {
     setAnchorEl(null);
   };
