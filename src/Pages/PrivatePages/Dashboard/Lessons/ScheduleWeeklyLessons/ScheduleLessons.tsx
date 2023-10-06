@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import {
   ButtonElement,
-  InputElement,
   Loader,
   SelectInput,
 } from "../../../../../Ui_elements";
@@ -17,7 +16,6 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { formatOptions } from "../../../../../utils/utilFns";
 import noData from "../../../../../Assets/noData.png";
-import { Skeleton } from "@mui/material";
 
 const ScheduleLessons = () => {
   const {
