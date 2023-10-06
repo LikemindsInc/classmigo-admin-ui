@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { SelectInput } from "../../../../../../Ui_elements";
 import { useApiPost } from "../../../../../../custom-hooks";
 import { updateWeek } from "../../../../../../Urls";
-import { WEEK_OPTIONS } from "../../../../../../utils/constants";
+import { generateWeekoptions } from "../../../../../../utils/constants";
 import { toast } from "react-toastify";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 
@@ -51,7 +51,7 @@ export const ScheduleCard = ({ item }: Props) => {
         </div>
         <SelectContainer>
           <SelectInput
-            options={WEEK_OPTIONS}
+            options={generateWeekoptions()}
             onChange={(value: any) => {
               const requestBody: any = {
                 week: value?.value,
