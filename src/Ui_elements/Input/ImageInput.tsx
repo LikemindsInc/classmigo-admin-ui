@@ -26,7 +26,6 @@ export const ImageInput = ({
   defaultImage
 }: ImageInputProps) => {
   const fileInputRef = useRef<any>(null);
-  const [fileReview, setFileReview] = useState(null)
   const [preview, setPreview] = useState(defaultImage || "");
 
   const handleInputChange = async (
@@ -60,10 +59,8 @@ export const ImageInput = ({
         <HiddenInput
           type="file"
           accept={type === "image" ? "image/*" : "video" ? "video/*" : ""}
-          // accept="image/*, video/*"
           ref={fileInputRef}
           onChange={handleInputChange}
-          // {...(register && { ...register(id) })}
         />
 
         <Icon />

@@ -80,10 +80,10 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
         <UpcomingSection>
           <h4>Upcoming Amigo Quiz</h4>
           <h6>Upcoming Scheduled Amigo Quiz Dates</h6>
-          {quizes.some((item: any) => item?.isActive) ? (
+          {quizes.some((item: any) => !item?.isPast) ? (
             <CardContainer>
               {quizes.map((el: any) => {
-                if (el?.isActive) {
+                if (!el?.isPast) {
                   return (
                     <QuizCard
                       item={el}

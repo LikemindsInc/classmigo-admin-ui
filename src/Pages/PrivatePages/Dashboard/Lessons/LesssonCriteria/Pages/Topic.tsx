@@ -131,8 +131,7 @@ const SelectTopic = () => {
                 item={item}
                 classname={item?.lessonName}
                 key={index}
-                // classTitle={scope}
-                // subjectTitle={classTitle}
+
                 id={item?._id}
                 index={index}
                 track={index}

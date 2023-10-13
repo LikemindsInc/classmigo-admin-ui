@@ -61,3 +61,5 @@ export const PAYMENT_DATES = [
     value: "ALL_TIME",
   },
 ];
+
+export const ZEGO_CHAR = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP'

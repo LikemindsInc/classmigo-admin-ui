@@ -49,11 +49,11 @@ const AmigoQuiz = () => {
         name: "Amigo Quiz",
         route: "quiz",
       },
-      {
-        id: 1,
-        name: "Practice Quiz",
-        route: "practice",
-      },
+      // {
+      //   id: 1,
+      //   name: "Practice Quiz",
+      //   route: "practice",
+      // },
       {
         id: 2,
         name: "Leader board",
@@ -102,15 +102,15 @@ const AmigoQuiz = () => {
           classOptions={allClasses}
         />
       )}
-      {location.hash === "#practice/schedule_practice_quiz/view_questions" && (
+      {/* {location.hash === "#practice/schedule_practice_quiz/view_questions" && (
         <ViewPracticeQuiz />
-      )}
-      {location.hash === "#practice" && <ViewPracticeQuiz />}
+      )} */}
+      {/* {location.hash === "#practice" && <ViewPracticeQuiz />} */}
       {location.hash === "#leaderboard" && <Leaderboard />}
       {location.hash === "#quiz/schedule_quiz" && <ScheduleQuiz />}
-      {location.hash === "#practice/schedule_practice_quiz" && (
+      {/* {location.hash === "#practice/schedule_practice_quiz" && (
         <SchedulePracticeQuiz />
-      )}
+      )} */}
       {location.hash === "#quiz/schedule_quiz/edit_question" && (
         <EditQuizQuestion />
       )}
@@ -122,9 +122,9 @@ const AmigoQuiz = () => {
       {location.hash === "#quiz/schedule_quiz/add_quiz_question" && (
         <AddQuizQuestion />
       )}
-      {location.hash === "#practice/schedule_pactice_quiz/add_question" && (
+      {/* {location.hash === "#practice/schedule_pactice_quiz/add_question" && (
         <AddPracticeQuizQuestion />
-      )}
+      )} */}
     </Container>
   );
 };

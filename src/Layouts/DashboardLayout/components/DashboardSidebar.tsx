@@ -87,11 +87,11 @@ export const DashboardSidebar = () => {
       title: "General Knowledge",
       icon: <UserIcon />,
     },
-    // {
-    //   path: "/amigo_quiz",
-    //   title: "AmigoQuiz",
-    //   icon: <AmigoQuizIcon />,
-    // },
+    {
+      path: "/amigo_quiz",
+      title: "AmigoQuiz",
+      icon: <AmigoQuizIcon />,
+    },
   ];
 
   const subscriptionMenu = [

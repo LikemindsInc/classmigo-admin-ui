@@ -175,3 +175,9 @@ export const convertKoboToNaira = (kobo:number) => {
 
   return formattedNaira;
 };
+
+
+export const roundNumberDown = (points:number):number => {
+  return Math.floor(points)
+}
+
