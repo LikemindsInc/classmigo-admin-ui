@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
-import { Drawer, Empty, Switch } from "antd";
+import { Drawer, Empty } from "antd";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";
-import { ExportIcon } from "../../../../../Assets/Svgs";
 import { ColumnsType } from "antd/es/table";
 import {
   ButtonElement,
@@ -30,6 +29,7 @@ const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [parent, setParent] = useState<any>([]);
   const [user, setUser] = useState<DataType | null>(null);
+  const [studentToUnlink, setStudentToUnlink] = useState("")
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
   const [openModal, setOpenModal] = useState(false);
@@ -147,7 +147,6 @@ const Parents = () => {
 
   const {
     data: parentData,
-    isLoading: isLoadingParentData,
     isFetching: isFetchingParentData,
     refetch: fetchParent,
   } = useApiGet(
@@ -160,7 +159,6 @@ const Parents = () => {
     }
   );
 
-
   const { mutate: toggleParent } = useAPiPut(
     (_: any) => toggleParentUrl(_, userId),
     handleSuccess,
@@ -172,8 +170,8 @@ const Parents = () => {
     user?.dependents
       ? () =>
           unlinkStudentUrl(
-            user?.key,
-            user?.dependents?.map((item) => [item._id])
+            studentToUnlink,
+            user?.key
           )
       : null,
     () => {
@@ -186,9 +184,11 @@ const Parents = () => {
         draggable: true,
         theme: "light",
       });
+      setOpenModal(false)
+      setOpenDrawer(false)
     },
-    () => {
-      toast.error(`Something went wrong, couldn't unlink`, {
+    (e) => {
+      toast.error(`Something went wrong, couldn't unlink, ${e}`, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -197,7 +197,8 @@ const Parents = () => {
         draggable: true,
         theme: "light",
       });
-    }
+    },
+    [generateQueryKey("Parent-data", searchFilter)]
   );
 
   useEffect(() => {
@@ -325,10 +326,12 @@ const Parents = () => {
                     <p>{item.phoneNumber}</p>
                     <ButtonElement
                       outline
-                      isLoading={isUnlinkingParent}
                       width={84}
                       label={"Unlink"}
-                      onClick={confirmUnlink}
+                      onClick={() => {
+                        setStudentToUnlink(item?._id)
+                        confirmUnlink()
+                      }}
                     />
                   </div>
                 ))
@@ -356,7 +359,9 @@ const Parents = () => {
             />
             <ButtonElement
               label="Unlink"
-              onClick={() => unlink()}
+              onClick={() => {
+                unlink()
+              }}
               isLoading={isUnlinkingParent}
             />
           </div>

@@ -66,6 +66,8 @@ const VideoLibrary = () => {
   } = useApiGet(["allSubjects"], () => getAllSubjectsUrl(classValue?.value), {
     refetchOnWindowFocus: false,
     enabled: !!classValue,
+    cacheTime: 0,
+    staleTime: 0,
   });
   const {
     data: topics,
@@ -75,20 +77,10 @@ const VideoLibrary = () => {
   } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.value), {
     refetchOnWindowFocus: false,
     enabled: !!subjectValue,
+    cacheTime: 0,
+    staleTime: 0,
+    retry:false
   });
-
-  useEffect(() => {
-    if (classValue) {
-      fetchSubject();
-    }
-  }, [classValue, fetchSubject]);
-
-  useEffect(() => {
-    if (subjectValue) {
-      setValue("topic", "");
-      fetchTopic();
-    }
-  }, [fetchTopic, setValue, subjectValue]);
 
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
   const activeSubjects = subjects?.data?.subjects.filter(
@@ -98,18 +90,30 @@ const VideoLibrary = () => {
     (item: any) => item.isActive
   );
 
-  const allClasses = useMemo(
+  var allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
     [activeClasses]
   );
 
-  const allSubjects = useMemo(() => {
-    return formatOptions(activeSubjects, "name", "name");
-  }, [activeSubjects]);
+  var allSubjects = formatOptions(activeSubjects, "name", "name");
 
-  const allTopics = useMemo(() => {
-    return formatOptions(activeTopics, "lessonName", "_id");
-  }, [activeTopics]);
+  var allTopics = formatOptions(activeTopics, "lessonName", "_id");
+
+  useEffect(() => {
+    if (classValue) {
+      setValue("subject", "");
+      setValue("topic", "");
+      fetchSubject();
+      fetchTopic()
+    }
+  }, [classValue, fetchSubject, fetchTopic, setValue]);
+
+  useEffect(() => {
+    if (subjectValue) {
+      setValue("topic", "");
+      fetchTopic();
+    }
+  }, [fetchTopic, setValue, subjectValue]);
 
   useEffect(() => {
     if (allVideos) {

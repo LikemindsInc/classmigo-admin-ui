@@ -7,7 +7,6 @@ import { convertKoboToNaira } from "../../../../../../utils/utilFns";
 import dayjs from "dayjs";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { Loader } from "../../../../../../Ui_elements";
-import { AxiosError } from "axios";
 
 export const Receipt = ({ id }: any) => {
   const [details, setDetails] = useState<any>([]);

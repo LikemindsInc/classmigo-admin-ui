@@ -28,8 +28,8 @@ export const TableElement = ({
     if (paginationData) {
       setPagination({
         current: paginationData?.page + 1 ,
-        pageSize: paginationData?.perPage,
-        total: paginationData?.totalDocs
+        pageSize: paginationData?.size,
+        total: paginationData?.numberOfPages
       });
     }
   }, [paginationData]);

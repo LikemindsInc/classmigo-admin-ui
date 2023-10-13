@@ -6,7 +6,6 @@ import {
   SearchInput,
   SelectInput,
 } from "../../../../../Ui_elements";
-import { ExportIcon } from "../../../../../Assets/Svgs";
 import { Drawer, Empty } from "antd";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { TableElement } from "../../../../../Ui_elements/Table/Table";

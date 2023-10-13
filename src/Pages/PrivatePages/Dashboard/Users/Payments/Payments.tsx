@@ -230,18 +230,23 @@ const Payments = () => {
 
   useEffect(() => {
     if (paymentData) {
-      const newData = paymentData?.data?.content.map((item: any) => ({
-        key: item?._id,
-        name: `${item?.student?.firstName} ${item?.student?.lastName}`,
-        username: item?.student?.userName,
-        class: item?.className,
-        datePurchased: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
-        plan: item?.subscription?.friendlyName,
-        amount: item?.amount,
-        image: item?.student?.profileImageUrl,
-        subStart: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
-        subStop: moment(item?.nextDueDate).format("DD, MMM, YYYY"),
-      }));
+      const newData = paymentData?.data?.content
+        .filter((item: any) => item?.amount > 0)
+        .map((item: any) => {
+          return {
+            key: item?._id,
+            name: `${item?.student?.firstName} ${item?.student?.lastName}`,
+            username: item?.student?.userName,
+            class: item?.className,
+            datePurchased: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
+            plan: item?.subscription?.friendlyName,
+            amount: item?.amount,
+            image: item?.student?.profileImageUrl,
+            subStart: moment(item?.dateSubscribed).format("DD, MMM, YYYY"),
+            subStop: moment(item?.nextDueDate).format("DD, MMM, YYYY"),
+          };
+        });
+
       setPayment(newData);
     }
   }, [paymentData]);

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { TableElement } from "../../../../../../../Ui_elements/Table/Table";
 import { useApiGet } from "../../../../../../../custom-hooks";
-import {
-  getSingleLeaderboardUrl,
-} from "../../../../../../../Urls";
+import { getSingleLeaderboardUrl } from "../../../../../../../Urls";
 import { ColumnsType } from "antd/es/table";
 import { UserDetails } from "./Components/UserDetails";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import noData from "../../../../../../../Assets/noData.png"
+import noData from "../../../../../../../Assets/noData.png";
+import { roundNumberDown } from "../../../../../../../utils/utilFns";
+import { Loader } from "../../../../../../../Ui_elements";
 
 interface DataType {
   key: string;
@@ -23,14 +23,14 @@ interface DataType {
 
 export const QuizLeaderboard = () => {
   const [boardData, setBoardData] = useState<any>([]);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { state } = useLocation();
 
   if (!state) {
-    navigate ("/amigo_quiz")
+    navigate("/amigo_quiz");
   }
-  const { data, isLoading, isFetching, refetch } = useApiGet(
+  const { data, isLoading, isInitialLoading, refetch } = useApiGet(
     ["lala"],
     () => getSingleLeaderboardUrl(state._id),
     {
@@ -49,7 +49,7 @@ export const QuizLeaderboard = () => {
           name: `${item?.student?.firstName} ${item?.student?.lastName}`,
           username: item?.student?.userName,
           phoneNumber: item?.student?.phoneNumber,
-          points: item?.score,
+          points: roundNumberDown(item?.score),
           class: item?.className,
           image: item?.student?.profileImageUrl,
         }))
@@ -70,7 +70,6 @@ export const QuizLeaderboard = () => {
       key: "name",
       ellipsis: true,
       render: (name: string, record: DataType) => {
-        console.log(record, "record");
         return (
           <UserDetails index={record?.index} image={record.image} name={name} />
         );
@@ -124,12 +123,16 @@ export const QuizLeaderboard = () => {
     return updatedColumn;
   });
 
+  if (isInitialLoading) {
+    return <Loader />;
+  }
+
   return (
     <>
       {boardData.length > 0 ? (
         <TableElement
           data={boardData}
-          loading={isLoading || isFetching}
+          loading={isLoading}
           pagination
           columns={updatedColumns}
           paginationData={data?.data?.pagination}

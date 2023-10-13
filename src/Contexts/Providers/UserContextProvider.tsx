@@ -12,9 +12,13 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     return userDataFromCookie ? JSON.parse(userDataFromCookie) : null;
   });
 
+  const hours = 1; 
+  const expirationDate = new Date();
+  expirationDate.setTime(expirationDate.getTime() + hours * 60 * 60 * 1000); 
+
   const handleSetUser = (userData: any) => {
     setUser(userData);
-    Cookies.set("user", JSON.stringify(userData), { expires: 7 });
+    Cookies.set("user", JSON.stringify(userData), { expires: expirationDate });
   };
 
   return (
