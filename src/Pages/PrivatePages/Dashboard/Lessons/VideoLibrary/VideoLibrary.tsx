@@ -23,21 +23,11 @@ import { MenuItem } from "@mui/material";
 
 const VideoLibrary = () => {
   const [videos, setVideos] = useState([]);
-  // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  // const open = Boolean(anchorEl);
-
   const { handleSubmit, watch, control, setValue } = useForm({});
 
   let classValue = watch("class");
   let subjectValue = watch("subject");
   let topicValue = watch("topic");
-
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
-  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
 
   const {
     data: allVideos,
@@ -73,6 +63,7 @@ const VideoLibrary = () => {
     data: topics,
     // isLoading: isLoadingTopics,
     isFetching: isFetchingTopics,
+    isError: isErrorTopics,
     refetch: fetchTopic,
   } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.value), {
     refetchOnWindowFocus: false,
@@ -95,8 +86,11 @@ const VideoLibrary = () => {
     [activeClasses]
   );
 
-  var allSubjects = formatOptions(activeSubjects, "name", "name");
+  if (isErrorTopics) {
+    console.log("error");
+  }
 
+  var allSubjects = formatOptions(activeSubjects, "name", "name");
   var allTopics = formatOptions(activeTopics, "lessonName", "_id");
 
   useEffect(() => {
@@ -104,9 +98,14 @@ const VideoLibrary = () => {
       setValue("subject", "");
       setValue("topic", "");
       fetchSubject();
-      fetchTopic()
     }
   }, [classValue, fetchSubject, fetchTopic, setValue]);
+
+  useEffect(() => {
+    if(subjectValue === "" || subjectValue === undefined){
+      fetchTopic()
+    }
+  },[fetchTopic, subjectValue, classValue])
 
   useEffect(() => {
     if (subjectValue) {
@@ -172,7 +171,7 @@ const VideoLibrary = () => {
                 <SelectInput
                   {...field}
                   value={topicValue}
-                  options={allTopics}
+                  options={isErrorTopics ? [] : allTopics}
                   defaultValue="Select Topic"
                   isLoading={isFetchingTopics}
                 />

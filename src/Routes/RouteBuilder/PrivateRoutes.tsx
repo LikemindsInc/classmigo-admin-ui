@@ -2,7 +2,7 @@ import { lazy, Suspense, useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Loader } from "../../Ui_elements";
 import { DashboardLayout } from "../../Layouts/DashboardLayout/DashboardLayout";
-import { Container } from "../../Pages/PrivatePages/Dashboard/Users/Students/Students";
+import Cookies from "js-cookie";
 import { UserContext } from "../../Contexts/Contexts";
 
 const LazyHome = lazy(
@@ -196,9 +196,14 @@ const LazyAddSubtopic = lazy(
 );
 
 export const PrivateRoutes = () => {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+  const userDataFromCookie = Cookies.get("user");
 
-  interface RouteConfig {
+  if (!userDataFromCookie) {
+    setUser(null)
+  }
+
+  interface RouteConfig { 
     path: string;
     element: any;
     children?: RouteConfig[];

@@ -31,7 +31,6 @@ export const InputElement = ({
       {type === "password" && (
         <InputHolder>
           {label && <label>{label}</label>}
-
           <TextInput
             {...otherProps}
             value={value}

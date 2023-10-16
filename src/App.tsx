@@ -22,6 +22,7 @@ function App() {
   const isOnline = useIsOnline();
   const queryClient = new QueryClient();
 
+
   const customTheme = createTheme({
     typography: {
       fontFamily: "Arial, sans-serif",
@@ -37,6 +38,8 @@ function App() {
       },
     },
   });
+
+
 
   return (
     <QueryClientProvider client={queryClient}>
