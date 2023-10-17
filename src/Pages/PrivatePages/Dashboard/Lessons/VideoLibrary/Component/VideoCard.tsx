@@ -16,7 +16,7 @@ export const VideoCard = ({ title, index, source, details, classValue }: VideoPr
   return (
     <Container>
       <MainContent>
-        <VideoPlayerElement source={source} />
+        <VideoPlayerElement height="100%" source={source} />
       </MainContent>
       <TopicContainer
         onClick={() =>
@@ -75,8 +75,9 @@ const TopicContainer = styled.div`
 
 const MainContent = styled.div`
   width: 100%;
-  height: fit-content;
+  height: 250px;
   border-radius: 12px 12px 0px 0px;
+  max-height:200px;
   display: flex;
   align-items: center;
   justify-content: center;

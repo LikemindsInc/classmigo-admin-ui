@@ -65,7 +65,7 @@ const VideoLibrary = () => {
     isFetching: isFetchingTopics,
     isError: isErrorTopics,
     refetch: fetchTopic,
-  } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.value), {
+  } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.value,classValue?.value), {
     refetchOnWindowFocus: false,
     enabled: !!subjectValue,
     cacheTime: 0,
@@ -85,10 +85,6 @@ const VideoLibrary = () => {
     () => formatOptions(activeClasses, "value", "name"),
     [activeClasses]
   );
-
-  if (isErrorTopics) {
-    console.log("error");
-  }
 
   var allSubjects = formatOptions(activeSubjects, "name", "name");
   var allTopics = formatOptions(activeTopics, "lessonName", "_id");

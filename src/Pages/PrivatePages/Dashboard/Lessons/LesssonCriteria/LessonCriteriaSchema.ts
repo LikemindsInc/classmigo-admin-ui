@@ -35,14 +35,36 @@ export const topicSchema = yup.object().shape({
     )
     .nullable()
     .required("Please enter a subject"),
-    description: yup
-    .string()
-    .required("Please enter a description"),
-    video: yup
+  description: yup.string().required("Please enter a description"),
+  video: yup
     .mixed()
-    .required("Please upload an intro video"),
-});
+    .test("file-or-url", "Please upload a video", function (value) {
+      if (this.parent.introVideo) {
+        return true; // No need to validate if there's a video URL
+      }
+      if (value) {
+        return true; // No need to validate if there's a file
+      }
+      return false; // Both file and URL are missing
+    })
+  ,
 
+  introVideo: yup
+    .string()
+    .test(
+      "file-or-url",
+      "Please upload a video or provide a video URL",
+      function (value) {
+        if (this.parent.video) {
+          return true; // No need to validate if there's a file
+        }
+        if (value) {
+          return true; // No need to validate if there's a video URL
+        }
+        return false; // Both file and URL are missing
+      }
+    ),
+});
 
 export const subTopicSchema = yup.object().shape({
   subtopicTitle: yup
@@ -59,20 +81,16 @@ export const subTopicSchema = yup.object().shape({
     .required("Please enter a short description"),
   video: yup
     .mixed()
-    .test(
-      "file-or-url",
-      "Please upload a video",
-      function (value) {
-        if (this.parent.videoUrl) {
-          return true; // No need to validate if there's a video URL
-        }
-        if (value) {
-          return true; // No need to validate if there's a file
-        }
-        return false; // Both file and URL are missing
+    .test("file-or-url", "Please upload a video", function (value) {
+      if (this.parent.videoUrl) {
+        return true; // No need to validate if there's a video URL
       }
-    ),
-    // .required("Please upload a video"),
+      if (value) {
+        return true; // No need to validate if there's a file
+      }
+      return false; // Both file and URL are missing
+    }),
+  // .required("Please upload a video"),
   videoUrl: yup
     .string()
     .test(
@@ -87,7 +105,7 @@ export const subTopicSchema = yup.object().shape({
         }
         return false; // Both file and URL are missing
       }
-    )
+    ),
 });
 
 // export const subTopicSchema = yup.object().shape({
