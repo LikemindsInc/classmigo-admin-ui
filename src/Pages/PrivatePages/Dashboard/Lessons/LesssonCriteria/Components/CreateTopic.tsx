@@ -48,6 +48,7 @@ export const CreateTopic = ({
     setValue("topic", "");
     setValue("description", "");
     setValue("video", null as any);
+    setValue("introVideo", "")
     setOpenModal(false);
   };
   
@@ -122,6 +123,8 @@ export const CreateTopic = ({
           placeholder="Enter Video URL"
           register={register}
           id="introVideo"
+          error={errors}
+
         />
       </InputHolders>
       <ButtonElement

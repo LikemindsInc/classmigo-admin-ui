@@ -7,13 +7,16 @@ interface Props {
 }
 export const VideoPlayerElement = ({ source, height }: Props) => {
   return (
-      <ReactPlayer
-        url={source}
-        controls={true}
-        width="100%"
-        height={height || "300"}
-        pip={true}
-        stopOnUnmount={false}
-      />
+    <ReactPlayer
+      url={source}
+      controls={true}
+      width="100%"
+      style={{
+        borderRadius: "12px",
+      }}
+      height={height || "250"}
+      pip={true}
+      stopOnUnmount={false}
+    />
   );
 };

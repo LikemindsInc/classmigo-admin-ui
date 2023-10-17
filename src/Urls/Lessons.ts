@@ -2,12 +2,13 @@ import { ADMIN_BASE_URL } from "../utils/constants";
 import { request } from "../utils/requestProcessor";
 
 export const getAllLessonsUrl = (
-  lessonName?: string,
+  subjectName?:string,
+  className?: string,
   page?: number,
   size?: number
 ) => {
   return request({
-    url: `${ADMIN_BASE_URL}/lessons?subject=${lessonName}`,
+    url: `${ADMIN_BASE_URL}/lessons?subject=${subjectName}&class=${className}`,
     method: "GET",
     params: { page, size },
   });

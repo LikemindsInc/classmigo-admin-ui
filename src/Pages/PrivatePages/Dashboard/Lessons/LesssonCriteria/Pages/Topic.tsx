@@ -29,7 +29,7 @@ const SelectTopic = () => {
   const dragOverTopic = useRef<any>(null);
   const { setOpenModal } = useContext(ModalContext);
 
-  const { subject } = useContext(LessonCriteriaContext);
+  const { subject, className } = useContext(LessonCriteriaContext);
 
   const {
     register,
@@ -59,7 +59,8 @@ const SelectTopic = () => {
   const handleCancel = () => {
     setValue("topic", "");
     setValue("description", "");
-    setValue("video", null as any);
+    setValue("video", "");
+    setValue("introVideo", "")
     setOpenModal(false);
   };
 
@@ -70,7 +71,7 @@ const SelectTopic = () => {
     refetch: getLessons,
   } = useApiGet(
     [generateQueryKey("lessons-get-all", page)],
-    () => getAllLessonsUrl(subject?.value, page, PAGE_SIZE),
+    () => getAllLessonsUrl(subject?.value,className?.value, page, PAGE_SIZE),
     {
       refetchOnWindowFocus: false,
       enabled: true,
