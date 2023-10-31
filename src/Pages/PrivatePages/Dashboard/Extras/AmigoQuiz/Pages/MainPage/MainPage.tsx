@@ -7,13 +7,12 @@ import {
   Loader,
   SelectInput,
 } from "../../../../../../../Ui_elements";
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { QuizCard } from "./Components/QuizCard";
 import { getAmigoQuizUrl } from "../../../../../../../Urls";
 import { useApiGet } from "../../../../../../../custom-hooks";
+import { Skeleton } from "@mui/material";
 
 interface MainProp {
   classOptions: { value: any; label: any }[];
@@ -25,7 +24,7 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
   const [quizes, setQuizes] = useState([]);
   const [filter, setFilter] = useState({
     className: "",
-    page:null
+    page: null,
   });
 
   const {
@@ -47,9 +46,9 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
     }
   }, [amigoQuiz?.data?.content]);
 
-  if (isLoadingAmigoQuiz) {
-    return <Loader />;
-  }
+  // if (isLoadingAmigoQuiz) {
+  //   return <Loader />;
+  // }
 
   return (
     <Container>
@@ -65,9 +64,9 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
           />
         </SelectContainer>
 
-        <SelectContainer>
+        {/* <SelectContainer>
           <DatePickerInput />
-        </SelectContainer>
+        </SelectContainer> */}
         <SelectContainer>
           <ButtonElement
             label="Schedule Amigo Quiz"
@@ -80,7 +79,15 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
         <UpcomingSection>
           <h4>Upcoming Amigo Quiz</h4>
           <h6>Upcoming Scheduled Amigo Quiz Dates</h6>
-          {quizes.some((item: any) => !item?.isPast) ? (
+
+          {isLoadingAmigoQuiz ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width={"100%"}
+              height={118}
+            />
+          ) : quizes.some((item: any) => !item?.isPast) ? (
             <CardContainer>
               {quizes.map((el: any) => {
                 if (!el?.isPast) {
@@ -106,7 +113,14 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
           <h4>Past Amigo Quiz</h4>
           <h6>Past Scheduled Amigo Quiz Dates</h6>
 
-          {quizes.some((item: any) => item?.isPast) ? (
+          {isLoadingAmigoQuiz ? (
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width={"100%"}
+              height={118}
+            />
+          ) : quizes.some((item: any) => item?.isPast) ? (
             <CardContainer>
               {quizes.map((item: any) => {
                 if (item?.isPast) {
@@ -169,7 +183,6 @@ const FilterContainer = styled.div`
     flex-direction: column;
   }
 `;
-
 
 const SelectContainer = styled.div`
   display: flex;

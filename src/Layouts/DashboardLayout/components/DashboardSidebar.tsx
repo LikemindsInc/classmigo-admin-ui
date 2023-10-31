@@ -41,6 +41,11 @@ export const DashboardSidebar = () => {
       title: "Payments",
       icon: <PaymentIcon />,
     },
+    // {
+    //   path: "/referals",
+    //   title: "Referals",
+    //   icon: <PaymentIcon />,
+    // },
   ];
 
   const lessonMenus = [
@@ -87,11 +92,11 @@ export const DashboardSidebar = () => {
       title: "General Knowledge",
       icon: <UserIcon />,
     },
-    // {
-    //   path: "/amigo_quiz",
-    //   title: "AmigoQuiz",
-    //   icon: <AmigoQuizIcon />,
-    // },
+    {
+      path: "/amigo_quiz",
+      title: "AmigoQuiz",
+      icon: <AmigoQuizIcon />,
+    },
   ];
 
   const subscriptionMenu = [

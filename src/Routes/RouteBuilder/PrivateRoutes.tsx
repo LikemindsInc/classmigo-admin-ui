@@ -195,6 +195,13 @@ const LazyAddSubtopic = lazy(
     )
 );
 
+const LazyReferals = lazy(
+  () =>
+    import(
+      "../../Pages/PrivatePages/Dashboard/Users/Referals/Referals"
+    )
+);
+
 export const PrivateRoutes = () => {
   const { user, setUser } = useContext(UserContext);
   const userDataFromCookie = Cookies.get("user");
@@ -353,6 +360,12 @@ export const PrivateRoutes = () => {
       element: <LazyAmigoQuiz />,
       restrictedRole: ["TEACHER"],
     },
+    {
+      path: "/referals",
+      element: <LazyReferals />,
+      restrictedRole: ["TEACHER"],
+    },
+
     // {
     //   path: "/amigo_quiz/practice_quiz",
     //   element: <LazyPracticeQuiz />,

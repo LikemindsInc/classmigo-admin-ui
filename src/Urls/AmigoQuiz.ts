@@ -19,7 +19,7 @@ export const updateAmigoQuizUrl = (data: any, id: string) =>
 export const getAmigoQuizUrl = (filter: { className: string }) => {
   const generatedParams = generateUrlParams(filter)
   return request({
-    url: `${BASE_URL}/quiz/?${generatedParams}`,
+    url: `${BASE_URL}/quiz/${generatedParams}`,
     method: "GET",
   });
 };
@@ -93,7 +93,7 @@ export const deletePracticeQuizUrl = (id: string) =>
 export const getLeaderboardUrl = (filter?: any) => {
   const generatedParam = generateUrlParams(filter);
   return request({
-    url: `${BASE_URL}/students/leaderboard?${generatedParam}`,
+    url: `${BASE_URL}/students/leaderboard${generatedParam}`,
     method: "GET",
   });
 };

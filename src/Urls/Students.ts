@@ -6,7 +6,7 @@ const ADMIN_BASE_URL = "admin";
 export const getStudentDataUrl = (filter?: any) => {
   const generatedParam = generateUrlParams(filter);
   return request({
-    url: `${ADMIN_BASE_URL}/students?${generatedParam}`,
+    url: `${ADMIN_BASE_URL}/students${generatedParam}`,
     method: "GET",
   });
 };

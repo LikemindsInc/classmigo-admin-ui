@@ -9,7 +9,7 @@ export * from "./QuizLibrary";
 export * from "./ScheduleLesson";
 export * from "./Subscription";
 export * from "./AmigoQuiz"
-
+export * from "./Referals"
 
 
 
