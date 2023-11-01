@@ -153,7 +153,7 @@ export const generateUrlParams = (obj: any) => {
   const arrayOfObjectKeys = Object.keys(obj);
   arrayOfObjectKeys.forEach((key) => {
     if (obj[key] || obj[key] === false) {
-      generatedUrl += `${key}=${obj[key]}&`;
+      generatedUrl += `?${key}=${obj[key]}&`;
     }
   });
   return generatedUrl;
