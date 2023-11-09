@@ -41,11 +41,11 @@ export const DashboardSidebar = () => {
       title: "Payments",
       icon: <PaymentIcon />,
     },
-    // {
-    //   path: "/referals",
-    //   title: "Referals",
-    //   icon: <PaymentIcon />,
-    // },
+    {
+      path: "/referals",
+      title: "Referals",
+      icon: <PaymentIcon />,
+    },
   ];
 
   const lessonMenus = [

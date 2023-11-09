@@ -98,7 +98,6 @@ export const formatDate = (date: Date): string => {
 };
 
 export const formatIncomingDate = (incomingDate: string): string => {
-
   const newDateTime = new Date(incomingDate);
 
   const formattedDateTime = newDateTime.toISOString().slice(0, 16);
@@ -141,6 +140,21 @@ export async function customPost<T>(
   }
 }
 
+export async function customApiGet<T>(
+  url: string,
+  headers?: Record<string, string>
+): Promise<T> {
+  try {
+    const response: AxiosResponse<T> = await axios.get(url, {
+      headers: headers || {},
+    });
+    return response.data;
+  } catch (e:any) {
+    throw new Error(`Error fetching data: ${e.message}`);
+  }
+}
+
+
 export const CalculateDiscount = (value: number, total: number) => {
   if (total === 0) {
     return 0;
@@ -153,12 +167,11 @@ export const generateUrlParams = (obj: any) => {
   const arrayOfObjectKeys = Object.keys(obj);
   arrayOfObjectKeys.forEach((key) => {
     if (obj[key] || obj[key] === false) {
-      generatedUrl += `?${key}=${obj[key]}&`;
+      generatedUrl += `${key}=${obj[key]}&`;
     }
   });
   return generatedUrl;
 };
-
 
 export const generateQueryKey = (baseKey: string, searchFilter: any) => {
   const searchFilterString = JSON.stringify(searchFilter);
@@ -167,8 +180,7 @@ export const generateQueryKey = (baseKey: string, searchFilter: any) => {
   return queryKey;
 };
 
-export const convertKoboToNaira = (kobo:number) => {
-
+export const convertKoboToNaira = (kobo: number) => {
   const naira = kobo / 100;
 
   const formattedNaira = naira.toLocaleString();
@@ -176,8 +188,6 @@ export const convertKoboToNaira = (kobo:number) => {
   return formattedNaira;
 };
 
-
-export const roundNumberDown = (points:number):number => {
-  return Math.floor(points)
-}
-
+export const roundNumberDown = (points: number): number => {
+  return Math.floor(points);
+};

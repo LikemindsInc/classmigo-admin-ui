@@ -9,6 +9,7 @@ import styled from "styled-components";
 import noData from "../../../../../../../Assets/noData.png";
 import { roundNumberDown } from "../../../../../../../utils/utilFns";
 import { Loader } from "../../../../../../../Ui_elements";
+import dayjs from "dayjs";
 
 interface DataType {
   key: string;
@@ -50,7 +51,6 @@ export const QuizLeaderboard = () => {
           username: item?.student?.userName,
           phoneNumber: item?.student?.phoneNumber,
           points: roundNumberDown(item?.score),
-          class: item?.className,
           image: item?.student?.profileImageUrl,
         }))
       );
@@ -88,12 +88,6 @@ export const QuizLeaderboard = () => {
       ellipsis: true,
     },
     {
-      title: "CLASS",
-      dataIndex: "class",
-      key: "class",
-      ellipsis: true,
-    },
-    {
       title: "PHONE NUMBER",
       dataIndex: "phoneNumber",
       key: "phoneNumber",
@@ -113,9 +107,6 @@ export const QuizLeaderboard = () => {
       case "username":
         updatedColumn.width = "15%";
         break;
-      case "class":
-        updatedColumn.width = "10";
-        break;
       default:
         break;
     }
@@ -129,6 +120,7 @@ export const QuizLeaderboard = () => {
 
   return (
     <>
+      <h3>{state?.tag.replace(/_/g, " ")} leaderboard  |  {dayjs(state?.createdAt).format('MMMM D, YYYY')}</h3>
       {boardData.length > 0 ? (
         <TableElement
           data={boardData}

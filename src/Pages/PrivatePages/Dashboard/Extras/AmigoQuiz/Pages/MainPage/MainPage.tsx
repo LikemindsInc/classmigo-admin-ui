@@ -94,7 +94,7 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
                   return (
                     <QuizCard
                       item={el}
-                      isActive={el.isActive}
+                      isPast={el.isPast}
                       dateTime={el.startDateTime}
                     />
                   );
@@ -127,7 +127,7 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
                   return (
                     <QuizCard
                       item={item}
-                      isActive={item.isActive}
+                      isPast={item.isPast}
                       dateTime={item.startDateTime}
                     />
                   );
@@ -157,6 +157,7 @@ const Container = styled.section`
   flex-direction: column;
   gap: 10%;
   overflow-y: scroll;
+  margin-top: -3rem;
   position: relative !important;
   > button {
     font-size: 0.8rem;
