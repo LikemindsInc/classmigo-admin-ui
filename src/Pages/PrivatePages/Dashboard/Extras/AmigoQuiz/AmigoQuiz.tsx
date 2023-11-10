@@ -4,18 +4,10 @@ import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import { Loader, TabNavigation } from "../../../../../Ui_elements";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MainPage } from "./Pages/MainPage/MainPage";
-import { Leaderboard } from "./Pages/LeaderboardPage/Leaderboard";
-import { ViewPracticeQuiz } from "./Pages/PracticePage/ViewPracticeQuiz";
-import { ScheduleQuiz } from "./Pages/MainPage/ScheduleQuiz";
-import { ViewQuestions } from "./Pages/MainPage/ViewQuestions";
-import { EditQuizQuestion } from "./Pages/MainPage/EditQuestion";
-import { QuizLeaderboard } from "./Pages/MainPage/Leaderboard";
-import { AddPracticeQuizQuestion } from "./Pages/PracticePage/AddPracticeQuestion";
 import { getAllClassesUrl } from "../../../../../Urls";
 import { useApiGet } from "../../../../../custom-hooks";
 import { formatOptions } from "../../../../../utils/utilFns";
-import { AddQuizQuestion } from "./Pages/MainPage/AddQuestion";
-import { SchedulePracticeQuiz } from "./Pages/PracticePage/SchedulePracticeQuiz";
+import { AmigoRouter } from "./AmigoRouter";
 
 const AmigoQuiz = () => {
   const navigate = useNavigate();
@@ -49,14 +41,9 @@ const AmigoQuiz = () => {
         name: "Amigo Quiz",
         route: "quiz",
       },
-      // {
-      //   id: 1,
-      //   name: "Practice Quiz",
-      //   route: "practice",
-      // },
       {
-        id: 2,
-        name: "Leader board",
+        id: 1,
+        name: "General Leaderboard",
         route: "leaderboard",
       },
     ],
@@ -102,29 +89,7 @@ const AmigoQuiz = () => {
           classOptions={allClasses}
         />
       )}
-      {/* {location.hash === "#practice/schedule_practice_quiz/view_questions" && (
-        <ViewPracticeQuiz />
-      )} */}
-      {/* {location.hash === "#practice" && <ViewPracticeQuiz />} */}
-      {location.hash === "#leaderboard" && <Leaderboard />}
-      {location.hash === "#quiz/schedule_quiz" && <ScheduleQuiz />}
-      {/* {location.hash === "#practice/schedule_practice_quiz" && (
-        <SchedulePracticeQuiz />
-      )} */}
-      {location.hash === "#quiz/schedule_quiz/edit_question" && (
-        <EditQuizQuestion />
-      )}
-      {location.hash === "#quiz/quiz_leaderboard" && <QuizLeaderboard />}
-      {location.hash === "#quiz/schedule_quiz/view_questions" && (
-        <ViewQuestions />
-      )}
-
-      {location.hash === "#quiz/schedule_quiz/add_quiz_question" && (
-        <AddQuizQuestion />
-      )}
-      {/* {location.hash === "#practice/schedule_pactice_quiz/add_question" && (
-        <AddPracticeQuizQuestion />
-      )} */}
+      <AmigoRouter/>
     </Container>
   );
 };

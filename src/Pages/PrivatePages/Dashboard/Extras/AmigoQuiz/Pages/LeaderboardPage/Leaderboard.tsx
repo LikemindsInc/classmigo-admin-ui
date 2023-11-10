@@ -17,6 +17,7 @@ import {
   generateQueryKey,
 } from "../../../../../../../utils/utilFns";
 import dayjs from "dayjs";
+import { Controller, useForm } from "react-hook-form";
 
 interface DataType {
   key: string;
@@ -40,6 +41,7 @@ export const Leaderboard = () => {
     startDate: null,
   });
 
+  const  {control, setValue} = useForm()
   const hasFilter = () => {
     const { query, className, endDate, startDate } = searchFilter;
     return [query, className, endDate, startDate].some(
@@ -227,18 +229,25 @@ export const Leaderboard = () => {
     <Container>
       <UtilHolder>
         <div>
-          <SelectContainer>
-            <SelectInput
-              id="className"
-              options={allClasses}
-              onChange={onSelectClassname}
-              defaultValue={"Select a class"}
-              isLoading={isLoadingClasses}
-            />
-            {typeof searchFilter?.className === "string" && (
-              <CancelIcon onClick={handleClearClass}>&#8855;</CancelIcon>
+          <Controller
+            name="className"
+            control={control}
+            render={({ field }) => (
+              <SelectContainer>
+                <SelectInput
+                  {...field}
+                  id="className"
+                  options={allClasses}
+                  onChange={onSelectClassname}
+                  defaultValue={"Select a class"}
+                  isLoading={isLoadingClasses}
+                />
+                {typeof searchFilter?.className === "string" && (
+                  <CancelIcon onClick={handleClearClass}>&#8855;</CancelIcon>
+                )}
+              </SelectContainer>
             )}
-          </SelectContainer>
+          />
 
           <SelectContainer>
             <DatePickerInput
@@ -350,7 +359,6 @@ const SelectContainer = styled.div`
   gap: 10px;
   width: 100%;
 `;
-
 
 const Content = styled.section``;
 

@@ -12,11 +12,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Tag } from "../../../../../../../../Ui_elements";
 
 interface Props {
-  isActive: false;
+  isPast: false;
   dateTime: string;
   item: any;
 }
-export const QuizCard = ({ isActive, dateTime, item }: Props) => {
+export const QuizCard = ({ isPast, dateTime, item }: Props) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ export const QuizCard = ({ isActive, dateTime, item }: Props) => {
         <MoreContainer id="basic-button" onClick={handleClick}>
           <MoreIcon />
         </MoreContainer>
-        {isActive === false ? (
+        {isPast ? (
           <Menu
             id="basic-menu"
             anchorEl={anchorEl}
@@ -236,7 +236,7 @@ const Container = styled.div`
 const Item = styled(MenuItem)`
   font-size: 0.8rem;
   font-weight: 700 !important;
-  width: 200px;import { useQueryClient } from '@tanstack/react-query';
+  width: 200px;
 
 `;
 

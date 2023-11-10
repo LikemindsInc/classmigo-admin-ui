@@ -63,3 +63,5 @@ export const PAYMENT_DATES = [
 ];
 
 export const ZEGO_CHAR = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP'
+
+export const UNIVERSAL_KEY = "JR8xhgZnhpUo6BPv1VLRB78oQaxplTmct_gxOiNN4Jm1lGSegfcc-RnfYUXmB7r561Y"

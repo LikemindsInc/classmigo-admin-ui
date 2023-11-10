@@ -13,7 +13,7 @@ export const request = async (options: any) => {
   if (accessToken) {
     token = JSON.parse(accessToken);
   }
-  
+
   token !== "" &&
     (client.defaults.headers.common.Authorization = `Bearer ${token?.token}`);
 
@@ -28,20 +28,25 @@ export const request = async (options: any) => {
   return client(options).then(onSuccess).catch(onError);
 };
 
-export const extractErrors = (error: any) => {
-  if (typeof error.response.data.error === "string")
-    return [error.response.data.message || error.response.data.error];
-  if (error.response) {
-    if (error.response.data.message && error.response.data.message.length > 0) {
-      return error.response.data.message.map((error: any) => {
-        return error;
-      });
-    } else if (error.response.data.message) {
-      return [error.response.data.message];
-    } else {
-      return [error.response.data.error];
-    }
-  } else {
-    return [];
+export const countryRequest = async (
+  token: string,
+  url: string,
+  state?: string
+) => {
+  const client = axios.create({
+    baseURL: "https://www.universal-tutorial.com/api/",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  });
+
+  try {
+    const response = await (state
+      ? client.get(`${url}${state && `/${state}`}`)
+      : client.get(url));
+    return response.data;
+  } catch (error: any) {
+    throw new Error(`Error fetching countries: ${error.message}`);
   }
 };
