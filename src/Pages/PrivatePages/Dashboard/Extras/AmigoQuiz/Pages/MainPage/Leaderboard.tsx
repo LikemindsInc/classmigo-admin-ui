@@ -24,6 +24,8 @@ interface DataType {
 
 export const QuizLeaderboard = () => {
   const [boardData, setBoardData] = useState<any>([]);
+  const [winner, setWinner] = useState<string>("");
+
   const navigate = useNavigate();
 
   const { state } = useLocation();
@@ -54,6 +56,8 @@ export const QuizLeaderboard = () => {
           image: item?.student?.profileImageUrl,
         }))
       );
+      setWinner(() => data?.data?.winner?.student?._id);
+
     }
   }, [data?.data?.content, data]);
 
@@ -71,7 +75,13 @@ export const QuizLeaderboard = () => {
       ellipsis: true,
       render: (name: string, record: DataType) => {
         return (
-          <UserDetails index={record?.index} image={record.image} name={name} />
+          <UserDetails
+            winner={winner}
+            index={record?.index}
+            image={record.image}
+            name={name}
+            id={record.key}
+          />
         );
       },
     },
@@ -120,7 +130,10 @@ export const QuizLeaderboard = () => {
 
   return (
     <>
-      <h3>{state?.tag.replace(/_/g, " ")} leaderboard  |  {dayjs(state?.createdAt).format('MMMM D, YYYY')}</h3>
+      <h3>
+        {state?.tag.replace(/_/g, " ")} leaderboard |{" "}
+        {dayjs(state?.createdAt).format("MMMM D, YYYY")}
+      </h3>
       {boardData.length > 0 ? (
         <TableElement
           data={boardData}

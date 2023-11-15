@@ -12,7 +12,7 @@ export const getReferalDataUrl = (filter?: any) => {
 
 export const getUserReferalsUrl = (code: string) => {
   return request({
-    url: `/agent?${code}`,
+    url: `/agent/${code}`,
     method: "GET",
   });
 };

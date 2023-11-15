@@ -1,9 +1,10 @@
 import { Skeleton } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { Divider, Drawer} from "antd";
+import { Divider, Drawer } from "antd";
 import { ColumnsType } from "antd/es/table";
+import { AnyARecord } from "dns";
 import { debounce } from "lodash";
-import { useContext, useEffect,useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { DrawerContext } from "../../../../../../../Contexts/Contexts";
@@ -23,9 +24,7 @@ import {
   unblockReferalsUrl,
 } from "../../../../../../../Urls";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
-import {
-  generateQueryKey,
-} from "../../../../../../../utils/utilFns";
+import { generateQueryKey } from "../../../../../../../utils/utilFns";
 
 interface DataType {
   key: string;
@@ -328,12 +327,12 @@ export const ReferalTable = () => {
                   <h6>{user?.fullName}</h6>
 
                   <Divider />
-                  <p>Email: {user?.email}</p>
-                  <p>Phone number: {user?.phoneNumber}</p>
-                  <p>Country: {user?.country}</p>
-                  <p>Sate: {user?.state}</p>
-                  <p>LGA: {user?.lga}</p>
-                  <p>Ref code: {user?.code}</p>
+                  <p><Title>Email:</Title> {user?.email}</p>
+                  <p><Title>Phone number:</Title> {user?.phoneNumber}</p>
+                  <p><Title>Country:</Title> {user?.country}</p>
+                  <p><Title>State:</Title> {user?.state}</p>
+                  <p><Title>LGA:</Title> {user?.lga}</p>
+                  <p><Title>Ref code:</Title> {user?.code}</p>
                 </div>
               </UserInfo>
 
@@ -355,8 +354,29 @@ export const ReferalTable = () => {
                     <div>
                       {refData?.data?.content?.length > 0 ? (
                         refData?.data?.content?.map(
-                          (item: string, index: number) => (
-                            <p key={index}>{item}</p>
+                          (item: any, index: number) => (
+                            <div key={index}>
+                              <p>
+                                <Title>
+                                  Full name:
+                                </Title>
+                                {item?.studentReferred?.firstName}{" "}
+                                {item?.studentReferred?.firstName}
+                              </p>
+                              <p>
+                                <Title>
+                                  Leaderboard score:
+                                </Title>{" "}
+                                {item?.studentReferred?.leaderBoardScore}
+                              </p>
+                              <p>
+                                <Title>
+                                  Phone number:{" "}
+                                </Title>
+                                {item?.studentReferred?.phoneNumber}
+                              </p>
+                              <Divider />
+                            </div>
                           )
                         )
                       ) : (
@@ -365,8 +385,6 @@ export const ReferalTable = () => {
                     </div>
                   )}
                 </div>
-
-                <Divider />
 
                 <div>
                   <h4>Status</h4>
@@ -553,6 +571,9 @@ const Details = styled.div`
       font-weight: 600;
       font-size: 0.9rem;
     }
+    span{
+      font-size: 0.9rem;
+    }
     p {
       font-size: 0.9rem;
     }
@@ -574,3 +595,7 @@ const SwitchContainer = styled.div`
   align-items: center;
   gap: 10px;
 `;
+
+const Title = styled.span`
+  font-weight: 600;
+  `
