@@ -32,6 +32,7 @@ interface DataType {
 
 export const Leaderboard = () => {
   const [student, setStudent] = useState<any>([]);
+  const [winner, setWinner] = useState<string>("");
   const [searchFilter, setSearchFilter] = useState<any>({
     page: 0,
     pageSize: 10,
@@ -41,7 +42,7 @@ export const Leaderboard = () => {
     startDate: null,
   });
 
-  const  {control, setValue} = useForm()
+  const { control, setValue } = useForm();
   const hasFilter = () => {
     const { query, className, endDate, startDate } = searchFilter;
     return [query, className, endDate, startDate].some(
@@ -147,7 +148,7 @@ export const Leaderboard = () => {
     if (leaderboardData) {
       setStudent(() =>
         leaderboardData?.data?.content.map((item: any, index: number) => ({
-          key: item._id,
+          key: item?.student?._id,
           index: index,
           name: `${item?.student?.firstName} ${item?.student?.lastName}`,
           username: item?.student?.userName,
@@ -157,6 +158,7 @@ export const Leaderboard = () => {
           image: item?.student?.profileImageUrl,
         }))
       );
+      setWinner(() => leaderboardData?.data?.winner?.student?._id);
     }
   }, [leaderboardData]);
 
@@ -174,7 +176,13 @@ export const Leaderboard = () => {
       ellipsis: true,
       render: (name: string, record: DataType) => {
         return (
-          <UserDetails index={record?.index} image={record.image} name={name} />
+          <UserDetails
+            winner={winner}
+            index={record?.index}
+            image={record.image}
+            name={name}
+            id={record.key}
+          />
         );
       },
     },
@@ -225,6 +233,7 @@ export const Leaderboard = () => {
     updatedColumn.title = <h5 style={headerStyle}>{column.title}</h5>;
     return updatedColumn;
   });
+
   return (
     <Container>
       <UtilHolder>

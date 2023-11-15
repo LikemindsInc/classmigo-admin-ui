@@ -324,7 +324,17 @@ const Container = styled.form`
 `;
 
 const InputHolder = styled.div`
+  display: flex;
   width: 50%;
+  label {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  flex-direction: column;
+  gap: 10px;
+  @media ${devices.tabletL} {
+    width: 100%;
+  }
 `;
 
 const SelectContainer = styled.div`

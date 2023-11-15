@@ -6,14 +6,19 @@ export const UserDetails = ({
   image,
   name,
   index,
+  winner,
+  id,
 }: {
   image: string;
   name: string;
   index?: number;
-}) => {
+  winner: string;
+  id: string;
+  }) => {
+
   return (
     <Container>
-      {index === 0 && (
+      {(winner === id && index === 0)  && (
         <i>
           <MedalIcon />
         </i>

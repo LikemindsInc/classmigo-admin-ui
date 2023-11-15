@@ -24,6 +24,7 @@ export const TableElement = ({
 }: TableProps | any) => {
   const [pagination, setPagination] = useState<any>();
 
+
   useEffect(() => {
     if (paginationData) {
       setPagination({

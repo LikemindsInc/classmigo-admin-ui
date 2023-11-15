@@ -1,7 +1,4 @@
 import React, {
-  Dispatch,
-  SetStateAction,
-  useContext,
   useEffect,
   useMemo,
 } from "react";
@@ -23,7 +20,6 @@ import {
 import { formatOptions } from "../../../../../../utils/utilFns";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createQuizSchema } from "../QuizLibrarySchema";
-import { ModalContext } from "../../../../../../Contexts/Contexts";
 
 interface CreateQuizProps {
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,8 +36,6 @@ export const CreateQuiz: React.FC<CreateQuizProps> = ({ setModal }) => {
   } = useForm({
     resolver: yupResolver(createQuizSchema),
   });
-
-  const { setOpenModal } = useContext(ModalContext);
 
   let classValue: any = watch("class");
   let subjectValue: any = watch("subject");
@@ -115,7 +109,7 @@ export const CreateQuiz: React.FC<CreateQuizProps> = ({ setModal }) => {
     data: topics,
     isFetching: isLoadingTopics,
     refetch: fetchTopic,
-  } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.label), {
+  } = useApiGet(["allTopics"], () => getAllLessonsUrl(subjectValue?.label, classValue?.value), {
     refetchOnWindowFocus: false,
     enabled: !!subjectValue,
   });

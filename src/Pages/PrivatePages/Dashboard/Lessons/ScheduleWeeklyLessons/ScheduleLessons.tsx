@@ -49,7 +49,7 @@ const ScheduleLessons = () => {
     data: topics,
     isFetching: isLoadingTopics,
     refetch: fetchTopic,
-  } = useApiGet(["lessonTopic"], () => getAllLessonsUrl(subjectValue?.label), {
+  } = useApiGet(["lessonTopic"], () => getAllLessonsUrl(subjectValue?.label, classValue?.value), {
     refetchOnWindowFocus: false,
     enabled: !!subjectValue,
     staleTime: 0,
