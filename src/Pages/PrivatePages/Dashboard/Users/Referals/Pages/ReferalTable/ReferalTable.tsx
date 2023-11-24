@@ -47,6 +47,13 @@ export const ReferalTable = () => {
     pageSize: 10,
     state: null,
   });
+  const [refFilter, setRefFilter] = useState<any>({
+    startDate: null,
+    endDate:null,
+    page: 0,
+    pageSize: 10,
+    state: null,
+  });
   const queryClient = useQueryClient();
 
   const debouncedSearchFilterUpdate = debounce((value) => {
@@ -117,7 +124,9 @@ export const ReferalTable = () => {
     isLoading: isLoadingRefs,
     isError,
     refetch: fetchData,
-  } = useApiGet(["ref-user"], () => getUserReferalsUrl(code), {
+  } = useApiGet(
+    [generateQueryKey("ref-user", refFilter) ],
+    () => getUserReferalsUrl(code, refFilter), {
     refetchOnWindowFocus: false,
     enabled: !!code,
   });
@@ -321,7 +330,9 @@ export const ReferalTable = () => {
               isFetchingRefs={isFetchingRefs}
               isLoadingRefs={isLoadingRefs}
               isActive={isActive}
-              fetchData={fetchData}
+                fetchData={fetchData}
+  
+                setRefFilter={setRefFilter}
               setSearchFilter={setSearchFilter}
               searchFilter={searchFilter}
               setUser={setUser}

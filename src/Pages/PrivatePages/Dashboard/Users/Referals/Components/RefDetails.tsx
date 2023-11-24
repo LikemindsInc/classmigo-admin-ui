@@ -1,9 +1,12 @@
 import { Divider } from "@mui/material";
 import { ColumnsType } from "antd/es/table";
+import { Controller } from "react-hook-form";
 import styled from "styled-components";
+import { DatePickerInput } from "../../../../../../Ui_elements";
 import { SwitchElement } from "../../../../../../Ui_elements/Switch/Switch";
 import { TableElement } from "../../../../../../Ui_elements/Table/Table";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
+import dayjs from "dayjs";
 
 export const RefDetails = ({
   refData,
@@ -12,6 +15,7 @@ export const RefDetails = ({
   unblock,
   isFetchingRefs,
   isActive,
+  setRefFilter,
   setSearchFilter,
   searchFilter,
   setUser,
@@ -90,6 +94,34 @@ export const RefDetails = ({
     return updatedColumn;
   });
 
+  const handleClearEndDate = () => {
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      endDate: null,
+    }));
+  };
+
+  const handleFromDateChange = (value: any) => {
+    setRefFilter((prev: any) => ({
+      ...prev,
+      startDate: dayjs(value).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+    }));
+  };
+
+  const handleClearFromDate = () => {
+    setRefFilter((prev: any) => ({
+      ...prev,
+      startDate: null,
+    }));
+  };
+
+  const handleToDateChange = (value: any) => {
+    setRefFilter((prev: any) => ({
+      ...prev,
+      endDate: dayjs(value).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+    }));
+  };
+
   return (
     <Container>
       <UserInfo>
@@ -126,6 +158,26 @@ export const RefDetails = ({
       <Details>
         <div>
           <h4>All referrals</h4>
+
+          <SelectHolder>
+            <SelectContainer>
+              <DatePickerInput
+                hint={"From Date"}
+                onChange={handleFromDateChange}
+              />
+              {typeof searchFilter?.startDate === "string" && (
+                <CancelIcon onClick={handleClearFromDate}>&#8855;</CancelIcon>
+              )}
+            </SelectContainer>
+            <SelectContainer>
+              <DatePickerInput hint={"To Date"} onChange={handleToDateChange} />
+
+              {typeof searchFilter?.endDate === "string" && (
+                <CancelIcon onClick={handleClearEndDate}>&#8855;</CancelIcon>
+              )}
+            </SelectContainer>
+          </SelectHolder>
+
           <div>
             <TableElement
               loading={isFetchingRefs}
@@ -228,4 +280,27 @@ const SwitchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+const SelectContainer = styled.div`
+  display: flex;
+  align-items: center !important;
+  gap: 10px;
+  label{
+    margin-top: 10px !important;
+  }
+`;
+
+const SelectHolder = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+`;
+
+const CancelIcon = styled.div`
+  color: red;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
 `;
