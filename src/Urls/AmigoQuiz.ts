@@ -17,7 +17,7 @@ export const updateAmigoQuizUrl = (data: any, id: string) =>
     data: data,
   });
 export const getAmigoQuizUrl = (filter: { className: string }) => {
-  const generatedParams = generateUrlParams(filter)
+  const generatedParams = generateUrlParams(filter);
   return request({
     url: `${BASE_URL}/quiz/?${generatedParams}`,
     method: "GET",
@@ -88,6 +88,13 @@ export const deletePracticeQuizUrl = (id: string) =>
     method: "DELETE",
   });
 
+export const uploadQuestionsUrl = (data: any, id: string, ) =>
+  request({
+    url: `${BASE_URL}/${id}/questions/upload`,
+    method: "POST",
+    data: data,
+  });
+
 //Leaderboard
 
 export const getLeaderboardUrl = (filter?: any) => {
@@ -98,10 +105,9 @@ export const getLeaderboardUrl = (filter?: any) => {
   });
 };
 
-export const getSingleLeaderboardUrl = (id:string) => {
+export const getSingleLeaderboardUrl = (id: string) => {
   return request({
     url: `${BASE_URL}/quiz/${id}/leaderboard`,
     method: "GET",
   });
 };
-

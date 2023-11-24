@@ -1,8 +1,6 @@
-import { Skeleton } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { Divider, Drawer } from "antd";
+import { Drawer } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { AnyARecord } from "dns";
 import { debounce } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -10,12 +8,9 @@ import styled from "styled-components";
 import { DrawerContext } from "../../../../../../../Contexts/Contexts";
 import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
 import {
-  ButtonElement,
   Options,
   SearchInput,
 } from "../../../../../../../Ui_elements";
-import { CenteredDialog } from "../../../../../../../Ui_elements/Modal/Modal";
-import { SwitchElement } from "../../../../../../../Ui_elements/Switch/Switch";
 import { TableElement } from "../../../../../../../Ui_elements/Table/Table";
 import {
   blockReferalsUrl,
@@ -25,6 +20,7 @@ import {
 } from "../../../../../../../Urls";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import { generateQueryKey } from "../../../../../../../utils/utilFns";
+import { RefDetails } from "../../Components/RefDetails";
 
 interface DataType {
   key: string;
@@ -46,7 +42,6 @@ export const ReferalTable = () => {
   const [user, setUser] = useState<DataType | null>(null);
   const [code, setCode] = useState<any>(null);
   const [isActive, setIsActive] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
   const [searchFilter, setSearchFilter] = useState<any>({
     page: 0,
     pageSize: 10,
@@ -118,8 +113,10 @@ export const ReferalTable = () => {
 
   const {
     data: refData,
+    isFetching: isFetchingRefs,
     isLoading: isLoadingRefs,
     isError,
+    refetch: fetchData,
   } = useApiGet(["ref-user"], () => getUserReferalsUrl(code), {
     refetchOnWindowFocus: false,
     enabled: !!code,
@@ -136,9 +133,6 @@ export const ReferalTable = () => {
     handleSuccess,
     handleError
   );
-  // useEffect(() => {
-  //   setIsActive(user?.isActive || false);
-  // }, [user]);
 
   useEffect(() => {
     if (referalData) {
@@ -158,6 +152,12 @@ export const ReferalTable = () => {
       );
     }
   }, [searchFilter, referalData]);
+
+  useEffect(() => {
+    if (code) {
+      fetchData();
+    }
+  }, [code, fetchData]);
 
   const headerStyle = {
     color: "gray",
@@ -197,12 +197,7 @@ export const ReferalTable = () => {
       ellipsis: true,
       render(row) {
         return (
-          <div
-            onClick={() => handleRowClick(row)}
-            style={{ cursor: "pointer" }}
-          >
-            <p style={{ fontSize: "14px" }}>{row ? "Active" : "Inactive"}</p>
-          </div>
+          <p style={{ fontSize: "14px" }}>{row ? "Active" : "Inactive"}</p>
         );
       },
     },
@@ -213,14 +208,9 @@ export const ReferalTable = () => {
       ellipsis: true,
       render(row) {
         return (
-          <div
-            onClick={() => handleRowClick(row)}
-            style={{ cursor: "pointer" }}
-          >
-            <p style={{ fontSize: "14px" }}>
-              {row ? "Verified" : "Not verified"}
-            </p>
-          </div>
+          <p style={{ fontSize: "14px" }}>
+            {row ? "Verified" : "Not verified"}
+          </p>
         );
       },
     },
@@ -280,6 +270,7 @@ export const ReferalTable = () => {
     setUser(data);
     setCode(data?.code);
     setIsActive(data?.isActive);
+    setOpenDrawer(true);
   };
 
   return (
@@ -313,7 +304,7 @@ export const ReferalTable = () => {
         onClose={() => setOpenDrawer(false)}
         open={openDrawer}
         closeIcon={false}
-        width={window.innerWidth < 768 ? "80%" : "25%"}
+        width={window.innerWidth < 768 ? "80%" : "80%"}
       >
         <DrawerContentContainer>
           {isError ? (
@@ -321,110 +312,26 @@ export const ReferalTable = () => {
               <p>Something went wrong, could not fetch user</p>
             </div>
           ) : (
-            <>
-              <UserInfo>
-                <div>
-                  <h6>{user?.fullName}</h6>
-
-                  <Divider />
-                  <p><Title>Email:</Title> {user?.email}</p>
-                  <p><Title>Phone number:</Title> {user?.phoneNumber}</p>
-                  <p><Title>Country:</Title> {user?.country}</p>
-                  <p><Title>State:</Title> {user?.state}</p>
-                  <p><Title>LGA:</Title> {user?.lga}</p>
-                  <p><Title>Ref code:</Title> {user?.code}</p>
-                </div>
-              </UserInfo>
-
-              <Details>
-                <div>
-                  <h4>All referrals</h4>
-                  {isLoadingRefs ? (
-                    [...Array(4)].map((_, index) => (
-                      <SkeletonContainer key={index}>
-                        <Skeleton
-                          animation="wave"
-                          variant="rectangular"
-                          width={"100%"}
-                          height={118}
-                        />
-                      </SkeletonContainer>
-                    ))
-                  ) : (
-                    <div>
-                      {refData?.data?.content?.length > 0 ? (
-                        refData?.data?.content?.map(
-                          (item: any, index: number) => (
-                            <div key={index}>
-                              <p>
-                                <Title>
-                                  Full name:
-                                </Title>
-                                {item?.studentReferred?.firstName}{" "}
-                                {item?.studentReferred?.firstName}
-                              </p>
-                              <p>
-                                <Title>
-                                  Leaderboard score:
-                                </Title>{" "}
-                                {item?.studentReferred?.leaderBoardScore}
-                              </p>
-                              <p>
-                                <Title>
-                                  Phone number:{" "}
-                                </Title>
-                                {item?.studentReferred?.phoneNumber}
-                              </p>
-                              <Divider />
-                            </div>
-                          )
-                        )
-                      ) : (
-                        <p>This user has no referrals</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <h4>Status</h4>
-                  <SwitchContainer>
-                    <p>{isActive ? "Block" : "Unblock"}</p>
-                    <SwitchElement
-                      activeState={isActive}
-                      handleChange={() => (isActive ? block() : unblock())}
-                    />
-                  </SwitchContainer>
-                </div>
-              </Details>
-            </>
+            <RefDetails
+              refData={refData?.data}
+              code={code}
+              user={user}
+              block={block}
+              unblock={unblock}
+              isFetchingRefs={isFetchingRefs}
+              isLoadingRefs={isLoadingRefs}
+              isActive={isActive}
+              fetchData={fetchData}
+              setSearchFilter={setSearchFilter}
+              searchFilter={searchFilter}
+              setUser={setUser}
+              setUserId={setCode}
+              setIsActive={setIsActive}
+              setCode={setCode}
+            />
           )}
         </DrawerContentContainer>
       </Drawer>
-
-      <Modal
-        title="Delete Quiz?"
-        okText="Delete"
-        cancelText="Cancel"
-        cancel={() => setOpenModal(false)}
-        openState={openModal}
-      >
-        <ModalContent>
-          <p>Are you sure you want to unlink?</p>
-          <div>
-            <ButtonElement
-              outline
-              label="Cancel"
-              onClick={() => setOpenModal(false)}
-            />
-            <ButtonElement
-              label="Unlink"
-              // onClick={() => link()}
-              // isLoading={isUnlinking}
-            />
-          </div>
-        </ModalContent>
-      </Modal>
     </Container>
   );
 };
@@ -444,21 +351,6 @@ export const Container = styled.section`
 
   @media ${devices.tablet} {
     padding: 0 1rem 1rem 1rem;
-  }
-`;
-
-const Modal = styled(CenteredDialog)``;
-
-const ModalContent = styled.div`
-  text-align: center;
-  p {
-    margin: 10% 0;
-  }
-
-  div {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
   }
 `;
 
@@ -532,70 +424,3 @@ const UtilsHolder = styled.div`
 `;
 
 const DrawerContentContainer = styled.aside``;
-
-const SkeletonContainer = styled.div`
-  margin-bottom: 10px;
-`;
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 2rem;
-  img {
-    width: 3rem;
-    height: 3rem;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  div {
-    width: 100%;
-    margin-top: 1rem;
-    span {
-      font-size: 0.8rem;
-    }
-    h6 {
-      font-weight: 700;
-      font-size: 1.3rem;
-    }
-    p {
-      font-weight: 400;
-      font-size: 0.9rem;
-    }
-  }
-`;
-
-const Details = styled.div`
-  > div {
-    margin-top: 2rem;
-    h6 {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    span{
-      font-size: 0.9rem;
-    }
-    p {
-      font-size: 0.9rem;
-    }
-  }
-
-  h4 {
-    margin-bottom: 0.6rem;
-  }
-
-  > div:first-child {
-    div {
-      margin-top: 1rem;
-    }
-  }
-`;
-
-const SwitchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const Title = styled.span`
-  font-weight: 600;
-  `

@@ -72,8 +72,8 @@ h6 {
 .input {
   border: 1px solid var(--primary-color);
   border-radius: 10px;
-  height: clamp(2rem, 10vw, 4.5rem);
-  width: clamp(2rem, 10vw, 4.5rem) !important;
+  height: 50px;
+  width: 50px !important;
   font-size: 2rem;
 }
 .input:focus {

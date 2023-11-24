@@ -1,4 +1,4 @@
-import {useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { DeleteOutlined } from "@ant-design/icons";
 import Placeholder from "../../../../../../../../Assets/placeholder.png";
@@ -9,6 +9,7 @@ import { ButtonElement } from "../../../../../../../../Ui_elements";
 import { EditIcon } from "../../../../../../../../Assets/Svgs";
 import { useApiPost } from "../../../../../../../../custom-hooks";
 import { deleteQuizQuestionUrl } from "../../../../../../../../Urls";
+import { devices } from "../../../../../../../../utils/mediaQueryBreakPoints";
 
 interface QuestionCardProp {
   imageUrl?: string | null;
@@ -155,6 +156,13 @@ const Container = styled.div`
   background-color: var(--dashboardBackground);
   margin-bottom: 2rem;
   justify-content: space-between;
+  @media ${devices.mobileL} {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  @media ${devices.mobileM} {
+      width:200px !important;
+    }
 `;
 const Number = styled.div`
   background-color: var(--primary-color);
@@ -208,18 +216,32 @@ const OptionsContainer = styled.div`
       align-items: center;
       justify-content: center;
       border-radius: 50%;
+      @media ${devices.tabletL} {
+        font-size: 0.8rem;
+      }
     }
     p {
       font-size: 0.9rem;
+      @media ${devices.tabletL} {
+        font-size: 0.8rem;
+      }
     }
   }
 `;
 
 const ImageContainer = styled.div`
   img {
-    width: 200px;
-    height: 100px;
+    width: 15vw;
+    height: 150px;
+    aspect-ratio: 1;
     object-fit: cover;
+    background-color: var(--hover-color);
+    @media ${devices.mobileM} {
+      width:inherit !important;
+    }
+    @media ${devices.tabletL} {
+      width: 20vw;
+    }
   }
   > div {
     display: flex;
@@ -227,6 +249,9 @@ const ImageContainer = styled.div`
     justify-content: flex-end;
     align-items: center;
     margin-top: 1rem;
+    @media ${devices.mobileM} {
+      justify-content: flex-start;
+    }
     button {
       font-size: 0.7rem;
       width: fit-content !important;
@@ -243,6 +268,9 @@ const Delete = styled(DeleteOutlined)`
 const Correct = styled.h6`
   color: var(--primary-color);
   font-size: 1rem;
+  @media ${devices.tabletL} {
+    font-size: 0.8rem;
+  }
 `;
 
 const Modal = styled(CenteredDialog)``;
