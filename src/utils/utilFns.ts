@@ -149,11 +149,10 @@ export async function customApiGet<T>(
       headers: headers || {},
     });
     return response.data;
-  } catch (e:any) {
+  } catch (e: any) {
     throw new Error(`Error fetching data: ${e.message}`);
   }
 }
-
 
 export const CalculateDiscount = (value: number, total: number) => {
   if (total === 0) {
@@ -191,3 +190,19 @@ export const convertKoboToNaira = (kobo: number) => {
 export const roundNumberDown = (points: number): number => {
   return Math.floor(points);
 };
+
+export const downloadTemplate = () => {
+  const csvData = [
+    ` QUESTION, EXPLANATION, OPTION1_LABEL, OPTION1_VALUE, OPTION2_LABEL, OPTION2_VALUE, OPTION3_LABEL, OPTION_3_VALUE, OPTION4_LABEL, OPTION_4_VALUE, CORRECT_OPTION, SCORE, IMAGE_LINK, ,`,
+  ];
+
+  const element = document.createElement("a");
+  const file = new Blob([csvData as any], { type: "text/csv" });
+  element.href = URL.createObjectURL(file);
+  element.download = "template.csv";
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+};
+
+

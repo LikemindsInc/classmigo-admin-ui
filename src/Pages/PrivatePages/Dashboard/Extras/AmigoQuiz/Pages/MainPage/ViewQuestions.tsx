@@ -1,22 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { QuestionCard } from "./Components/QuestionCard";
 import styled from "styled-components";
-import { ButtonElement, SearchInput } from "../../../../../../../Ui_elements";
+import {
+  ButtonElement,
+  ImageInput,
+  SearchInput,
+} from "../../../../../../../Ui_elements";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
-import { AddIcon } from "../../../../../../../Assets/Svgs";
+import {
+  AddIcon,
+  CsvIcon,
+  CsvIconPrimary,
+} from "../../../../../../../Assets/Svgs";
 import { useLocation, useNavigate } from "react-router-dom";
 import noData from "../../../../../../../Assets/noData.png";
 import dayjs from "dayjs";
-import { useApiGet } from "../../../../../../../custom-hooks";
-import { getAmigoQuizSingleQuestionsUrl } from "../../../../../../../Urls";
+import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
+import {
+  getAmigoQuizSingleQuestionsUrl,
+  uploadQuestionsUrl,
+} from "../../../../../../../Urls";
 import { Skeleton } from "@mui/material";
+import { downloadTemplate } from "../../../../../../../utils/utilFns";
+import { CenteredDialog } from "../../../../../../../Ui_elements/Modal/Modal";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 export const ViewQuestions = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { item } = state;
+  const [openModal, setOpenModal] = useState(false);
 
-  const { data, isLoading } = useApiGet(
+  const { register, setValue, handleSubmit } = useForm();
+
+  const { data, isLoading, refetch } = useApiGet(
     ["amigoQuestion"],
     () => getAmigoQuizSingleQuestionsUrl(item._id),
     {
@@ -24,6 +42,39 @@ export const ViewQuestions = () => {
       enabled: true,
     }
   );
+
+  const { mutate: updateQuestion, isLoading: updateLoading } = useApiPost(
+    (_: any) => uploadQuestionsUrl(_, item._id),
+    () => {
+      toast.success("Successfully added question", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      refetch();
+    },
+
+    (e: any) =>
+      toast.error(`Something went wrong while adding question ${e}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      })
+  );
+  const onSubmit = (data: any) => {
+    const formData = new FormData();
+    formData.append("file", data.file);
+    updateQuestion(formData as any);
+    setOpenModal(false);
+  };
 
   return (
     <Container>
@@ -33,14 +84,27 @@ export const ViewQuestions = () => {
         <SearchContainer>
           <SearchInput />
         </SearchContainer>
-        <ButtonElement
-          icon={<AddIcon />}
-          label="Add New Question"
-          width={200}
-          onClick={() =>
-            navigate("#quiz/schedule_quiz/add_quiz_question", { state: item })
-          }
-        />
+        <ButtonHolders>
+          <ButtonElement
+            outline
+            icon={<CsvIconPrimary />}
+            label="Download CSV Format"
+            onClick={downloadTemplate}
+          />
+          <ButtonElement
+            outline
+            icon={<CsvIconPrimary />}
+            label="Upload questions"
+            onClick={() => setOpenModal(true)}
+          />
+          <ButtonElement
+            icon={<AddIcon />}
+            label="Add New Question"
+            onClick={() =>
+              navigate("#quiz/schedule_quiz/add_quiz_question", { state: item })
+            }
+          />
+        </ButtonHolders>
       </UtilsHolder>
       <QuestionContainer>
         {data?.data?.questions.length > 0 ? (
@@ -77,6 +141,30 @@ export const ViewQuestions = () => {
           </NoData>
         )}
       </QuestionContainer>
+      <Modal
+        openState={openModal}
+        cancel={() => {
+          setValue("file", null);
+          setOpenModal(false);
+        }}
+        width={"35%"}
+      >
+        <ModalContent onSubmit={handleSubmit(onSubmit)}>
+          <h5>Upload question file</h5>
+          <ImageInput
+            register={register}
+            id="file"
+            type="file"
+            title="Upload file"
+          />
+
+          <ButtonElement
+            type="submit"
+            isLoading={updateLoading}
+            label="Upload questions"
+          />
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
@@ -97,26 +185,27 @@ const UtilsHolder = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media ${devices.tablet} {
+  @media ${devices.tabletL} {
     flex-direction: column;
   }
-  > div {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
 
-    button {
-      font-size: 0.8rem;
-      width: 300px;
-      @media ${devices.tablet} {
-        width: 100%;
-      }
-    }
+  h6 {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+`;
 
-    h6 {
-      font-size: 1rem;
-      font-weight: 700;
-    }
+const Modal = styled(CenteredDialog)``;
+
+const ModalContent = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20%;
+  height: 300px;
+  @media ${devices.tablet} {
+    width: 100px;
   }
 `;
 
@@ -132,7 +221,7 @@ const SearchContainer = styled.div`
   p {
     font-weight: 600;
   }
-  @media ${devices.tablet} {
+  @media ${devices.tabletL} {
     width: 100%;
     margin-bottom: 20px;
   }
@@ -140,6 +229,28 @@ const SearchContainer = styled.div`
 
 const QuestionContainer = styled.section`
   padding: 0 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ButtonHolders = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  button {
+    font-size: 0.8rem;
+    width: 100%;
+    @media ${devices.tabletL} {
+      width: 100% !important;
+    }
+  }
+
+  @media ${devices.tabletL} {
+    width: 100%;
+    margin-top: 1rem;
+    flex-direction: column;
+  }
 `;
 
 const NoData = styled.div`

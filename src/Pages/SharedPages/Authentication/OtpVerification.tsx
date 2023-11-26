@@ -1,22 +1,106 @@
 import { useState } from "react";
 import OTPInput from "react-otp-input";
 import styled from "styled-components";
-import { ButtonElement } from "../../../Ui_elements";
-import { useNavigate } from "react-router-dom";
+import { ButtonElement, InputElement } from "../../../Ui_elements";
+import { useLocation, useNavigate } from "react-router-dom";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
+import { useForm } from "react-hook-form";
+import { newPasswordSchema } from "./authenticationSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "react-toastify";
+import { useApiPost } from "../../../custom-hooks";
+import { resetPasswordUrl } from "../../../Urls";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { phoneNumber } = state;
+  if (!phoneNumber) {
+    navigate("/login");
+  }
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(newPasswordSchema),
+  });
+
+  const { mutate: reset, isLoading } = useApiPost(
+    resetPasswordUrl,
+    () => {
+      toast.success("Your password has been reset successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      navigate("/login");
+    },
+    (e) => {
+      toast.error(`Something went wrong ${e}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    }
+  );
+
+  const onSubmit = (data: any) => {
+    if (!otp) {
+      toast.error("Please enter OTP", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    } else {
+      const request = {
+        data: phoneNumber,
+        newPassword: data.confirmNewPassword,
+        code: otp,
+      };
+
+      reset(request as any);
+    }
+  };
 
   return (
     <Container>
-      <h3>Enter OTP</h3>
+      <h3>Enter new password</h3>
       <p>
         An OPT has been sent to your email. Kindly check your email and enter
         the OTP below
       </p>
-      <div>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <InputElement
+          register={register}
+          id="password"
+          placeholder="Password"
+          label="New Password"
+          error={errors}
+          type="password"
+        />
+        <InputElement
+          placeholder="Password"
+          label="Confirm New Password"
+          type="password"
+          id="confirmNewPassword"
+          register={register}
+          error={errors}
+        />
         <Otp
           value={otp}
           onChange={setOtp}
@@ -26,14 +110,12 @@ const OtpVerification = () => {
           inputStyle={"input"}
           containerStyle={"input_container"}
         />
-      </div>
-      <div>
-        <ButtonElement
-          label="CONTINUE"
-          onClick={() => navigate("/create_new_password")}
-        />
-        <Resend>Resend OTP</Resend>
-      </div>
+
+        <div>
+          <ButtonElement label="CONTINUE" type="submit" isLoading={isLoading} />
+          <Resend>Resend OTP</Resend>
+        </div>
+      </Form>
     </Container>
   );
 };
@@ -43,8 +125,8 @@ export default OtpVerification;
 //styles
 
 const Container = styled.div`
-  margin-top: 14rem;
-  width: fit-content !important;
+  margin-top: 10rem;
+  width: 40% !important;
   height: fit-content !important;
   h3 {
     font-size: clamp(1.1rem, 5vw, 2rem);
@@ -58,6 +140,9 @@ const Container = styled.div`
     flex-direction: column;
     gap: 1rem;
     margin: 3rem 0;
+  }
+  @media ${devices.tabletL} {
+    width: 100% !important;
   }
   @media ${devices.tablet} {
     width: 18rem;
@@ -88,4 +173,11 @@ const Resend = styled.p`
   font-weight: 600;
   text-decoration: underline;
   margin: 0 auto;
+`;
+
+export const Form = styled.form`
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 `;

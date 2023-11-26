@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import { ErrorIcon, UploadIcon } from "../../Assets/Svgs";
+import { ErrorIcon, FileIcon, UploadIcon } from "../../Assets/Svgs";
 import { devices } from "../../utils/mediaQueryBreakPoints";
 import { ButtonElement } from "../Button/Button";
 import { VideoCameraAddOutlined } from "@ant-design/icons";
@@ -8,11 +8,11 @@ import { UseControllerProps } from "react-hook-form";
 
 interface ImageInputProps {
   title?: string;
-  type: string;
+  type?: string;
   register?: any;
   id?: string;
   error?: any;
-  setValue?:any
+  setValue?: any;
   defaultImage?: string;
 }
 
@@ -23,16 +23,18 @@ export const ImageInput = ({
   id,
   error,
   setValue,
-  defaultImage
+  defaultImage,
 }: ImageInputProps) => {
   const fileInputRef = useRef<any>(null);
   const [preview, setPreview] = useState(defaultImage || "");
+  const [fileName, setFileName] = useState("");
 
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0] || null;
     file && setPreview(URL.createObjectURL(file));
+    file && setFileName(file.name);
     if (file) {
       if (register) {
         register(id, {
@@ -49,16 +51,24 @@ export const ImageInput = ({
   };
 
   const handleClearMedia = () => {
-    setValue(id, null)
-          setPreview("")
-  }
+    setValue(id, null);
+    setPreview("");
+  };
 
   return (
     <OuterWrapper>
       <Container onClick={handleUploadButtonClick}>
         <HiddenInput
           type="file"
-          accept={type === "image" ? "image/*" : "video" ? "video/*" : ""}
+          accept={
+            type === "image"
+              ? "image/*"
+              : type === "video"
+              ? "video/*"
+              : type === "file"
+              ? (".csv" || ".numbers")
+              : ""
+          }
           ref={fileInputRef}
           onChange={handleInputChange}
         />
@@ -67,10 +77,17 @@ export const ImageInput = ({
         <p>{title || "Upload Image"}</p>
         {type === "image" ? (
           <Preview preview={!!preview} src={preview} />
-        ) : (
+        ) : type === "video" ? (
           <VideoPreview preview={!!preview}>
             <VideoCameraAddOutlined style={{ fontSize: "4rem" }} />
           </VideoPreview>
+        ) : (
+          type === "file" && (
+            <VideoPreview preview={!!preview}>
+              {/* <FileIcon style={{ fontSize: "1rem" }} /> */}
+              {fileName && <p>{fileName}</p>}
+            </VideoPreview>
+          )
         )}
       </Container>
       {error && id ? (
@@ -79,9 +96,7 @@ export const ImageInput = ({
           <p>{error[id]?.message}</p>
         </ErrorContainer>
       ) : null}
-      {!!preview && (
-        <ButtonElement onClick={handleClearMedia} label="Remove" />
-      )}
+      {!!preview && <ButtonElement onClick={handleClearMedia} label="Remove" />}
     </OuterWrapper>
   );
 };
@@ -152,7 +167,6 @@ const VideoPreview = styled.div<{ preview: boolean }>`
   transform: translate(-50%, -50%);
 `;
 
-
 const ErrorContainer = styled.div`
   position: absolute;
   bottom: -20px;
@@ -160,13 +174,12 @@ const ErrorContainer = styled.div`
   z-index: 2;
   display: flex;
   align-items: center;
-  gap:5px;
+  gap: 5px;
   p {
     font-size: 0.7rem !important;
     color: red;
   }
 `;
-
 
 const Error = styled(ErrorIcon)`
   width: 0.8rem;

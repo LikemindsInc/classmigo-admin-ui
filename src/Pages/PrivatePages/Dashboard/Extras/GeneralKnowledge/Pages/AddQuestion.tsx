@@ -237,7 +237,7 @@ const AddQuestion = () => {
                 <SelectInput
                   // value={value}
                   options={allSubjects}
-                  defaultValue={"Subject Class"}
+                  defaultValue={"Select Subject"}
                   onChange={(value: any) => {
                     setSubjectValue(value);
                     setValue("subject", value?.value)
@@ -256,7 +256,7 @@ const AddQuestion = () => {
                 <SelectInput
                   {...field}
                   options={allTopics}
-                  defaultValue={"Subject Class"}
+                  defaultValue={"Select Topic"}
                   error={errors?.topic}
                   isLoading={isLoadingTopics}
                 />

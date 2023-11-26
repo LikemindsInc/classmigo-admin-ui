@@ -72,7 +72,7 @@ const CreateAdmin = () => {
     handleSuccess,
     handleError
   );
-
+ 
   const generateRandomPassword = () => {
     const value = generateRandom(8);
 

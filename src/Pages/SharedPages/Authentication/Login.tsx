@@ -130,7 +130,7 @@ const ResetPassword = styled.p`
   font-weight: 600;
   margin-top: 0.5rem;
   margin-bottom: 2rem;
-  :hover {
+  &:hover {
     cursor: pointer;
   }
 `;

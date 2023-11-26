@@ -155,13 +155,13 @@ export const ScheduleQuiz = () => {
         />
       </InputHolder>
 
-      <InputHolder>
+      {/* <InputHolder>
         <ButtonElement
           outline
           label="Upload Questions.CSV"
           icon={<CsvIconPrimary />}
         />
-      </InputHolder>
+      </InputHolder> */}
 
       <InputHolder>
         <ButtonElement
