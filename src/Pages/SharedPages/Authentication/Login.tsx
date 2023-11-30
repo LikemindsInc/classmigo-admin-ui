@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
 import { ButtonElement, InputElement } from "../../../Ui_elements";
 import { devices } from "../../../utils/mediaQueryBreakPoints";
@@ -77,7 +77,7 @@ const Login = () => {
           register={register}
           error={errors}
         />
-        <ResetPassword onClick={() => navigate("/forgot_password")}>
+        <ResetPassword to={"/forgot_password"}>
           Forgot Password?
         </ResetPassword>
         <ButtonElement type="submit" label="LOGIN" isLoading={isLogin} />
@@ -102,6 +102,12 @@ const LoginBox = styled.div`
   p {
     font-size: clamp(0.8rem, 3vw, 1rem);
   }
+  a{
+    text-decoration: none;
+    &:hover{
+      cursor: pointer;
+    }
+  }
   > div {
     display: flex;
     flex-direction: column;
@@ -124,7 +130,7 @@ const LoginBox = styled.div`
   }
 `;
 
-const ResetPassword = styled.p`
+const ResetPassword = styled(Link)`
   color: var(--primary-color);
   text-decoration: underline;
   font-weight: 600;
