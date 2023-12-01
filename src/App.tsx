@@ -16,13 +16,11 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useIsOnline } from "./custom-hooks";
 import Error from "./Pages/PrivatePages/Dashboard/Error/Error";
 import { LessonCriteriaProvider } from "./Contexts/Providers/LessonCriteriaProvider";
-import { useNavigate } from "react-router-dom";
 
 function App() {
   const { user } = useContext(UserContext);
   const isOnline = useIsOnline();
   const queryClient = new QueryClient();
-  const navigate = useNavigate();
 
   const customTheme = createTheme({
     typography: {
@@ -40,9 +38,7 @@ function App() {
     },
   });
 
-  if (!user) {
-    navigate("/");
-  }
+
 
   return (
     <QueryClientProvider client={queryClient}>

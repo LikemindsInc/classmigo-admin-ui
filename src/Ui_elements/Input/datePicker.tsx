@@ -22,7 +22,7 @@ export const DatePickerInput = ({
               borderRadius: "4px",
               height: "40px",
             },
-            "& .MuiInputLabel-root": {
+            "& .MuiInputLabel-root": { 
               fontSize: "0.8rem",
               marginTop:"-5px"
             },

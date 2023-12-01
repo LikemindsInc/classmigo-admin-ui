@@ -10,9 +10,10 @@ export const getReferalDataUrl = (filter?: any) => {
   });
 };
 
-export const getUserReferalsUrl = (code: string) => {
+export const getUserReferalsUrl = (code:string,filter: string) => {
+  const generatedParam = generateUrlParams(filter)
   return request({
-    url: `/agent/${code}`,
+    url: `/agent/${code}?${generatedParam}`,
     method: "GET",
   });
 };
