@@ -13,12 +13,10 @@ import { ModalContext } from "../../../../../../Contexts/Contexts";
 interface Props {
   quizId?: number | string;
   details?: any;
-  
 }
 export const Card = ({ quizId, details }: Props) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
 
   const onSuccess = () => {
     toast.success("Successfully Deleted Quiz", {
@@ -57,27 +55,26 @@ export const Card = ({ quizId, details }: Props) => {
   };
   return (
     <OuterContainer>
-      <>
-        <Container>
-          <DetailsContainer
-            onClick={() => {
-              navigate(`/quiz_library/${details?.name}`, {
-                state: quizId,
-              });
-            }}
-          >
-            <h6>{details?.name}</h6>
-          </DetailsContainer>
-          <ToolsContainer>
-            <Tools>{details?.questions.length} Questions</Tools>
-          </ToolsContainer>
-        </Container>
-        {isDeletingQuiz ? (
-          <Spinner color="var(--primary-color)" />
-        ) : (
-          <Delete onClick={() => setOpen(true)} />
-        )}
-      </>
+      <Container>
+        <DetailsContainer
+          onClick={() => {
+            navigate(`/quiz_library/${details?.name}`, {
+              state: quizId,
+            });
+          }}
+        >
+          <h6>{details?.name}</h6>
+        </DetailsContainer>
+        <ToolsContainer>
+          <Tools>{details?.questions.length} Questions</Tools>
+        </ToolsContainer>
+      </Container>
+      {isDeletingQuiz ? (
+        <Spinner color="var(--primary-color)" />
+      ) : (
+        <Delete onClick={() => setOpen(true)} />
+      )}
+
       <Modal
         title="Delete Quiz?"
         okText="Delete"
@@ -110,7 +107,12 @@ const Container = styled.div`
   padding: 1.5rem 2rem;
   border-radius: 14px;
   width: 100%;
+  max-width: 700px;
   transition: all 0.3s ease-in-out;
+
+  @media ${devices.tabletL} {
+    flex-direction: column;
+  }
 
   @media ${devices.tabletL} {
     padding: 0.6rem 0.3rem;
@@ -142,10 +144,11 @@ const ToolsContainer = styled.div`
 `;
 
 const DetailsContainer = styled.div`
-  width: 100%;
+  width: 80%;
+  max-width: auto;
 
   h6 {
-
+    word-wrap: break-word;
     font-size: 1.2rem;
     font-weight: 700;
     @media ${devices.tablet} {
@@ -161,12 +164,17 @@ export const SwitchContainer = styled.div`
 `;
 
 const OuterContainer = styled.div`
-  width: 100% !important;
+  max-width: 100% !important;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 5%;
   margin-bottom: 1.5rem;
   transition: transform 0.3s ease-in-out;
+
+  @media ${devices.tabletL} {
+    flex-direction: column;
+  }
 `;
 
 const Delete = styled(DeleteOutlined)`

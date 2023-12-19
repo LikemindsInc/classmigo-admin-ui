@@ -125,11 +125,15 @@ export const QuizCard = ({ isPast, dateTime, item }: Props) => {
               View Quiz Questions
             </Item>
             <Item
-              onClick={() =>
+              onClick={() => {
+                sessionStorage.setItem(
+                  "quizLeaderboardState",
+                  JSON.stringify(item)
+                );
                 navigate("#quiz/quiz_leaderboard", {
                   state: item,
-                })
-              }
+                });
+              }}
             >
               View Leaderboard
             </Item>
@@ -237,7 +241,6 @@ const Item = styled(MenuItem)`
   font-size: 0.8rem;
   font-weight: 700 !important;
   width: 200px;
-
 `;
 
 const MoreContainer = styled.div`

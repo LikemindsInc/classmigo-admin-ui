@@ -6,6 +6,7 @@ const client = axios.create({
   baseURL: BASE_URL,
 });
 
+
 export const request = async (options: any) => {
   var accessToken: any = Cookies.get("user");
   let token: any = "";
@@ -24,7 +25,6 @@ export const request = async (options: any) => {
   const onError = (error: any) => {
     return Promise.reject(error.response?.data?.message);
   };
-
   return client(options).then(onSuccess).catch(onError);
 };
 

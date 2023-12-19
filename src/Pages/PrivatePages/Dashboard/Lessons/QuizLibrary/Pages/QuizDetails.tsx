@@ -1,38 +1,85 @@
-import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { AddIcon, CsvIcon } from "../../../../../../Assets/Svgs";
-import { useApiGet } from "../../../../../../custom-hooks";
-import {
-  ButtonElement,
-  SearchInput,
-  SelectInput,
-} from "../../../../../../Ui_elements";
+import { useApiGet, useApiPost } from "../../../../../../custom-hooks";
+import { ButtonElement, ImageInput } from "../../../../../../Ui_elements";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
 import { QuestionCard } from "../Components/QuestionCard";
-import { getQuizQuestions } from "../../../../../../Urls";
+import {
+  getQuizQuestions,
+  uploadQuizQuestionsUrl,
+} from "../../../../../../Urls";
 import { Skeleton } from "@mui/material";
 import noData from "../../../../../../Assets/noData.png";
+import { downloadTemplate } from "../../../../../../utils/utilFns";
+import { toast } from "react-toastify";
+import { CenteredDialog } from "../../../../../../Ui_elements/Modal/Modal";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 const QuizDetails = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [openModal, setOpenModal] = useState(false);
 
-  const { data: quizQuestions, isLoading: isLoadingQuizQuestions } = useApiGet(
-    [`quiz${state}`],
-    () => getQuizQuestions(state),
-    {
-      refetchOnWindowFocus: false,
-      enabled: true,
-    }
+  const {
+    register,
+    setValue,
+    handleSubmit
+  } = useForm();
+
+  const {
+    data: quizQuestions,
+    isLoading: isLoadingQuizQuestions,
+    refetch,
+  } = useApiGet([`quiz${state}`], () => getQuizQuestions(state), {
+    refetchOnWindowFocus: false,
+    enabled: true,
+  });
+
+  const { mutate: updateQuestion, isLoading: updateLoading } = useApiPost(
+    (_: any) => uploadQuizQuestionsUrl(_, state),
+    () => {
+      toast.success("Successfully added question", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      refetch();
+    },
+
+    (e: any) =>
+      toast.error(`Something went wrong while adding question ${e}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      })
   );
 
+  const onSubmit = (data: any) => {
+    const formData = new FormData();
+    formData.append("file", data.file);
+    updateQuestion(formData as any);
+    setOpenModal(false);
+  };
 
   return (
     <Container>
       <Header>
         <div>
-          <ButtonElement label="Upload CSV" icon={<CsvIcon />} />
+          <ButtonElement
+            label="Upload questions"
+            icon={<CsvIcon />}
+            onClick={() => setOpenModal(true)}
+          />
           <ButtonElement
             label="Add New Question"
             icon={<AddIcon />}
@@ -41,7 +88,11 @@ const QuizDetails = () => {
             }
           />
         </div>
-        <ButtonElement outline={true} label="Download CSV Format" />
+        <ButtonElement
+          outline={true}
+          label="Download CSV Format"
+          onClick={downloadTemplate}
+        />
       </Header>
       <Body>
         {/* <SearchContainer>
@@ -69,7 +120,7 @@ const QuizDetails = () => {
               {quizQuestions.data.questions.map((item: any, index: number) => (
                 <QuestionCard
                   key={index}
-                  id={index+1}
+                  id={index + 1}
                   question={item?.question}
                   options={item?.options}
                   imageUrl={item?.imageUrl}
@@ -88,6 +139,32 @@ const QuizDetails = () => {
             </NoData>
           )}
         </QuestionsContainer>
+
+        <Modal
+          openState={openModal}
+          cancel={() => {
+            setValue("file", null);
+            setOpenModal(false);
+          }}
+          width={"35%"}
+        >
+          <ModalContent onSubmit={handleSubmit(onSubmit)}>
+            <h5>Upload question file</h5>
+            <ImageInput
+              register={register}
+              setValue={setValue}
+              id="file"
+              type="file"
+              title="Upload file"
+            />
+
+            <ButtonElement
+              type="submit"
+              isLoading={updateLoading}
+              label="Upload questions"
+            />
+          </ModalContent>
+        </Modal>
       </Body>
     </Container>
   );
@@ -112,6 +189,8 @@ const Container = styled.section`
   }
 `;
 
+const Modal = styled(CenteredDialog)``;
+
 const Header = styled.div`
   display: flex;
   width: 100%;
@@ -125,7 +204,6 @@ const Header = styled.div`
       gap: 5%;
       width: 100%;
     }
-
   }
   button {
     font-size: 0.8rem;
@@ -135,22 +213,22 @@ const Header = styled.div`
   @media ${devices.tabletL} {
     gap: 4%;
     flex-direction: column;
-    button{
-      width:100%;
+    button {
+      width: 100%;
       margin-bottom: 20px;
     }
   }
 `;
 
-const SearchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  p {
-    font-weight: 600;
-  }
-`;
+// const SearchContainer = styled.div`
+//   display: flex;
+//   align-items: center;
+//   gap: 1rem;
+//   margin-bottom: 2rem;
+//   p {
+//     font-weight: 600;
+//   }
+// `;
 
 const Body = styled.section`
   width: 100%;
@@ -178,5 +256,17 @@ const NoData = styled.div`
   p {
     text-align: center;
     font-size: 0.8rem;
+  }
+`;
+
+const ModalContent = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20%;
+  height: 300px;
+  @media ${devices.tablet} {
+    width: 100px;
   }
 `;

@@ -206,3 +206,17 @@ export const downloadTemplate = () => {
 };
 
 
+export const downloadGeneralTemplate = () => {
+  const csvData = [
+    ` QUESTION, EXPLANATION, OPTION1_LABEL, OPTION1_VALUE, OPTION2_LABEL, OPTION2_VALUE, OPTION3_LABEL, OPTION_3_VALUE, OPTION4_LABEL, OPTION_4_VALUE, CORRECT_OPTION, SCORE, IMAGE_LINK, CLASS, SUBJECT`,
+  ];
+
+  const element = document.createElement("a");
+  const file = new Blob([csvData as any], { type: "text/csv" });
+  element.href = URL.createObjectURL(file);
+  element.download = "template.csv";
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+};
+

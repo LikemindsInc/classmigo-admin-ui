@@ -31,6 +31,14 @@ export const getQuizQuestions = (id: string | number) => {
   });
 };
 
+export const uploadQuizQuestionsUrl = (data: any, id: string, ) =>
+  request({
+    url: `${ADMIN_BASE_URL}/quiz/${id}/questions/upload`,
+    method: "POST",
+    data: data,
+  });
+
+
 export const deleteQuiz = (id: string | number) => {
   return request({
     url: `${ADMIN_BASE_URL}/quiz/${id}`,

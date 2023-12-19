@@ -9,16 +9,18 @@ import {
 import { ModalContextProvider } from "./Contexts/Providers/ModalContextProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "react-toastify/dist/ReactToastify.css";
-import { useContext } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { UserContext } from "./Contexts/Contexts";
 import { ToastContainer } from "react-toastify";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useIsOnline } from "./custom-hooks";
 import Error from "./Pages/PrivatePages/Dashboard/Error/Error";
 import { LessonCriteriaProvider } from "./Contexts/Providers/LessonCriteriaProvider";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const { user } = useContext(UserContext);
+  const navigate = useNavigate();
   const isOnline = useIsOnline();
   const queryClient = new QueryClient();
 
@@ -38,7 +40,11 @@ function App() {
     },
   });
 
-
+  // useLayoutEffect(() => {
+  //   if (!user) {
+  //     navigate("/");
+  //   }
+  // }, [navigate, user]);
 
   return (
     <QueryClientProvider client={queryClient}>

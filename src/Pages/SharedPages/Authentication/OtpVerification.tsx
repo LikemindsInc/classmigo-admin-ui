@@ -9,13 +9,14 @@ import { newPasswordSchema } from "./authenticationSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import { useApiPost } from "../../../custom-hooks";
-import { resetPasswordUrl } from "../../../Urls";
+import { forgotpasswordUrl, resetPasswordUrl } from "../../../Urls";
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
   const { state } = useLocation();
   const { phoneNumber } = state;
+
   if (!phoneNumber) {
     navigate("/login");
   }
@@ -27,6 +28,15 @@ const OtpVerification = () => {
   } = useForm({
     resolver: yupResolver(newPasswordSchema),
   });
+
+  const resend = () => {
+    const requestBody = {
+      channel: "sms",
+      payload: phoneNumber,
+    };
+    sendOTP(requestBody as any);
+  }
+
 
   const { mutate: reset, isLoading } = useApiPost(
     resetPasswordUrl,
@@ -43,7 +53,7 @@ const OtpVerification = () => {
       navigate("/login");
     },
     (e) => {
-      toast.error(`Something went wrong ${e}`, {
+      toast.error(`Something went wrong, ${e}`, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -53,6 +63,31 @@ const OtpVerification = () => {
         theme: "light",
       });
     }
+  );
+
+  const { mutate: sendOTP, isLoading: isSending } = useApiPost(
+    forgotpasswordUrl,
+    () => {
+      toast.success("Otp has been sent successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    },
+    (error: any) =>
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      })
   );
 
   const onSubmit = (data: any) => {
@@ -111,10 +146,15 @@ const OtpVerification = () => {
           containerStyle={"input_container"}
         />
 
-        <div>
-          <ButtonElement label="CONTINUE" type="submit" isLoading={isLoading} />
-          <Resend>Resend OTP</Resend>
-        </div>
+        <Holder>
+          <ButtonElement
+            label="CONTINUE"
+            type="submit"
+            isLoading={isLoading || isSending} />
+          <div onClick={resend}>
+            <Resend>Resend OTP</Resend>
+          </div>
+        </Holder>
       </Form>
     </Container>
   );
@@ -180,4 +220,13 @@ export const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+`;
+
+const Holder = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  div {
+    cursor: pointer;
+  }
 `;

@@ -46,6 +46,7 @@ const ForgotPassword = () => {
         theme: "light",
       })
   );
+
   const onSubmit = (data: any) => {
     const { phoneNumber } = data;
     const requestBody = {
@@ -54,6 +55,7 @@ const ForgotPassword = () => {
     };
     sendOTP(requestBody as any);
   };
+  
   return (
     <Container>
       <h3>Forgot Password?</h3>

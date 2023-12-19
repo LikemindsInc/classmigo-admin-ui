@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { QuestionCard } from "./Components/QuestionCard";
 import styled from "styled-components";
 import {
@@ -9,7 +9,6 @@ import {
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
 import {
   AddIcon,
-  CsvIcon,
   CsvIconPrimary,
 } from "../../../../../../../Assets/Svgs";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -81,9 +80,9 @@ export const ViewQuestions = () => {
       <h6>{item?.className}</h6>
       <h3>{dayjs(item?.startDateTime).format("MMMM D, YYYY")}</h3>
       <UtilsHolder>
-        <SearchContainer>
+        {/* <SearchContainer>
           <SearchInput />
-        </SearchContainer>
+        </SearchContainer> */}
         <ButtonHolders>
           <ButtonElement
             outline
@@ -156,6 +155,7 @@ export const ViewQuestions = () => {
             id="file"
             type="file"
             title="Upload file"
+            setValue={setValue}
           />
 
           <ButtonElement
@@ -170,6 +170,7 @@ export const ViewQuestions = () => {
 };
 
 const Container = styled.section`
+  overflow-x: hidden;
   h6 {
     font-size: 1rem;
   }
@@ -228,8 +229,9 @@ const SearchContainer = styled.div`
 `;
 
 const QuestionContainer = styled.section`
-  padding: 0 20%;
+  padding: 0 20% !important;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 `;

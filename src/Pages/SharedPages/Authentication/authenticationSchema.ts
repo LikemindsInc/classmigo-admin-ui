@@ -23,15 +23,20 @@ export const resetAdminPasswordSchema = yup.object().shape({
   password: yup.string().required("Password is required"),
 });
 
-
 export const forgotPasswordSchema = yup.object().shape({
-  phoneNumber: yup.string().required("Enter your phone number"),
+  phoneNumber: yup
+    .string()
+    .matches(
+      /^\+234\d{10}$/,
+      "Phone number must match the format +234XXXXXXXXXX"
+    )
+    .required("Enter your phone number"),
 });
 
 export const newPasswordSchema = yup.object().shape({
   password: yup.string().required("Enter a new password"),
-  confirmNewPassword: yup.string().oneOf(
-    [yup.ref("password"), null as any],
-    "Passwords must match"
-  ).required('Confirm your password'),
+  confirmNewPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), null as any], "Passwords must match")
+    .required("Confirm your password"),
 });
