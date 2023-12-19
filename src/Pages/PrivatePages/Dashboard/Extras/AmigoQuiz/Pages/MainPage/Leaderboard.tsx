@@ -25,6 +25,7 @@ interface DataType {
 export const QuizLeaderboard = () => {
   const [boardData, setBoardData] = useState<any>([]);
   const [winner, setWinner] = useState<string>("");
+  const [newState, setNewState] = useState<any>(null);
 
   const navigate = useNavigate();
 
@@ -33,6 +34,16 @@ export const QuizLeaderboard = () => {
   if (!state) {
     navigate("/amigo_quiz");
   }
+
+  useEffect(() => {
+    const storedState = sessionStorage.getItem("quizLeaderboardState");
+
+    if (storedState) {
+      const parsedState = JSON.parse(storedState);
+      setNewState(parsedState); 
+    }
+  }, []);
+
   const { data, isLoading, isInitialLoading, refetch } = useApiGet(
     ["lala"],
     () => getSingleLeaderboardUrl(state._id),
@@ -57,7 +68,6 @@ export const QuizLeaderboard = () => {
         }))
       );
       setWinner(() => data?.data?.winner?.student?._id);
-
     }
   }, [data?.data?.content, data]);
 

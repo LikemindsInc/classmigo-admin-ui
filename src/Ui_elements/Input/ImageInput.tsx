@@ -51,7 +51,8 @@ export const ImageInput = ({
   };
 
   const handleClearMedia = () => {
-    setValue(id, null);
+    console.log(id,"dsjkfdj")
+    setValue(id, "");
     setPreview("");
   };
 

@@ -7,10 +7,7 @@ import { toast } from "react-toastify";
 import styled from "styled-components";
 import { DrawerContext } from "../../../../../../../Contexts/Contexts";
 import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
-import {
-  Options,
-  SearchInput,
-} from "../../../../../../../Ui_elements";
+import { Options, SearchInput } from "../../../../../../../Ui_elements";
 import { TableElement } from "../../../../../../../Ui_elements/Table/Table";
 import {
   blockReferalsUrl,
@@ -49,7 +46,7 @@ export const ReferalTable = () => {
   });
   const [refFilter, setRefFilter] = useState<any>({
     startDate: null,
-    endDate:null,
+    endDate: null,
     page: 0,
     pageSize: 10,
     state: null,
@@ -125,11 +122,13 @@ export const ReferalTable = () => {
     isError,
     refetch: fetchData,
   } = useApiGet(
-    [generateQueryKey("ref-user", refFilter) ],
-    () => getUserReferalsUrl(code, refFilter), {
-    refetchOnWindowFocus: false,
-    enabled: !!code,
-  });
+    [generateQueryKey("ref-user", refFilter)],
+    () => getUserReferalsUrl(code, refFilter),
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!code,
+    }
+  );
 
   const { mutate: block } = useApiPost(
     () => blockReferalsUrl(code),
@@ -330,9 +329,8 @@ export const ReferalTable = () => {
               isFetchingRefs={isFetchingRefs}
               isLoadingRefs={isLoadingRefs}
               isActive={isActive}
-                fetchData={fetchData}
-  
-                setRefFilter={setRefFilter}
+              fetchData={fetchData}
+              setRefFilter={setRefFilter}
               setSearchFilter={setSearchFilter}
               searchFilter={searchFilter}
               setUser={setUser}

@@ -147,13 +147,6 @@ export const ViewAgent = () => {
       theme: "light",
     });
 
-    setValue("fullName", "");
-    setValue("phoneNumber", "");
-    setValue("email", "");
-    setValue("password", "");
-    setValue("country", null as any);
-    setValue("state", null as any);
-    setValue("lga", null as any);
   };
 
   const { mutate: createAgents, isLoading: isCreatingAgent } = useApiPost(

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import {
   ButtonElement,
-  SearchInput,
+  ImageInput,
   SelectInput,
 } from "../../../../../Ui_elements";
 import { AddIcon, CsvIcon, UploadTick } from "../../../../../Assets/Svgs";
@@ -11,14 +11,23 @@ import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 import { QuestionCard } from "./Components/QuestionCard";
 import { useNavigate } from "react-router-dom";
-import { getAllClassesUrl, getAllQuizUrl } from "../../../../../Urls";
-import { useApiGet } from "../../../../../custom-hooks";
-import { formatOptions, generateQueryKey } from "../../../../../utils/utilFns";
+import { getAllClassesUrl } from "../../../../../Urls";
+import { useApiGet, useApiPost } from "../../../../../custom-hooks";
+import {
+  downloadGeneralTemplate,
+  formatOptions,
+  generateQueryKey,
+} from "../../../../../utils/utilFns";
 import { Controller, useForm } from "react-hook-form";
 import { debounce } from "lodash";
-import { getGeneralQuestions } from "../../../../../Urls/GeneralKnowledge";
+import {
+  generalKnowledgeBulkUpload,
+  getGeneralQuestions,
+} from "../../../../../Urls/GeneralKnowledge";
 import noData from "../../../../../Assets/noData.png";
+
 import { Skeleton } from "@mui/material";
+import { toast } from "react-toastify";
 
 type Filter = {
   search: string;
@@ -28,6 +37,7 @@ type Filter = {
 const GeneralKnowledge = () => {
   const { setOpenModal } = useContext(ModalContext);
   const [questions, setQuestions] = useState<any>();
+  const [openModalUpload, setOpenModalUpload] = useState(false);
 
   const { control, watch } = useForm();
   const [searchFilter, setSearchFilter] = useState<Filter>({
@@ -41,6 +51,8 @@ const GeneralKnowledge = () => {
       search: value,
     }));
   }, 1500);
+
+  const { register, setValue, handleSubmit } = useForm();
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -64,6 +76,56 @@ const GeneralKnowledge = () => {
       enabled: true,
     }
   );
+
+  const { mutate: updateQuestion, isLoading: updateLoading } = useApiPost(
+    generalKnowledgeBulkUpload,
+    () => {
+      toast.success("Successfully added question", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      fetchQuiz();
+      setOpenModalUpload(false);
+    },
+
+    (e: any) =>
+      toast.error(`Something went wrong while adding question ${e}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      })
+  );
+
+  // const onSubmit = (data: any) => {
+  //   const formData = new FormData();
+  //   formData.append("file", data.file);
+  //   console.log(formData)
+  //   updateQuestion(formData as any);
+  //   setOpenModal(false);
+  // };
+
+  const onSubmit = (data: any) => {
+    const formData: any = new FormData();
+    formData.append("file", data.file);
+
+    // Iterate through the FormData entries to see its content
+    for (const entry of formData.entries()) {
+      console.log(entry);
+    }
+
+    // Pass formData to updateQuestion function
+    updateQuestion(formData as any);
+    // setOpenModal(false);
+  };
 
   const activeClasses = classes?.data?.filter((item: any) => item.isActive);
   const allClasses = useMemo(
@@ -130,7 +192,7 @@ const GeneralKnowledge = () => {
             icon={<CsvIcon />}
             label="Upload CSV"
             // width={200}
-            onClick={() => setOpenModal(true)}
+            onClick={() => setOpenModalUpload(true)}
           />
           <ButtonElement
             icon={<AddIcon />}
@@ -139,7 +201,12 @@ const GeneralKnowledge = () => {
             onClick={() => navigate("/general_knowledge/add_question")}
           />
         </div>
-        <ButtonElement outline={true} label="Download CSV Format" width={250} />
+        <ButtonElement
+          outline={true}
+          label="Download CSV Format"
+          width={250}
+          onClick={downloadGeneralTemplate}
+        />
       </UtilsHolder>
 
       <QuestionsContainer>
@@ -191,6 +258,32 @@ const GeneralKnowledge = () => {
           />
         </ModalContent>
       </Modal>
+
+      <ModalUpload
+        openState={openModalUpload}
+        cancel={() => {
+          setValue("file", null);
+          setOpenModalUpload(false);
+        }}
+        width={"35%"}
+      >
+        <ModalContent2 onSubmit={handleSubmit(onSubmit)}>
+          <h5>Upload question file</h5>
+          <ImageInput
+            register={register}
+            setValue={setValue}
+            id="file"
+            type="file"
+            title="Upload file"
+          />
+
+          <ButtonElement
+            type="submit"
+            isLoading={updateLoading}
+            label="Upload questions"
+          />
+        </ModalContent2>
+      </ModalUpload>
     </Container>
   );
 };
@@ -212,6 +305,8 @@ const Container = styled.div`
     padding: 0 1rem 1rem 1rem;
   }
 `;
+
+const ModalUpload = styled(CenteredDialog)``;
 
 const UtilsHolder = styled.div`
   display: flex;
@@ -258,6 +353,18 @@ const ModalContent = styled.div`
 
   p {
     font-weight: 600;
+  }
+`;
+
+const ModalContent2 = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20%;
+  height: 300px;
+  @media ${devices.tablet} {
+    width: 100px;
   }
 `;
 

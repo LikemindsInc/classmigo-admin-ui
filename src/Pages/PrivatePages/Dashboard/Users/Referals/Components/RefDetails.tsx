@@ -28,6 +28,7 @@ export const RefDetails = ({
     fontWeight: 700,
   };
 
+  console.log(refData, "refData");
   interface DataType {
     key: string;
     code: string;
@@ -176,6 +177,13 @@ export const RefDetails = ({
                 <CancelIcon onClick={handleClearEndDate}>&#8855;</CancelIcon>
               )}
             </SelectContainer>
+
+            {refData?.content && (
+              <h6>
+                {refData?.content.length}{" "}
+                {refData?.content.length > 1 ? "Results" : "Result"}
+              </h6>
+            )}
           </SelectHolder>
 
           <div>
@@ -185,14 +193,11 @@ export const RefDetails = ({
               columns={updatedColumnns}
               pagination
               paginationData={refData?.data?.pagination}
-              // fetchFunction={() => getUserReferalsUrl(code)}
-              // fetchAction={fetchData}
               setSearchFilter={setSearchFilter}
               searchFilter={searchFilter}
               setUser={setUser}
               setUserId={setCode}
               setIsActive={setIsActive}
-              //   paginationData={pagination}
             />
           </div>
         </div>
@@ -286,16 +291,19 @@ const SelectContainer = styled.div`
   display: flex;
   align-items: center !important;
   gap: 10px;
-  label{
+  label {
     margin-top: 10px !important;
   }
 `;
 
 const SelectHolder = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   width: 100%;
+  h2 {
+    margin-bottom: 10px;
+  }
 `;
 
 const CancelIcon = styled.div`
