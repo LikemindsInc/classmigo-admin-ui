@@ -87,10 +87,10 @@ export const MainPage = ({ classOptions, isLoadingClassOptions }: MainProp) => {
               width={"100%"}
               height={118}
             />
-          ) : quizes.some((item: any) => !item?.isPast) ? (
+          ) : quizes.some((item: any) => !item?.isPast && !item?.isDeleted) ? (
             <CardContainer>
               {quizes.map((el: any) => {
-                if (!el?.isPast) {
+                if (!el?.isPast && !el?.isDeleted) {
                   return (
                     <QuizCard
                       item={el}

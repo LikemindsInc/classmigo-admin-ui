@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
 
 export const formatUrlName = (url: string): string => {
   const removePercentage = url.replace(/%20/g, " ");
@@ -205,8 +206,40 @@ export const downloadTemplate = () => {
   document.body.removeChild(element);
 };
 
+// export const downloadGeneralTemplate = () => {
+//   const csvData = [
+//     ` QUESTION, EXPLANATION, OPTION1_LABEL, OPTION1_VALUE, OPTION2_LABEL, OPTION2_VALUE, OPTION3_LABEL, OPTION_3_VALUE, OPTION4_LABEL, OPTION_4_VALUE, CORRECT_OPTION, SCORE, IMAGE_LINK, CLASS, SUBJECT`,
+//   ];
 
-export const downloadGeneralTemplate = () => {
+//   const element = document.createElement("a");
+//   const file = new Blob([csvData as any], { type: "text/csv" });
+//   element.href = URL.createObjectURL(file);
+//   element.download = "template.csv";
+//   document.body.appendChild(element);
+//   element.click();
+//   document.body.removeChild(element);
+// };
+
+const downloadFile = (element: any) => {
+  return new Promise<void>((resolve, reject) => {
+    // Append the element to the body before clicking to ensure browser compatibility
+    document.body.appendChild(element);
+
+    element.click();
+
+    // Listen for the download completion
+    element.addEventListener("load", () => {
+      resolve();
+    });
+
+    // Handle errors during the download
+    element.addEventListener("error", (error: Error) => {
+      reject(error);
+    });
+  });
+};
+
+export const downloadGeneralTemplate = async () => {
   const csvData = [
     ` QUESTION, EXPLANATION, OPTION1_LABEL, OPTION1_VALUE, OPTION2_LABEL, OPTION2_VALUE, OPTION3_LABEL, OPTION_3_VALUE, OPTION4_LABEL, OPTION_4_VALUE, CORRECT_OPTION, SCORE, IMAGE_LINK, CLASS, SUBJECT`,
   ];
@@ -215,8 +248,36 @@ export const downloadGeneralTemplate = () => {
   const file = new Blob([csvData as any], { type: "text/csv" });
   element.href = URL.createObjectURL(file);
   element.download = "template.csv";
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
-};
+
+  try {
+    await downloadFile(element);
+    // If this block is reached, it means the download was successful
+    toast.success("Download successful", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: "light",
+    });
+  } catch (error) {
+    toast.error(
+      "Something went wrong while trying to download. Consider switching browsers to see if that helps",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      }
+    );
+    // Handle the error as needed (e.g., show a message to the user)
+  } finally {
+    document.body.removeChild(element);
+  }
+}
+
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect, forwardRef } from "react";
 import styled from "styled-components";
 import { ErrorIcon, FileIcon, UploadIcon } from "../../Assets/Svgs";
 import { devices } from "../../utils/mediaQueryBreakPoints";
@@ -13,21 +13,25 @@ interface ImageInputProps {
   id?: string;
   error?: any;
   setValue?: any;
+  clearItem?: any;
+  onChange?: any;
   defaultImage?: string;
 }
 
-export const ImageInput = ({
+export const ImageInput = forwardRef(({
   title,
   type,
   register,
   id,
+  clearItem,
+  onChange,
   error,
   setValue,
   defaultImage,
-}: ImageInputProps) => {
+}: ImageInputProps,ref) => {
   const fileInputRef = useRef<any>(null);
   const [preview, setPreview] = useState(defaultImage || "");
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState<String | null>("");
 
   const handleInputChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -42,6 +46,7 @@ export const ImageInput = ({
         });
       }
     }
+    onChange && onChange(event);
   };
 
   const handleUploadButtonClick = () => {
@@ -51,9 +56,9 @@ export const ImageInput = ({
   };
 
   const handleClearMedia = () => {
-    console.log(id,"dsjkfdj")
     setValue(id, "");
     setPreview("");
+    setFileName(null);
   };
 
   return (
@@ -67,7 +72,7 @@ export const ImageInput = ({
               : type === "video"
               ? "video/*"
               : type === "file"
-              ? (".csv" || ".numbers")
+              ? ".csv" || ".numbers"
               : ""
           }
           ref={fileInputRef}
@@ -100,7 +105,7 @@ export const ImageInput = ({
       {!!preview && <ButtonElement onClick={handleClearMedia} label="Remove" />}
     </OuterWrapper>
   );
-};
+})
 
 const Container = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.1);

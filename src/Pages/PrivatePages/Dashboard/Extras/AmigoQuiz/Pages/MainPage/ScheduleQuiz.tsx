@@ -8,7 +8,6 @@ import {
   SelectInput,
 } from "../../../../../../../Ui_elements";
 import { DateTimePickerElement } from "../../../../../../../Ui_elements/Input/dateTimePicker";
-import { CsvIconPrimary } from "../../../../../../../Assets/Svgs";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { scheduleQuizSchema } from "./MainPageSchema";
 import { useApiGet, useApiPost } from "../../../../../../../custom-hooks";
@@ -22,9 +21,6 @@ import { AxiosError } from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatOptions } from "../../../../../../../utils/utilFns";
 import { devices } from "../../../../../../../utils/mediaQueryBreakPoints";
-
-
-
 
 export const ScheduleQuiz = () => {
   const { state } = useLocation();
@@ -114,9 +110,8 @@ export const ScheduleQuiz = () => {
   };
 
   if (isLoadingClassOptions) {
-    return <Loader/>
+    return <Loader />;
   }
-
 
   return (
     <Container onSubmit={handleSubmit(onSubmit)}>
@@ -127,7 +122,7 @@ export const ScheduleQuiz = () => {
           render={({ field }) => (
             <SelectInput
               {...field}
-              options={allClasses}
+              options={allClasses ? allClasses : []}
               defaultValue={"Select a class"}
               error={errors?.class}
               isLoading={isLoadingClassOptions}
@@ -147,11 +142,19 @@ export const ScheduleQuiz = () => {
       </InputHolder>
 
       <InputHolder>
-        <DateTimePickerElement
-          id="date"
-          setValue={setValue}
-          error={errors?.date}
-          defaultValue={state ? new Date(state?.item?.startDateTime) : null}
+        <Controller
+          name="date"
+          control={control}
+          render={({ field: { onChange, ...fieldProps } }) => (
+            <DateTimePickerElement
+              {...fieldProps}
+              onChange={onChange}
+              id="date"
+              setValue={setValue}
+              error={errors?.date}
+              defaultValue={state ? new Date(state?.item?.startDateTime) : null}
+            />
+          )}
         />
       </InputHolder>
 
@@ -184,8 +187,8 @@ const InputHolder = styled.div`
   & > button {
     width: 100%;
   }
-  @media ${devices.tabletL}{
-    width:100%;
-    margin-bottom:10%;
+  @media ${devices.tabletL} {
+    width: 100%;
+    margin-bottom: 10%;
   }
 `;
