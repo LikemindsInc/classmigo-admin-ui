@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { UploadTick } from "../../../../../../Assets/Svgs";
@@ -19,10 +19,7 @@ import {
   getAllSubjectsUrl,
 } from "../../../../../../Urls";
 import { devices } from "../../../../../../utils/mediaQueryBreakPoints";
-import {
-  customPost,
-  formatOptions,
-} from "../../../../../../utils/utilFns";
+import { customPost, formatOptions } from "../../../../../../utils/utilFns";
 import { OptionsCard } from "../Components/OptionsCard";
 import { addGeneralQuestionSchema } from "../GeneralQuizLibrarySchema";
 import { useNavigate } from "react-router-dom";
@@ -36,22 +33,45 @@ const AddQuestion = () => {
   const [classValue, setClassValue] = useState<any>(null);
   const [subjectValue, setSubjectValue] = useState<any>(null);
 
-  const { setOpenModal } = useContext(ModalContext);
-  const navigate = useNavigate();
-  const handleCancel = () => {
-    setOpenModal(false);
-  };
-
   const {
     register,
     handleSubmit,
     getValues,
+    watch,
     setValue,
     control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(addGeneralQuestionSchema),
+    defaultValues: {
+      class: sessionStorage.getItem("class")
+        ? JSON.parse(sessionStorage.getItem("class")!)?.label
+        : "",
+      topic: sessionStorage.getItem("topic")
+        ? JSON.parse(sessionStorage.getItem("topic")!)?.label
+        : null,
+      subject: sessionStorage.getItem("subject")
+        ? JSON.parse(sessionStorage.getItem("subject")!)?.label
+        : null,
+
+      difficulty: sessionStorage.getItem("difficulty")
+        ? JSON.parse(sessionStorage.getItem("difficulty")!)?.label
+        : null,
+    },
   });
+
+  let watchClass: any = watch("class");
+  let watchSubject: any = watch("subject");
+  let watchTopic: any = watch("topic");
+  let watchDifficulty: any = watch("difficulty");
+
+  console.log(watchClass, watchSubject, watchTopic, watchDifficulty);
+
+  const { setOpenModal } = useContext(ModalContext);
+  const navigate = useNavigate();
+  const handleCancel = () => {
+    setOpenModal(false);
+  };
 
   const difficulties = [
     {
@@ -68,7 +88,6 @@ const AddQuestion = () => {
     },
   ];
 
-
   const { data: classes, isFetching: isLoadingClasses } = useApiGet(
     ["allClasses"],
     () => getAllClassesUrl(),
@@ -81,48 +100,70 @@ const AddQuestion = () => {
   const {
     data: subjects,
     isFetching: isLoadingSubjects,
+    refetch: fetchSubject,
   } = useApiGet(
     ["allSubjects"],
-    () => getAllSubjectsUrl(classValue && classValue),
+    () =>
+      getAllSubjectsUrl(
+        watchClass?.value || JSON.parse(sessionStorage.getItem("class")!)?.value
+      ),
     {
       refetchOnWindowFocus: false,
-      enabled: !!classValue,
+      enabled: !!watchClass,
+      cacheTime: 0,
+      staleTime: 0,
     }
   );
 
   const {
     data: topics,
     isFetching: isLoadingTopics,
+    refetch: fetchTopic,
   } = useApiGet(
     ["lessonTopic"],
-    () => getAllLessonsUrl(subjectValue && subjectValue?.label),
+    () =>
+      getAllLessonsUrl(
+        watchSubject?.label ||
+          JSON.parse(sessionStorage.getItem("class")!)?.label,
+        watchClass?.value || JSON.parse(sessionStorage.getItem("class")!)?.value
+      ),
     {
       refetchOnWindowFocus: false,
-      enabled: !!subjectValue,
+      enabled: !!watchSubject,
+      cacheTime: 0,
       staleTime: 0,
+      retry: false,
     }
   );
 
-  const activeClasses = classes?.data?.filter((item: any) => item.isActive);
-  const activeSubjects = subjects?.data?.subjects.filter(
-    (item: any) => item.isActive
-  );
-  const activeTopics = topics?.data?.content.filter(
-    (item: any) => item.isActive
+  const activeClasses = useMemo(
+    () => classes?.data?.filter((item: any) => item.isActive) ?? [],
+    [classes]
   );
 
-  const allClasses = useMemo(
+  const activeSubjects = useMemo(
+    () => subjects?.data?.subjects?.filter((item: any) => item.isActive) ?? [],
+    [subjects]
+  );
+  const activeTopics = useMemo(
+    () => topics?.data?.content?.filter((item: any) => item.isActive) ?? [],
+    [topics]
+  );
+
+  var allClasses = useMemo(
     () => formatOptions(activeClasses, "value", "name"),
     [activeClasses]
   );
 
-  const allSubjects = useMemo(() => {
-    return formatOptions(activeSubjects, "name", "_id");
-  }, [activeSubjects]);
+  var allSubjects = useMemo(
+    () => formatOptions(activeSubjects, "name", "_id"),
+    [activeSubjects]
+  );
 
-  const allTopics = useMemo(() => {
-    return formatOptions(activeTopics, "lessonName", "_id");
-  }, [activeTopics]);
+  var allTopics = useMemo(
+    () => formatOptions(activeTopics, "lessonName", "_id"),
+    [activeTopics]
+  );
 
   const onSuccess = () => {
     toast.success("Successfully added question", {
@@ -149,6 +190,20 @@ const AddQuestion = () => {
     });
   };
 
+  useEffect(() => {
+    if (watchClass) {
+      setValue("subject", "");
+      setValue("topic", "");
+      fetchSubject();
+    }
+  }, [watchClass, fetchSubject, setValue]);
+
+  useEffect(() => {
+    if (watchSubject) {
+      fetchTopic();
+    }
+  }, [watchSubject]);
+
   const { mutate: addQuestion, isLoading: isAddingQuestion } = useApiPost(
     addGeneralKnowledgeUrl,
     onSuccess,
@@ -169,10 +224,18 @@ const AddQuestion = () => {
           setIsUploadingImage(false);
         }
         const requestBody: any = {
-          subjectId: subjectValue?.value,
-          class: classValue,
-          lessonId: data?.topic?.value,
-          difficultyLevel: data?.difficulty?.label,
+          subjectId:
+            data.subject.value ||
+            JSON.parse(sessionStorage.getItem("subject")!)?.value,
+          class:
+            data.class.value ||
+            JSON.parse(sessionStorage.getItem("class")!)?.value,
+          lessonId:
+            data.topic.value ||
+            JSON.parse(sessionStorage.getItem("topic")!)?.value,
+          difficultyLevel:
+            data.difficulty.label ||
+            JSON.parse(sessionStorage.getItem("difficulty")!)?.label,
           question: data.question,
           imageUrl: response?.data?.data?.url,
           explanation: data?.explanation,
@@ -189,10 +252,18 @@ const AddQuestion = () => {
       }
     } else {
       const requestBody: any = {
-        subjectId: subjectValue?.value,
-        class: classValue,
-        lessonId: data?.topic?.value,
-        difficultyLevel: data?.difficulty?.label,
+        subjectId:
+          data.subject.value ||
+          JSON.parse(sessionStorage.getItem("subject")!)?.value,
+        class:
+          data.class.value ||
+          JSON.parse(sessionStorage.getItem("class")!)?.value,
+        lessonId:
+          data.topic.value ||
+          JSON.parse(sessionStorage.getItem("topic")!)?.value,
+        difficultyLevel:
+          data.difficulty.label ||
+          JSON.parse(sessionStorage.getItem("difficulty")!)?.label,
         question: data.question,
         explanation: data?.explanation,
         options: options.map((label) => ({
@@ -210,67 +281,87 @@ const AddQuestion = () => {
     <>
       <Container onSubmit={handleSubmit(onSubmit)}>
         <SelectHolder>
-          <Controller
-            name="class"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <SelectContainer>
-                <SelectInput
-                  // value={value}
-                  options={allClasses}
-                  defaultValue={"Select Class"}
-                  onChange={(value: any) => {
-                    setClassValue(value?.value);
-                    setValue("class", value?.value)
-                  }}
-                  error={errors?.class}
-                  isLoading={isLoadingClasses}
-                />
-              </SelectContainer>
-            )}
-          />
-          <Controller
-            name="subject"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <SelectContainer>
-                <SelectInput
-                  // value={value}
-                  options={allSubjects}
-                  defaultValue={"Select Subject"}
-                  onChange={(value: any) => {
-                    setSubjectValue(value);
-                    setValue("subject", value?.value)
-                  }}
-                  error={errors?.subject}
-                  isLoading={isLoadingSubjects}
-                />
-              </SelectContainer>
-            )}
-          />
-          <Controller
-            name="topic"
-            control={control}
-            render={({ field }) => (
-              <SelectContainer>
-                <SelectInput
-                  {...field}
-                  options={allTopics}
-                  defaultValue={"Select Topic"}
-                  error={errors?.topic}
-                  isLoading={isLoadingTopics}
-                />
-              </SelectContainer>
-            )}
-          />
+          {
+            <Controller
+              name="class"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <SelectContainer>
+                  <SelectInput
+                    {...restField}
+                    options={allClasses}
+                    defaultValue={"Select Class"}
+                    onChange={(value: any) => {
+                      // setClassValue(value?.value);
+                      sessionStorage.setItem("class", JSON.stringify(value));
+                      onChange(value);
+                      // fetchSubject()
+                    }}
+                    error={errors?.class}
+                    isLoading={isLoadingClasses}
+                  />
+                </SelectContainer>
+              )}
+            />
+          }
+
+          {allSubjects && (
+            <Controller
+              name="subject"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <SelectContainer>
+                  <SelectInput
+                    {...restField}
+                    options={allSubjects ?? []}
+                    defaultValue={"Select Subject"}
+                    onChange={(value: any) => {
+                      // setSubjectValue(value?.value);
+                      sessionStorage.setItem("subject", JSON.stringify(value));
+                      onChange(value);
+                      // fetchTopic()
+                    }}
+                    error={errors?.subject}
+                    isLoading={isLoadingSubjects}
+                  />
+                </SelectContainer>
+              )}
+            />
+          )}
+
+          {allTopics && (
+            <Controller
+              name="topic"
+              control={control}
+              render={({ field: { onChange, ...restField } }) => (
+                <SelectContainer>
+                  <SelectInput
+                    {...restField}
+                    onChange={(value) => {
+                      sessionStorage.setItem("topic", JSON.stringify(value));
+                      onChange(value);
+                    }}
+                    options={allTopics ?? []}
+                    defaultValue={"Select Topic"}
+                    error={errors?.topic}
+                    isLoading={isLoadingTopics}
+                  />
+                </SelectContainer>
+              )}
+            />
+          )}
 
           <Controller
             name="difficulty"
             control={control}
-            render={({ field }) => (
+            render={({ field: { onChange, ...restField } }) => (
               <SelectContainer>
                 <SelectInput
-                  {...field}
+                  {...restField}
+                  onChange={(value) => {
+                    sessionStorage.setItem("difficulty", JSON.stringify(value));
+                    onChange(value);
+                  }}
                   options={difficulties}
                   defaultValue={"Select Difficulty"}
                   error={errors?.difficulty}
@@ -353,7 +444,6 @@ const AddQuestion = () => {
           />
         </ModalContent>
       </Modal>
-      ;
     </>
   );
 };

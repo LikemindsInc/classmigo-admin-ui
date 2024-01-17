@@ -42,7 +42,7 @@ const VideoLibrary = () => {
 
   const {
     data: classes,
-    isLoading: isLoadingClasses,
+    isLoading: isLoadingClasses, 
     isFetching: isFetchingClasses,
   } = useApiGet(["allClasses"], () => getAllClassesUrl(), {
     refetchOnWindowFocus: false,
@@ -59,6 +59,7 @@ const VideoLibrary = () => {
     cacheTime: 0,
     staleTime: 0,
   });
+  
   const {
     data: topics,
     // isLoading: isLoadingTopics,

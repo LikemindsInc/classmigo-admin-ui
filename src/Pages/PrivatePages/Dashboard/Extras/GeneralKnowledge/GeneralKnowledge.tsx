@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState, useRef } from "react";
 import styled from "styled-components";
 import { devices } from "../../../../../utils/mediaQueryBreakPoints";
 import {
@@ -25,19 +25,24 @@ import {
   getGeneralQuestions,
 } from "../../../../../Urls/GeneralKnowledge";
 import noData from "../../../../../Assets/noData.png";
-
+import * as yup from "yup";
 import { Skeleton } from "@mui/material";
 import { toast } from "react-toastify";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type Filter = {
   search: string;
   className: string;
 };
 
+const schema = yup.object().shape({
+  file: yup.mixed().required("Please add a file"),
+});
 const GeneralKnowledge = () => {
   const { setOpenModal } = useContext(ModalContext);
   const [questions, setQuestions] = useState<any>();
   const [openModalUpload, setOpenModalUpload] = useState(false);
+  const fileRef = useRef(null);
 
   const { control, watch } = useForm();
   const [searchFilter, setSearchFilter] = useState<Filter>({
@@ -52,7 +57,14 @@ const GeneralKnowledge = () => {
     }));
   }, 1500);
 
-  const { register, setValue, handleSubmit } = useForm();
+  const {
+    register,
+    setValue,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   const { data: classes, isLoading: isLoadingClasses } = useApiGet(
     ["allClasses"],
@@ -262,7 +274,7 @@ const GeneralKnowledge = () => {
       <ModalUpload
         openState={openModalUpload}
         cancel={() => {
-          setValue("file", null);
+          setValue("file", null as any);
           setOpenModalUpload(false);
         }}
         width={"35%"}
@@ -270,8 +282,10 @@ const GeneralKnowledge = () => {
         <ModalContent2 onSubmit={handleSubmit(onSubmit)}>
           <h5>Upload question file</h5>
           <ImageInput
+            error={errors.file}
             register={register}
             setValue={setValue}
+            // clearItem={clearUpload}
             id="file"
             type="file"
             title="Upload file"

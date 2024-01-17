@@ -13,20 +13,26 @@ interface Props {
   setValue: any;
   error?: any;
   defaultValue?: any;
+  onChange?: any;
 }
 export const DateTimePickerElement = ({
   id,
   setValue,
+  onChange,
   error,
   defaultValue,
 }: Props) => {
+  const currentDay = dayjs(new Date());
+  const currentTime = dayjs(new Date().getTime());
+
   return (
     <Container>
       <Picker
         label="Enter time and date-"
-        onChange={(newValue) => {
-          setValue(id, newValue);
-        }}
+        onChange={onChange}
+        // onChange={(newValue) => {
+        //   setValue(id, newValue);
+        // }}
         sx={{
           width: "100%",
           "& .MuiInputLabel-root.Mui-focused": {
@@ -54,8 +60,8 @@ export const DateTimePickerElement = ({
             backgroundColor: "var(--primary-color)",
           },
         }}
-        minDate={dayjs(new Date())}
-        minTime={dayjs(new Date().getTime())}
+        minDate={currentDay}
+        minTime={currentDay ? currentTime : undefined}
         defaultValue={defaultValue ? dayjs(defaultValue) : null}
       />
       {error ? (

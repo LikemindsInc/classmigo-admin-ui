@@ -169,7 +169,7 @@ const LiveSessionsForm = () => {
       subject: data?.subject?.value,
       class: data?.class?.value,
       note: data?.note,
-      date: data?.date,
+      date: data?.date, 
       liveUrl: data?.liveUrl,
       title: data?.title,
       durationInMinutes: data?.durationInMinutes,

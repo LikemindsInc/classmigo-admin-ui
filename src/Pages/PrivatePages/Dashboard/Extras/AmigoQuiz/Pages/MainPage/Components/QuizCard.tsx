@@ -30,7 +30,7 @@ export const QuizCard = ({ isPast, dateTime, item }: Props) => {
   };
 
   const success = () => {
-    toast.success("Successfully Scheduled Quiz", {
+    toast.success("Successfully Deleted Quiz", {
       position: "top-right",
       autoClose: 3000,
       hideProgressBar: false,
