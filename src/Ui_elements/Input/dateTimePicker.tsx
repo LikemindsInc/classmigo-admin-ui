@@ -61,7 +61,6 @@ export const DateTimePickerElement = ({
           },
         }}
         minDate={currentDay}
-        minTime={currentDay ? currentTime : undefined}
         defaultValue={defaultValue ? dayjs(defaultValue) : null}
       />
       {error ? (
