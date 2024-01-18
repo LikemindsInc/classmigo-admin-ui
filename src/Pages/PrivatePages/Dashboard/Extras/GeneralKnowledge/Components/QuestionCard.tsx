@@ -275,6 +275,12 @@ const Delete = styled(DeleteOutlined)`
 
 const Modal = styled(CenteredDialog)``;
 const ModalContent = styled.div`
+  >div{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
   img {
     width: 100%;
     height: auto;
