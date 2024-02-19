@@ -146,7 +146,6 @@ const Students = () => {
     toggleStudent(requestBody);
   };
 
-
   useEffect(() => {
     setOpenDrawer(false);
   }, [setOpenDrawer]);
@@ -272,6 +271,7 @@ const Students = () => {
           subscription: item.subcription,
           parent: item.parent,
           image: item.image,
+          createdAt: item.createdAt,
         }))
       );
     }
@@ -310,6 +310,14 @@ const Students = () => {
       dataIndex: "status",
       key: "status",
       ellipsis: true,
+    },
+    {
+      title: "Date of Registration",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (data: any) => {
+        return moment(data).format("DD/MM/YYYY hh:mm a");
+      },
     },
     {
       title: "SUBSCRIPTION",
@@ -409,9 +417,7 @@ const Students = () => {
     <Container>
       <UtilsHolder>
         <div>
-          <SearchInput
-            onSearch={handleSearchFilter}
-          />
+          <SearchInput onSearch={handleSearchFilter} />
           <Controller
             name="className"
             control={control}

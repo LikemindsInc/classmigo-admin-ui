@@ -24,12 +24,13 @@ import { toast } from "react-toastify";
 import { debounce } from "lodash";
 import { generateQueryKey } from "../../../../../utils/utilFns";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
+import moment from "moment";
 
 const Parents = () => {
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
   const [parent, setParent] = useState<any>([]);
   const [user, setUser] = useState<DataType | null>(null);
-  const [studentToUnlink, setStudentToUnlink] = useState("")
+  const [studentToUnlink, setStudentToUnlink] = useState("");
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
   const [openModal, setOpenModal] = useState(false);
@@ -86,6 +87,14 @@ const Parents = () => {
       title: "STATUS",
       dataIndex: "status",
       key: "status",
+    },
+    {
+      title: "Date of Registration",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (data: any) => {
+        return moment(data).format("DD/MM/YYYY hh:mm a");
+      },
     },
     {
       title: "",
@@ -168,11 +177,7 @@ const Parents = () => {
 
   const { mutate: unlink, isLoading: isUnlinkingParent } = useApiPost(
     user?.dependents
-      ? () =>
-          unlinkStudentUrl(
-            studentToUnlink,
-            user?.key
-          )
+      ? () => unlinkStudentUrl(studentToUnlink, user?.key)
       : null,
     () => {
       toast.success(`Successfully unlinked`, {
@@ -184,8 +189,8 @@ const Parents = () => {
         draggable: true,
         theme: "light",
       });
-      setOpenModal(false)
-      setOpenDrawer(false)
+      setOpenModal(false);
+      setOpenDrawer(false);
     },
     (e) => {
       toast.error(`Something went wrong, couldn't unlink, ${e}`, {
@@ -211,6 +216,7 @@ const Parents = () => {
         status: item.isActive ? "Active" : "Inactive",
         dependents: item.dependents,
         isActive: item.isActive,
+        createdAt: item.createdAt,
       }));
       setParent(newData);
     }
@@ -226,16 +232,16 @@ const Parents = () => {
 
     switch (column.dataIndex) {
       case "name":
-        updatedColumn.width = "25%";
+        updatedColumn.width = "20%";
         break;
       case "phoneNumber":
-        updatedColumn.width = "25%";
+        updatedColumn.width = "15%";
         break;
       case "status":
-        updatedColumn.width = "25%";
+        updatedColumn.width = "10%";
         break;
       case "email":
-        updatedColumn.width = "25%";
+        updatedColumn.width = "20%";
         break;
 
       default:
@@ -329,8 +335,8 @@ const Parents = () => {
                       width={84}
                       label={"Unlink"}
                       onClick={() => {
-                        setStudentToUnlink(item?._id)
-                        confirmUnlink()
+                        setStudentToUnlink(item?._id);
+                        confirmUnlink();
                       }}
                     />
                   </div>
@@ -360,7 +366,7 @@ const Parents = () => {
             <ButtonElement
               label="Unlink"
               onClick={() => {
-                unlink()
+                unlink();
               }}
               isLoading={isUnlinkingParent}
             />
