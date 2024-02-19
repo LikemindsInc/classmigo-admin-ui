@@ -6,10 +6,10 @@ interface TableProps {
   data: any;
   paginationData: any;
   loading: boolean;
-  searchFilter: any
-  setSearchFilter:any
+  searchFilter: any;
+  setSearchFilter: any;
   fetchFunction?: () => void;
-  fetchAction?:()=>void
+  fetchAction?: () => void;
 }
 
 export const TableElement = ({
@@ -20,33 +20,30 @@ export const TableElement = ({
   fetchFunction,
   searchFilter,
   setSearchFilter,
-  fetchAction
+  fetchAction,
 }: TableProps | any) => {
   const [pagination, setPagination] = useState<any>();
-
 
   useEffect(() => {
     if (paginationData) {
       setPagination({
-        current: paginationData?.page + 1 ,
+        current: paginationData?.page + 1,
         pageSize: paginationData?.size,
-        total: paginationData?.numberOfPages
+        total: paginationData?.numberOfPages,
       });
     }
   }, [paginationData]);
 
-
   const handlePagination = (page: number) => {
     setPagination((prev: any) => ({
       ...prev,
-      current: page
-    }))
-    setSearchFilter((prev: any) => (
-      {
-        ...prev,
-        page: page - 1 ,
-        pageSize: pagination?.pageSize
-      }));
+      current: page,
+    }));
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      page: page - 1,
+      pageSize: pagination?.pageSize,
+    }));
   };
 
   useEffect(() => {
@@ -54,19 +51,21 @@ export const TableElement = ({
       fetchAction();
       fetchFunction(searchFilter);
     }
-  },[fetchAction, fetchFunction, searchFilter])
+  }, [fetchAction, fetchFunction, searchFilter]);
 
   return (
     <Table
       sortDirections={["ascend"]}
-      pagination={pagination && {
-        total: pagination.total,
-        pageSize: pagination.pageSize,
-        current: pagination.current,
-        onChange: (page) => {
-          handlePagination(page);
-        },
-      }}
+      pagination={
+        pagination && {
+          total: pagination.total * pagination.pageSize,
+          pageSize: pagination.pageSize,
+          current: pagination.current,
+          onChange: (page) => {
+            handlePagination(page);
+          },
+        }
+      }
       size="large"
       loading={loading}
       columns={columns}
