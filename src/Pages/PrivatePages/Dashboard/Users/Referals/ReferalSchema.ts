@@ -11,4 +11,5 @@ export const ViewAgentSchema = yup.object().shape({
   country: yup.mixed().required("Select a country"),
   state: yup.mixed().required("Select a state"),
   lga: yup.mixed().required("Select an Lga"),
+  agentCode: yup.string().optional(),
 });
