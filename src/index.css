@@ -16,7 +16,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
-
 }
 
 code {
@@ -155,4 +154,9 @@ button,
   min-width: 200px;
   cursor: pointer;
   text-decoration: none;
+}
+
+#react-select-33-listbox {
+  /* display: flex !important; */
+  /* flex-direction: column !important; */
 }

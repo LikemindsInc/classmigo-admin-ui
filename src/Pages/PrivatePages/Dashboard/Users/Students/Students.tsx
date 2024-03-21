@@ -28,8 +28,9 @@ import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
 import { toast } from "react-toastify";
 import { debounce } from "lodash";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
+import ModifyStudentSubscription from "./Components/ModifyStudentSubscribtion";
 
-interface DataType {
+export interface Student {
   key: string;
   name: string;
   username: string;
@@ -46,8 +47,9 @@ interface DataType {
 const Students = () => {
   //drawer handler
   const { openDrawer, setOpenDrawer } = useContext(DrawerContext);
+  const [subscriptionModal, setOpenSubscriptionModal] = useState(false);
   const [student, setStudent] = useState<any>([]);
-  const [user, setUser] = useState<DataType | null>(null);
+  const [user, setUser] = useState<Student | null>(null);
   const [userId, setUserId] = useState<any>(null);
   const [isActive, setIsActive] = useState(user?.isActive);
   const [openModal, setOpenModal] = useState(false);
@@ -66,6 +68,10 @@ const Students = () => {
     );
   };
   const { control, setValue } = useForm();
+
+  const handleOnModifyStudentSubscriptionComplete = () => {
+    setOpenDrawer(false);
+  };
 
   //util functions
 
@@ -283,13 +289,13 @@ const Students = () => {
     fontWeight: 700,
   };
 
-  const columns: ColumnsType<DataType> = [
+  const columns: ColumnsType<Student> = [
     {
       title: "NAME",
       dataIndex: "name",
       key: "name",
       ellipsis: true,
-      render: (name: string, record: DataType) => (
+      render: (name: string, record: Student) => (
         <UserDetails image={record.image} name={name} />
       ),
     },
@@ -381,7 +387,7 @@ const Students = () => {
     return updatedColumn;
   });
 
-  const handleRowClick = (data: DataType) => {
+  const handleRowClick = (data: Student) => {
     setUser(data);
     setUserId(data?.key);
     setIsActive(data?.isActive);
@@ -513,12 +519,13 @@ const Students = () => {
         onClose={() => setOpenDrawer(false)}
         open={openDrawer}
         closeIcon={false}
-        width={window.innerWidth < 768 ? "80%" : "25%"}
+        width={window.innerWidth < 768 ? "80%" : "45%"}
       >
         <DrawerContentContainer>
           {/* <CancelContainer>
             <CancelIcon />
           </CancelContainer> */}
+
           <UserInfo>
             <Avatar
               sx={{
@@ -590,6 +597,19 @@ const Students = () => {
               )}
             </ParentContainer>
           </Details>
+
+          <br />
+          <br />
+
+          <h4>Award Subscription</h4>
+
+          <ModifyStudentSubscription
+            student={user}
+            onComplete={handleOnModifyStudentSubscriptionComplete}
+          />
+
+          <br />
+          <br />
         </DrawerContentContainer>
       </Drawer>
 
