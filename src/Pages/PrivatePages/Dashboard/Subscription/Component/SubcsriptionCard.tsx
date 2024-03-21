@@ -4,12 +4,17 @@ import { SwitchElement } from "../../../../../Ui_elements/Switch/Switch";
 import { ButtonElement } from "../../../../../Ui_elements";
 import { CalculateDiscount } from "../../../../../utils/utilFns";
 import { useApiDelete } from "../../../../../custom-hooks";
-import { deleteSubscription, toggleSubscription } from "../../../../../Urls";
+import {
+  deleteSubscription,
+  toggleIsPublic,
+  toggleSubscription,
+} from "../../../../../Urls";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { ModalContext } from "../../../../../Contexts/Contexts";
 import { CenteredDialog } from "../../../../../Ui_elements/Modal/Modal";
 import { useNavigate } from "react-router-dom";
+import { Row } from "antd";
 
 interface Props {
   subName: string;
@@ -19,6 +24,7 @@ interface Props {
   planName: string;
   id: string;
   item: any;
+  isPublic: boolean;
 }
 export const SubscriptionCard = ({
   subName,
@@ -28,6 +34,7 @@ export const SubscriptionCard = ({
   planName,
   id,
   item,
+  isPublic,
 }: Props) => {
   const [active, setActive] = useState(isActive);
   const [open, setOpen] = useState(false);
@@ -89,8 +96,16 @@ export const SubscriptionCard = ({
     const request: any = {
       id: id,
       isActive: !active,
-    }
+    };
     activateToggleActive(request);
+  };
+
+  const handleChangeVisibility = () => {
+    const request: any = {
+      id: id,
+      isPublic: !isPublic,
+    };
+    changeSubscriptionVisibility(request);
   };
 
   const { mutate: deleteSub, isLoading } = useApiDelete(
@@ -107,6 +122,13 @@ export const SubscriptionCard = ({
     ["subscription"]
   );
 
+  const { mutate: changeSubscriptionVisibility } = useApiDelete(
+    (_: any) => toggleIsPublic(_, id),
+    onSuccessToggle,
+    onErrorToggle,
+    ["change-visibility", "subscription"]
+  );
+
   const handleDelete = () => {
     deleteSub();
     setOpen(false);
@@ -119,13 +141,22 @@ export const SubscriptionCard = ({
     <Container>
       <Header>
         <h5>{subName}</h5>
-        <div>
-          <p>{active ? "Active" : "Disabled"}</p>
-          <SwitchElement
-            activeState={active}
-            handleChange={handleToggleActive}
-          />
-        </div>
+        <Row>
+          <div>
+            <p>{active ? "Active" : "Disabled"}</p>
+            <SwitchElement
+              activeState={active}
+              handleChange={handleToggleActive}
+            />
+          </div>
+          <div>
+            <p>{"Is Public"}</p>
+            <SwitchElement
+              activeState={isPublic}
+              handleChange={handleChangeVisibility}
+            />
+          </div>
+        </Row>
       </Header>
       <Details>
         <PlanContainer>

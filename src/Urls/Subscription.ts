@@ -32,6 +32,14 @@ export const toggleSubscription = (data: any, id: any) => {
   });
 };
 
+export const toggleIsPublic = (data: any, id: any) => {
+  return request({
+    url: `${BASE_URL}/subscription/${id}/change-visibility`,
+    method: "PUT",
+    data: data,
+  });
+};
+
 export const updateSubscription = (data: any, id: any) => {
   return request({
     url: `${BASE_URL}/subscription/${id}`,
