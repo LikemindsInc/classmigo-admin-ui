@@ -134,6 +134,7 @@ export const ViewAgent = () => {
     setValue("country", null as any);
     setValue("state", null as any);
     setValue("lga", null as any);
+    setValue("agentCode", "");
     // reset()
   };
   const onError = (e: any) => {
@@ -146,7 +147,6 @@ export const ViewAgent = () => {
       draggable: true,
       theme: "light",
     });
-
   };
 
   const { mutate: createAgents, isLoading: isCreatingAgent } = useApiPost(
@@ -164,6 +164,7 @@ export const ViewAgent = () => {
       state: data?.state?.label,
       lga: data?.lga?.label,
       email: data?.email,
+      agentCode: data.agentCode,
     };
     createAgents(requestBody);
   };
@@ -202,6 +203,15 @@ export const ViewAgent = () => {
           label="Email"
           id="email"
           placeholder="Enter email"
+          register={register}
+          error={errors}
+        />
+      </InputHolder>
+      <InputHolder>
+        <InputElement
+          label="Agent Code (Optional)"
+          id="agentCode"
+          placeholder="Agent Code"
           register={register}
           error={errors}
         />

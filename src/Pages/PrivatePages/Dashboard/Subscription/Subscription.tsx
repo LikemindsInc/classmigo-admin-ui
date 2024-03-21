@@ -37,6 +37,7 @@ const Subscription = () => {
           <SubscriptionCard
             subName={item?.friendlyName}
             isActive={item?.isActive}
+            isPublic={item.isPublic}
             price={item?.price}
             discount={item?.discountedPrice}
             planName={item?.label}

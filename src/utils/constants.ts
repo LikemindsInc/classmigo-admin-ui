@@ -1,6 +1,6 @@
 export const BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
-  "https://classmigo.herokuapp.com/api/v1/";
+  "https://classmigo-prod.herokuapp.com/api/v1/";
 export const ADMIN_BASE_URL = "admin";
 
 export const APP_ROLES = ["MANAGER", "TEACHER", "ACCOUNTANT", "SYSTEM_ADMIN"];
@@ -62,6 +62,8 @@ export const PAYMENT_DATES = [
   },
 ];
 
-export const ZEGO_CHAR = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP'
+export const ZEGO_CHAR =
+  "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP";
 
-export const UNIVERSAL_KEY = "JR8xhgZnhpUo6BPv1VLRB78oQaxplTmct_gxOiNN4Jm1lGSegfcc-RnfYUXmB7r561Y"
+export const UNIVERSAL_KEY =
+  "JR8xhgZnhpUo6BPv1VLRB78oQaxplTmct_gxOiNN4Jm1lGSegfcc-RnfYUXmB7r561Y";

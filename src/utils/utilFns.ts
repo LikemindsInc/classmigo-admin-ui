@@ -89,6 +89,29 @@ export const formatOptions = (
     : [];
 };
 
+export const formatSubscriptionOptions = (
+  items: any[],
+  label: string | string[],
+  value: string | string[]
+) => {
+  return items?.length > 0
+    ? items.map((sessionData) => {
+        const newObj: Record<string, any> = {};
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            newObj[item] = sessionData[item];
+          });
+        }
+        return {
+          value: Array.isArray(value) ? newObj : sessionData._id,
+          label: Array.isArray(label)
+            ? `${sessionData[label[0]]} (${sessionData[label[1]]})`
+            : sessionData.friendlyName,
+        };
+      })
+    : [];
+};
+
 export const formatDate = (date: Date): string => {
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -278,6 +301,4 @@ export const downloadGeneralTemplate = async () => {
   } finally {
     document.body.removeChild(element);
   }
-}
-
-
+};

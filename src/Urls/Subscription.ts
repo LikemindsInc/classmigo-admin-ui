@@ -24,9 +24,17 @@ export const deleteSubscription = (id: any) => {
   });
 };
 
-export const toggleSubscription = (data:any, id: any) => {
+export const toggleSubscription = (data: any, id: any) => {
   return request({
     url: `${BASE_URL}/subscription/${id}/toggle-active`,
+    method: "PUT",
+    data: data,
+  });
+};
+
+export const toggleIsPublic = (data: any, id: any) => {
+  return request({
+    url: `${BASE_URL}/subscription/${id}/change-visibility`,
     method: "PUT",
     data: data,
   });
@@ -44,5 +52,13 @@ export const getSubscriptionAnalytics = (filter: any) => {
   return request({
     url: `${BASE_URL}/subscription/analytics?${generateUrlParams(filter)}`,
     method: "GET",
+  });
+};
+
+export const awardSubscription = (data: any) => {
+  return request({
+    url: `admin/student/subscribe`,
+    method: "POST",
+    data,
   });
 };
